@@ -13,15 +13,16 @@ import {
   Backdrop
 } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 export default function Login() {
   const [formData, setFormData] = useState({
     fullName: '',
     password: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -31,10 +32,13 @@ export default function Login() {
       [e.target.name]: e.target.value
     });
   };
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setIsSubmitting(true);
     setLoading(true);
 
     try {
@@ -42,20 +46,17 @@ export default function Login() {
         throw new Error('Please fill in all fields');
       }
 
-      const response = await login(formData.fullName, formData.password);
-      if (response?.user) {
-        navigate(response.user.role === 'admin' ? '/admin' : '/app');
-      } else {
-        throw new Error('Invalid response from server');
-      }
+      await login(formData.fullName, formData.password);
+      navigate('/app/dashboard');
     } catch (err) {
-      console.error('Login error:', err);
-      setError(err.response?.data?.message || err.message || 'Login failed');
+      setError(err.response?.data?.message || 'Invalid username or password');
+      // Clear password field on error
+      setFormData(prev => ({ ...prev, password: '' }));
     } finally {
-      setIsSubmitting(false);
       setLoading(false);
     }
   };
+
   return (
     <Container maxWidth="sm">
       <Backdrop
@@ -155,12 +156,24 @@ export default function Login() {
               fullWidth
               name="password"
               label="Password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               id="password"
               autoComplete="current-password"
               value={formData.password}
               onChange={handleChange}
-              variant="outlined"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={togglePasswordVisibility}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
             <Button
               type="submit"
