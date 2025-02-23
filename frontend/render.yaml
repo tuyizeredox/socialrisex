@@ -18,20 +18,11 @@ services:
         name: Content-Type
         value: image/png
     routes:
-      - type: rewrite
-        source: /(.*)
+      - type: redirect
+        source: /
         destination: /index.html
       - type: rewrite
-        source: /register
-        destination: /index.html
-      - type: rewrite
-        source: /login
-        destination: /index.html
-      - type: rewrite
-        source: /app/*
-        destination: /index.html
-      - type: rewrite
-        source: /admin/*
+        source: .*
         destination: /index.html
     envVars:
       - key: REACT_APP_API_URL
