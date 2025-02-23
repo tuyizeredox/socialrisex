@@ -99,3 +99,22 @@ const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
 });
+// Add compression middleware
+import compression from 'compression';
+
+// Add before routes
+app.use(compression());
+
+// Add response caching
+app.use((req, res, next) => {
+  if (req.method === 'GET') {
+    res.set('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
+  }
+  next();
+});
+
+// Enable keep-alive connections
+app.use((req, res, next) => {
+  res.set('Connection', 'keep-alive');
+  next();
+});

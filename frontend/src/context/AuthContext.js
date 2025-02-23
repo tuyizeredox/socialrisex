@@ -70,8 +70,8 @@ export const AuthProvider = ({ children }) => {
       throw new Error(message);
     }
   };
-
-  const login = async (fullName, password) => {
+  // Add memoization for callbacks
+  const login = useCallback(async (fullName, password) => {
     try {
       const res = await api.post('/auth/login', { fullName, password });
       
@@ -86,75 +86,22 @@ export const AuthProvider = ({ children }) => {
       showNotification(message, 'error');
       throw new Error(message);
     }
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
-    showNotification('Logged out successfully', 'success');
-  };
-
-  const updateProfile = async (userData) => {
-    try {
-      const res = await api.put('/users/profile', userData);
-      setUser(res.data);
-      showNotification('Profile updated successfully', 'success');
-      return res.data;
-    } catch (error) {
-      const message = error.response?.data?.error || 'Profile update failed';
-      showNotification(message, 'error');
-      throw new Error(message);
-    }
-  };
-
-  const verifyEmail = async (token) => {
-    try {
-      const res = await api.post('/auth/verify-email', { token });
-      showNotification('Email verified successfully', 'success');
-      return res.data;
-    } catch (error) {
-      const message = error.response?.data?.error || 'Email verification failed';
-      showNotification(message, 'error');
-      throw new Error(message);
-    }
-  };
-
-  const forgotPassword = async (email) => {
-    try {
-      await api.post('/auth/forgot-password', { email });
-      showNotification('Password reset email sent', 'success');
-    } catch (error) {
-      const message = error.response?.data?.error || 'Failed to send reset email';
-      showNotification(message, 'error');
-      throw new Error(message);
-    }
-  };
-
-  const resetPassword = async (token, password) => {
-    try {
-      await api.post('/auth/reset-password', { token, password });
-      showNotification('Password reset successful', 'success');
-    } catch (error) {
-      const message = error.response?.data?.error || 'Password reset failed';
-      showNotification(message, 'error');
-      throw new Error(message);
-    }
-  };
-
+  }, [showNotification]);
+  // Add useMemo for context value
+  const contextValue = useMemo(() => ({
+    user,
+    loading,
+    register,
+    login,
+    logout,
+    updateProfile,
+    verifyEmail,
+    forgotPassword,
+    resetPassword
+  }), [user, loading, register, login, logout, updateProfile, verifyEmail, forgotPassword, resetPassword]);
+  
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        register,
-        login,
-        logout,
-        updateProfile,
-        verifyEmail,
-        forgotPassword,
-        resetPassword
-      }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {!loading && children}
     </AuthContext.Provider>
   );
