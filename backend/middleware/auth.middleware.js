@@ -16,12 +16,17 @@ export const protect = async (req, res, next) => {
     
     // Modified query to handle projection properly
     const user = await User.findById(decoded.id)
-      .select('fullName email role isActive referralCode referralCount earnings')
-      .lean();
+      .select('+fullName +email +role +isActive +referralCode +referralCount +earnings +points +mobileNumber')
+      .lean()
+      .exec();
 
     if (!user) {
       throw new ErrorResponse('User not found', 404);
     }
+
+    // Remove sensitive fields
+    delete user.__v;
+    delete user.password;
 
     req.user = user;
     next();
