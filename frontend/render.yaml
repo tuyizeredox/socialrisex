@@ -5,24 +5,26 @@ services:
     buildCommand: npm ci && npm run build
     staticPublishPath: ./build
     nodeVersion: 16.x
-    buildFilter:
-      paths:
-        - src/**/*.js
-        - src/**/*.jsx
-        - src/**/*.css
-        - public/**/*
-        - package*.json
     headers:
       - path: /*
         name: Cache-Control
         value: no-cache
+      - path: /*.js
+        name: Content-Type
+        value: application/javascript
+      - path: /*.json
+        name: Content-Type
+        value: application/json
+      - path: /*.png
+        name: Content-Type
+        value: image/png
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
     envVars:
       - key: REACT_APP_API_URL
-        sync: false
+        value: https://socialrisexbackend.onrender.com/api
       - key: NODE_ENV
         value: production
       - key: CI
