@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import api from '../api';
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -42,14 +43,20 @@ export default function Login() {
     e.preventDefault();
     setError('');
     setLoading(true);
-
+  
     try {
       if (!formData.fullName || !formData.password) {
         throw new Error('Please fill in all fields');
       }
-
+  
       await login(formData.fullName, formData.password);
-      navigate('/app/dashboard');
+      // Redirect based on user role
+      const user = await api.get('/auth/me');
+      if (user.data.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/app/dashboard');
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid username or password');
       setFormData(prev => ({ ...prev, password: '' }));
@@ -57,7 +64,6 @@ export default function Login() {
       setLoading(false);
     }
   };
-
   return (
     <Container maxWidth="sm">
       <Backdrop

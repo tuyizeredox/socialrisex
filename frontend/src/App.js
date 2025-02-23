@@ -69,6 +69,9 @@ function App() {
         <Route path="videos" element={<VideoManagement />} />
         <Route path="withdrawals" element={<WithdrawalManagement />} />
       </Route>
+
+      {/* Catch all route - redirect to login for unknown routes */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }
