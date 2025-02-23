@@ -2,6 +2,7 @@ import User from '../models/User.js';
 import ErrorResponse from '../utils/errorResponse.js';
 import sendEmail from '../utils/sendEmail.js';
 import crypto from 'crypto';
+import bcrypt from 'bcryptjs'; // Add this import at the top with other imports
 
 export const register = async (req, res, next) => {
   try {
@@ -54,23 +55,20 @@ export const login = async (req, res, next) => {
 
     // Modified query to handle projection properly
     const user = await User.findOne({ fullName })
-      .select('+password +fullName +email +role +isActive +referralCode +referralCount +earnings +points +mobileNumber')
-      .exec();
+      .select('+password +fullName +email +role +isActive +referralCode +referralCount +earnings +points +mobileNumber');
     
     if (!user) {
       throw new ErrorResponse('Invalid credentials', 401);
     }
 
-    // Compare password
-    const isMatch = await bcrypt.compare(password, user.password);
+    // Use the matchPassword method from the User model instead of direct bcrypt compare
+    const isMatch = await user.matchPassword(password);
     if (!isMatch) {
       throw new ErrorResponse('Invalid credentials', 401);
     }
 
-    // Generate token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '30d'
-    });
+    // Generate token using the model method
+    const token = user.getSignedJwtToken();
 
     // Convert to plain object and remove sensitive data
     const userObject = user.toObject();
