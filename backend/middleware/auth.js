@@ -14,18 +14,27 @@ export const protect = async (req, res, next) => {
       return next(new ErrorResponse('Not authorized to access this route', 401));
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      
+      // Optimize query by selecting only needed fields
+      const user = await User.findById(decoded.id)
+        .select('fullName email role isActive referralCode referralCount earnings points mobileNumber')
+        .lean()
+        .cache(300); // Cache for 5 minutes
 
-    if (!user) {
-      return next(new ErrorResponse('User not found', 404));
+      if (!user) {
+        return next(new ErrorResponse('User not found', 404));
+      }
+
+      req.user = user;
+      next();
+    } catch (error) {
+      return next(new ErrorResponse('Invalid token', 401));
     }
-
-    req.user = user;
-    next();
   } catch (error) {
-    next(new ErrorResponse('Not authorized to access this route', 401));
+    next(new ErrorResponse('Authentication error', 401));
   }
 };
 
-export default protect; 
+export default protect;

@@ -1,61 +1,49 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://socialrisexbackend.onrender.com/api',
+  baseURL: process.env.REACT_APP_API_URL,
+  timeout: 10000, // 10 second timeout
   headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  },
-  withCredentials: true,
-  timeout: 30000 // 30 seconds timeout
+    'Content-Type': 'application/json'
+  }
 });
 
-// Add request interceptor with caching
+// Add request interceptor
 api.interceptors.request.use(
   (config) => {
-    // Add timestamp for performance monitoring
-    config.metadata = { startTime: new Date() };
-    
-    // Add token if available
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-
-    // Add cache control for GET requests
-    if (config.method === 'get') {
-      config.headers['Cache-Control'] = 'max-age=900'; // 15 minutes
-    }
-
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    return Promise.reject(error);
+  }
 );
 
-// Add response interceptor with performance monitoring
+// Add response interceptor
 api.interceptors.response.use(
-  (response) => {
-    // Log request duration
-    const duration = new Date() - response.config.metadata.startTime;
-    console.log(`Request to ${response.config.url} took ${duration}ms`);
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
 
-    // Cache successful GET responses in localStorage
-    if (response.config.method === 'get') {
-      const cacheKey = `api_cache_${response.config.url}`;
-      const cacheData = {
-        data: response.data,
-        timestamp: new Date().getTime()
-      };
-      localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+    // If the error is due to timeout or network issues and we haven't retried yet
+    if ((error.code === 'ECONNABORTED' || !error.response) && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        return await api(originalRequest);
+      } catch (retryError) {
+        return Promise.reject(retryError);
+      }
     }
 
-    return response;
-  },
-  (error) => {
-    if (error.response?.status === 401) {
+    // Handle token expiration
+    if (error.response?.status === 401 && !originalRequest._retry) {
       localStorage.removeItem('token');
       window.location.href = '/login';
     }
+
     return Promise.reject(error);
   }
 );

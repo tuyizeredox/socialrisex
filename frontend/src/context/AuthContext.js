@@ -17,18 +17,28 @@ export const AuthProvider = ({ children }) => {
       console.log(`${severity}: ${message}`);
     }
   }, [notification]);
-
   const loadUser = useCallback(async () => {
     try {
-      const response = await api.get('/auth/me');
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
+      const response = await api.get('/auth/me', {
+        timeout: 5000 // Set timeout to 5 seconds
+      });
+      
       setUser(response.data);
     } catch (error) {
-      console.error('Load user error:', error);
+      console.error('Load user error:', error?.response?.data?.message || error.message);
       localStorage.removeItem('token');
       setUser(null);
+    } finally {
+      setLoading(false);
     }
   }, []);
-
   useEffect(() => {
     const initializeAuth = async () => {
       try {
