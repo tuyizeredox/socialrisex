@@ -6,9 +6,6 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 // Route imports
 import apiRoutes from './routes/api.js';
 
@@ -65,12 +62,23 @@ app.use('/api', apiRoutes); // Keep existing API routes
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
   // Set static folder
+  // Fix ESM __filename and __dirname
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  
+  // Rest of your server code
+  const app = express();
+  
+  // Serve static files from the React app
   app.use(express.static(path.join(__dirname, '../frontend/build')));
-
+  
   // Handle React routing, return all requests to React app
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
   });
+  
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
 
 // Error handling middleware
