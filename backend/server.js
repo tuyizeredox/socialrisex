@@ -5,7 +5,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-
+import compression from 'compression';
 // Route imports
 import apiRoutes from './routes/api.js';
 
