@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import api from '../api';
+import api from '../utils/api'; // Update this line - change from '../api' to '../utils/api'
 
 export default function Login() {
   const [formData, setFormData] = useState({
