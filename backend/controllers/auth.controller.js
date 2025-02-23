@@ -48,30 +48,35 @@ export const login = async (req, res, next) => {
   try {
     const { fullName, password } = req.body;
 
-    // Validate inputs
     if (!fullName || !password) {
       throw new ErrorResponse('Please provide username and password', 400);
     }
 
-    // Find user by fullName and explicitly select password
-    const user = await User.findOne({ fullName }).select('+password');
+    // Find user by fullName and select only necessary fields
+    const user = await User.findOne({ fullName })
+      .select('+password -__v')
+      .lean()
+      .exec();
     
     if (!user) {
       throw new ErrorResponse('Invalid credentials', 401);
     }
 
     // Compare password
-    const isMatch = await user.matchPassword(password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       throw new ErrorResponse('Invalid credentials', 401);
     }
 
     // Generate token
-    const token = user.getSignedJwtToken();
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: '30d'
+    });
 
-    // Remove password from response
-    user.password = undefined;
+    // Remove sensitive data
+    delete user.password;
 
+    // Send response
     res.status(200).json({
       success: true,
       token,

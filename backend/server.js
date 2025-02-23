@@ -105,9 +105,29 @@ app.listen(PORT, () => {
 });
 // Add compression middleware
 import compression from 'compression';
-
-// Add before routes
+import cache from 'memory-cache';
+i
+// Add compression middleware
 app.use(compression());
+
+// Add caching middleware
+app.use((req, res, next) => {
+  const key = `__express__${req.originalUrl}` || req.url;
+  const cachedBody = cache.get(key);
+
+  if (cachedBody && req.method === 'GET') {
+    return res.send(cachedBody);
+  } else {
+    res.sendResponse = res.send;
+    res.send = (body) => {
+      if (req.method === 'GET') {
+        cache.put(key, body, 60000); // Cache for 1 minute
+      }
+      res.sendResponse(body);
+    };
+    next();
+  }
+});
 
 // Add response caching
 app.use((req, res, next) => {

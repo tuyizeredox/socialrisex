@@ -7,33 +7,32 @@ const api = axios.create({
     'Accept': 'application/json'
   },
   withCredentials: true,
-  timeout: 15000
+  timeout: 30000, // Increase timeout to 30 seconds
+  // Enable request caching
+  adapter: require('axios-cache-adapter').cache({
+    maxAge: 15 * 60 * 1000 // Cache for 15 minutes
+  })
 });
 
-// Add request interceptor
+// Add request interceptor for performance monitoring
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    // Remove cache-control header from non-GET requests
-    if (config.method !== 'get') {
-      delete config.headers['Cache-Control'];
-    }
+    config.metadata = { startTime: new Date() };
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    return Promise.reject(error);
+  }
 );
 
-// Add response interceptor
+// Add response interceptor for performance monitoring
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const duration = new Date() - response.config.metadata.startTime;
+    console.log(`Request to ${response.config.url} took ${duration}ms`);
+    return response;
+  },
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-    }
     return Promise.reject(error);
   }
 );

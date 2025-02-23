@@ -8,7 +8,9 @@ import {
   Button,
   Alert,
   Link,
-  Paper
+  Paper,
+  CircularProgress,
+  Backdrop
 } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
 
@@ -19,6 +21,7 @@ export default function Login() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -28,10 +31,10 @@ export default function Login() {
       [e.target.name]: e.target.value
     });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setIsSubmitting(true);
     setLoading(true);
 
     try {
@@ -49,12 +52,19 @@ export default function Login() {
       console.error('Login error:', err);
       setError(err.response?.data?.message || err.message || 'Login failed');
     } finally {
+      setIsSubmitting(false);
       setLoading(false);
     }
   };
-
   return (
     <Container maxWidth="sm">
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={isSubmitting}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+      
       <Box
         sx={{
           minHeight: '100vh',
@@ -156,12 +166,14 @@ export default function Login() {
               type="submit"
               fullWidth
               variant="contained"
+              disabled={loading}
               sx={{
                 mt: 3,
                 mb: 2,
                 py: 1.5,
                 fontSize: '1.1rem',
                 fontWeight: 600,
+                position: 'relative',
                 transition: 'all 0.3s ease-in-out',
                 background: theme =>
                   `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
@@ -170,9 +182,22 @@ export default function Login() {
                   boxShadow: 6
                 }
               }}
-              disabled={loading}
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {loading ? (
+                <>
+                  <CircularProgress
+                    size={24}
+                    sx={{
+                      position: 'absolute',
+                      left: '50%',
+                      marginLeft: '-12px'
+                    }}
+                  />
+                  <span style={{ visibility: 'hidden' }}>Login</span>
+                </>
+              ) : (
+                'Login'
+              )}
             </Button>
             <Box
               sx={{
