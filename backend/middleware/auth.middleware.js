@@ -14,8 +14,11 @@ export const protect = async (req, res, next) => {
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
-    // Get user from token
-    const user = await User.findById(decoded.id).select('-password');
+    // Modified query to handle projection properly
+    const user = await User.findById(decoded.id)
+      .select('fullName email role isActive referralCode referralCount earnings')
+      .lean();
+
     if (!user) {
       throw new ErrorResponse('User not found', 404);
     }
@@ -41,4 +44,4 @@ export const activeUser = async (req, res, next) => {
   } else {
     next(new ErrorResponse('Account not activated', 403));
   }
-}; 
+};
