@@ -17,11 +17,9 @@ export const protect = async (req, res, next) => {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       
-      // Optimize query by selecting only needed fields
       const user = await User.findById(decoded.id)
-        .select('fullName email role isActive referralCode referralCount earnings points mobileNumber')
-        .lean()
-        .cache(300); // Cache for 5 minutes
+        .select('-password -__v')
+        .lean();
 
       if (!user) {
         return next(new ErrorResponse('User not found', 404));

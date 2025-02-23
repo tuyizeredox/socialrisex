@@ -29,36 +29,33 @@ export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
   
     try {
-      if (!formData.fullName || !formData.password) {
+      if (!formData.fullName.trim() || !formData.password.trim()) {
         throw new Error('Please fill in all fields');
       }
-  
-      await login(formData.fullName, formData.password);
-      // Redirect based on user role
-      const user = await api.get('/auth/me');
-      if (user.data.role === 'admin') {
+      // Trim whitespace from credentials
+      const response = await login(formData.fullName.trim(), formData.password.trim());
+      
+      if (!response || !response.token) {
+        throw new Error('Login failed - Invalid response from server');
+      }
+
+      // Get user details
+      const userResponse = await api.get('/auth/me');
+      
+      if (userResponse.data.role === 'admin') {
         navigate('/admin');
       } else {
         navigate('/app/dashboard');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid username or password');
+      console.error('Login error:', err);
+      setError(err.message || 'Invalid username or password');
       setFormData(prev => ({ ...prev, password: '' }));
     } finally {
       setLoading(false);

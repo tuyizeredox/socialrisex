@@ -49,28 +49,30 @@ export const login = async (req, res, next) => {
   try {
     const { fullName, password } = req.body;
 
+    // Validation
     if (!fullName || !password) {
       throw new ErrorResponse('Please provide username and password', 400);
     }
 
-    // Modified query to handle projection properly
-    const user = await User.findOne({ fullName })
-      .select('+password +fullName +email +role +isActive +referralCode +referralCount +earnings +points +mobileNumber');
-    
+    // Find user - case insensitive search for fullName
+    const user = await User.findOne({
+      fullName: { $regex: new RegExp(`^${fullName}$`, 'i') }
+    }).select('+password +fullName +email +role +isActive +referralCode +referralCount +earnings +points +mobileNumber');
+
     if (!user) {
       throw new ErrorResponse('Invalid credentials', 401);
     }
 
-    // Use the matchPassword method from the User model instead of direct bcrypt compare
+    // Check password
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
       throw new ErrorResponse('Invalid credentials', 401);
     }
 
-    // Generate token using the model method
+    // Generate token
     const token = user.getSignedJwtToken();
 
-    // Convert to plain object and remove sensitive data
+    // Remove sensitive data
     const userObject = user.toObject();
     delete userObject.password;
     delete userObject.__v;
