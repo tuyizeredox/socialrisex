@@ -62,7 +62,7 @@ export default function Login() {
     <Container maxWidth="sm">
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={loading} {/* Changed from isSubmitting to loading */}
+        open={loading}
       >
         <CircularProgress color="inherit" />
       </Backdrop>
