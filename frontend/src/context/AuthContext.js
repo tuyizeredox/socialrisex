@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, useEffect } from 'react';
-import jwt_decode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode'; // Update this line
 import api from '../utils/api';
 import { useNotification } from './NotificationContext';
 
@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const token = localStorage.getItem('token');
         if (token) {
-          const decoded = jwtDecode(token);  // Update this line
+          const decoded = jwtDecode(token); // This should now work
           if (decoded.exp * 1000 < Date.now()) {
             localStorage.removeItem('token');
             setUser(null);
