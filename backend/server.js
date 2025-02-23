@@ -104,7 +104,7 @@ app.listen(PORT, () => {
   console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
 });
 // Add compression middleware
-import compression from 'compression';
+
 import cache from 'memory-cache';
 i
 // Add compression middleware
