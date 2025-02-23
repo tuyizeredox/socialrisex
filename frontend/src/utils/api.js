@@ -3,9 +3,10 @@ import axios from 'axios';
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL || 'https://socialrisexbackend.onrender.com/api',
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
   },
-  withCredentials: true // Add this line
+  withCredentials: true
 });
 
 // Request interceptor
