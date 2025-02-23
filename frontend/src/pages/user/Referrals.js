@@ -17,7 +17,8 @@ import {
   CircularProgress,
   Alert,
   IconButton,
-  Tooltip
+  Tooltip,
+  useTheme
 } from '@mui/material';
 import {
   ContentCopy,
@@ -33,6 +34,7 @@ import PageHeader from '../../components/common/PageHeader';
 import StatCard from '../../components/common/StatCard';
 
 export default function Referrals() {
+  const theme = useTheme();
   const [referralData, setReferralData] = useState(null);
   const [referralInfo, setReferralInfo] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -64,7 +66,9 @@ export default function Referrals() {
 
   const copyReferralLink = () => {
     if (referralInfo?.referralLink) {
-      navigator.clipboard.writeText(referralInfo.referralLink);
+      // Clean up the referral link by removing any double slashes except for https://
+      const cleanLink = referralInfo.referralLink.replace(/([^:]\/)\/+/g, "$1");
+      navigator.clipboard.writeText(cleanLink);
       showNotification('Referral link copied to clipboard!', 'success');
     }
   };
@@ -132,7 +136,7 @@ export default function Referrals() {
             <Typography 
               variant="body2" 
               sx={{ 
-                bgcolor: 'grey.100', 
+                bgcolor: theme.palette.mode === 'dark' ? 'grey.800' : 'grey.100',
                 p: 2, 
                 borderRadius: 1,
                 flexGrow: 1,
@@ -140,7 +144,7 @@ export default function Referrals() {
                 textOverflow: 'ellipsis'
               }}
             >
-              {referralInfo?.referralLink}
+              {referralInfo?.referralLink?.replace(/([^:]\/)\/+/g, "$1")}
             </Typography>
             <Tooltip title="Copy link">
               <IconButton onClick={copyReferralLink} color="primary">
@@ -198,4 +202,4 @@ export default function Referrals() {
       </TableContainer>
     </Container>
   );
-} 
+}
