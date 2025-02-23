@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "buildCommand": "CI=false GENERATE_SOURCEMAP=false npm run build",
-  "outputDirectory": "build",
   "framework": "create-react-app",
+  "buildCommand": "npm install -g npm@11.1.0 && CI=false GENERATE_SOURCEMAP=false npm run build",
+  "installCommand": "npm install",
+  "outputDirectory": "build",
+  "devCommand": "npm run start",
   "routes": [
     {
       "src": "/static/(.*)",
