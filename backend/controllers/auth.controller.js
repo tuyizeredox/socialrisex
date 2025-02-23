@@ -52,10 +52,9 @@ export const login = async (req, res, next) => {
       throw new ErrorResponse('Please provide username and password', 400);
     }
 
-    // Find user by fullName and select only necessary fields
+    // Modified query to handle projection properly
     const user = await User.findOne({ fullName })
-      .select('+password -__v')
-      .lean()
+      .select('+password +fullName +email +role +isActive +referralCode +referralCount +earnings +points +mobileNumber')
       .exec();
     
     if (!user) {
@@ -73,14 +72,16 @@ export const login = async (req, res, next) => {
       expiresIn: '30d'
     });
 
-    // Remove sensitive data
-    delete user.password;
+    // Convert to plain object and remove sensitive data
+    const userObject = user.toObject();
+    delete userObject.password;
+    delete userObject.__v;
 
     // Send response
     res.status(200).json({
       success: true,
       token,
-      user
+      user: userObject
     });
   } catch (error) {
     next(error);
