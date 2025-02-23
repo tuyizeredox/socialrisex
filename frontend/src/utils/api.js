@@ -1,10 +1,11 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'https://socialrisexbackend.onrender.com/api',
+  baseURL: 'https://socialrisexbackend.onrender.com/api',
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json'
+    'Accept': 'application/json',
+    'Access-Control-Allow-Origin': 'https://socialrisex.onrender.com'
   },
   withCredentials: true
 });
