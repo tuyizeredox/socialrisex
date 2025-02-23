@@ -10,7 +10,9 @@ import {
   Link,
   Paper,
   CircularProgress,
-  Backdrop
+  Backdrop,
+  InputAdornment,
+  IconButton
 } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
@@ -50,7 +52,6 @@ export default function Login() {
       navigate('/app/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid username or password');
-      // Clear password field on error
       setFormData(prev => ({ ...prev, password: '' }));
     } finally {
       setLoading(false);
@@ -61,7 +62,7 @@ export default function Login() {
     <Container maxWidth="sm">
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={isSubmitting}
+        open={loading} {/* Changed from isSubmitting to loading */}
       >
         <CircularProgress color="inherit" />
       </Backdrop>
