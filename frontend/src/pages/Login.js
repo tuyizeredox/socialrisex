@@ -35,10 +35,18 @@ export default function Login() {
     setLoading(true);
 
     try {
+      if (!formData.fullName || !formData.password) {
+        throw new Error('Please fill in all fields');
+      }
+
       const response = await login(formData.fullName, formData.password);
-      navigate(response.user.role === 'admin' ? '/admin' : '/app');
+      if (response && response.user) {
+        navigate(response.user.role === 'admin' ? '/admin' : '/app');
+      } else {
+        throw new Error('Invalid response from server');
+      }
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Login failed');
     } finally {
       setLoading(false);
     }

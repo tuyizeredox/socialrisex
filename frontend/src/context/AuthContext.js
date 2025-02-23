@@ -73,14 +73,17 @@ export const AuthProvider = ({ children }) => {
   const login = useCallback(async (fullName, password) => {
     try {
       const res = await api.post('/auth/login', { fullName, password });
-      if (res.data.token) {
-        localStorage.setItem('token', res.data.token);
-        setUser(res.data.user);
-        showNotification('Login successful!', 'success');
-        return res.data;
+      
+      if (!res.data || !res.data.token) {
+        throw new Error('Invalid response from server');
       }
+
+      localStorage.setItem('token', res.data.token);
+      setUser(res.data.user);
+      showNotification('Login successful!', 'success');
+      return res.data;
     } catch (error) {
-      const message = error.response?.data?.error || 'Login failed';
+      const message = error.response?.data?.message || error.message || 'Login failed';
       showNotification(message, 'error');
       throw new Error(message);
     }

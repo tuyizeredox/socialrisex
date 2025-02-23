@@ -48,24 +48,35 @@ export const login = async (req, res, next) => {
   try {
     const { fullName, password } = req.body;
 
-    // Validate email & password
+    // Validate inputs
     if (!fullName || !password) {
-      throw new ErrorResponse('Please provide user name and password', 400);
+      throw new ErrorResponse('Please provide username and password', 400);
     }
 
-    // Check for user
+    // Find user by fullName and explicitly select password
     const user = await User.findOne({ fullName }).select('+password');
+    
     if (!user) {
       throw new ErrorResponse('Invalid credentials', 401);
     }
 
-    // Check password
+    // Compare password
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
       throw new ErrorResponse('Invalid credentials', 401);
     }
 
-    sendTokenResponse(user, 200, res);
+    // Generate token
+    const token = user.getSignedJwtToken();
+
+    // Remove password from response
+    user.password = undefined;
+
+    res.status(200).json({
+      success: true,
+      token,
+      user
+    });
   } catch (error) {
     next(error);
   }

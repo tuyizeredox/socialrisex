@@ -1,8 +1,15 @@
 import api from './api';
 
-export const login = async (credentials) => {
-  const response = await api.post('/auth/login', credentials);
-  return response.data;
+export const login = async (fullName, password) => {
+  try {
+    const response = await api.post('/auth/login', { fullName, password });
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token);
+    }
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Login failed');
+  }
 };
 
 export const register = async (userData) => {
@@ -38,4 +45,4 @@ export const forgotPassword = async (email) => {
 export const resetPassword = async (token, password) => {
   const response = await api.post('/auth/reset-password', { token, password });
   return response.data;
-}; 
+};
