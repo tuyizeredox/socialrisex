@@ -116,5 +116,4 @@ userSchema.pre('save', function(next) {
 });
 
 const User = mongoose.model('User', userSchema);
-npm install mongoose-cache
 export default User;
