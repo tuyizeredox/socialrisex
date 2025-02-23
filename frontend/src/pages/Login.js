@@ -40,13 +40,14 @@ export default function Login() {
       }
 
       const response = await login(formData.fullName, formData.password);
-      if (response && response.user) {
+      if (response?.user) {
         navigate(response.user.role === 'admin' ? '/admin' : '/app');
       } else {
         throw new Error('Invalid response from server');
       }
     } catch (err) {
-      setError(err.message || 'Login failed');
+      console.error('Login error:', err);
+      setError(err.response?.data?.message || err.message || 'Login failed');
     } finally {
       setLoading(false);
     }

@@ -7,40 +7,35 @@ const api = axios.create({
     'Accept': 'application/json'
   },
   withCredentials: true,
-  timeout: 10000, // 10 second timeout
-  // Add caching headers
-  headers: {
-    'Cache-Control': 'max-age=3600',
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  }
+  timeout: 15000
 });
 
-// Add response caching
-const cache = new Map();
-
+// Add request interceptor
 api.interceptors.request.use(
-  async config => {
-    const cacheKey = `${config.method}:${config.url}`;
-    const cachedResponse = cache.get(cacheKey);
-    
-    if (cachedResponse && config.method === 'get') {
-      return Promise.resolve(cachedResponse);
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    // Remove cache-control header from non-GET requests
+    if (config.method !== 'get') {
+      delete config.headers['Cache-Control'];
     }
     return config;
   },
-  error => Promise.reject(error)
+  (error) => Promise.reject(error)
 );
 
+// Add response interceptor
 api.interceptors.response.use(
-  response => {
-    const cacheKey = `${response.config.method}:${response.config.url}`;
-    if (response.config.method === 'get') {
-      cache.set(cacheKey, response);
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
     }
-    return response;
-  },
-  error => Promise.reject(error)
+    return Promise.reject(error);
+  }
 );
 
 export default api;
