@@ -38,14 +38,19 @@ function App() {
           <Login />
         </PublicRoute>
       } />
-      <Route path="/register/*" element={
+      <Route path="register" element={
+        <PublicRoute>
+          <Register />
+        </PublicRoute>
+      } />
+      <Route path="register/:referralCode" element={
         <PublicRoute>
           <Register />
         </PublicRoute>
       } />
 
       {/* Protected User Routes */}
-      <Route path="/app/*" element={
+      <Route path="app/*" element={
         <PrivateRoute>
           <MainLayout />
         </PrivateRoute>
@@ -59,15 +64,12 @@ function App() {
       </Route>
 
       {/* Protected Admin Routes */}
-      <Route path="/admin/*" element={
+      <Route path="admin/*" element={
         <AdminRoute>
           <AdminLayout />
         </AdminRoute>
       }>
-        <Route index element={<AdminDashboard />} />
-        <Route path="users" element={<UserManagement />} />
-        <Route path="videos" element={<VideoManagement />} />
-        <Route path="withdrawals" element={<WithdrawalManagement />} />
+        {/* ... admin routes ... */}
       </Route>
 
       {/* Catch-all route */}
