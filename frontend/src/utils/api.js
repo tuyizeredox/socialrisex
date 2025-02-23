@@ -4,8 +4,7 @@ const api = axios.create({
   baseURL: 'https://socialrisexbackend.onrender.com/api',
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'Access-Control-Allow-Origin': 'https://socialrisex.onrender.com'
+    'Accept': 'application/json'
   },
   withCredentials: true
 });

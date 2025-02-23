@@ -47,8 +47,11 @@ const connectDB = async () => {
 connectDB();
 
 // Middleware
-app.use(express.json());
+// Move CORS middleware to the top, before other middleware
 app.use(cors(corsOptions));
+app.use(express.json());
+
+// Remove the custom CORS middleware that was added before
 
 // Logger middleware for development
 if (process.env.NODE_ENV === 'development') {
