@@ -26,7 +26,6 @@ import WithdrawalManagement from './pages/admin/WithdrawalManagement';
 
 function App() {
   return (
-    <BrowserRouter>
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={
@@ -74,7 +73,6 @@ function App() {
       {/* Catch all route - redirect to login for unknown routes */}
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
-    </BrowserRouter>
   );
 }
 

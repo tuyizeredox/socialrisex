@@ -6,6 +6,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
+import ErrorBoundary from './components/common/ErrorBoundary';
 import App from './App';
 
 function ThemedApp() {
@@ -15,7 +16,9 @@ function ThemedApp() {
       <CssBaseline />
       <NotificationProvider>
         <AuthProvider>
-          <App />
+          <ErrorBoundary>
+            <App />
+          </ErrorBoundary>
         </AuthProvider>
       </NotificationProvider>
     </MuiThemeProvider>

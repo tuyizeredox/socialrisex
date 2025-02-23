@@ -1,11 +1,16 @@
 import { Component } from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, CircularProgress } from '@mui/material';
 import { Error } from '@mui/icons-material';
 
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { 
+      hasError: false, 
+      error: null,
+      errorInfo: null,
+      isLoading: false 
+    };
   }
 
   static getDerivedStateFromError(error) {
@@ -14,11 +19,24 @@ class ErrorBoundary extends Component {
 
   componentDidCatch(error, errorInfo) {
     console.error('Error caught by boundary:', error, errorInfo);
+    this.setState({ errorInfo });
   }
 
-  handleReset = () => {
-    this.setState({ hasError: false, error: null });
-    window.location.reload();
+  handleReset = async () => {
+    this.setState({ isLoading: true });
+    try {
+      // Clear any cached data or states that might be causing the error
+      localStorage.removeItem('token');
+      sessionStorage.clear();
+      
+      // Wait a brief moment before reloading
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      window.location.reload();
+    } catch (err) {
+      console.error('Reset failed:', err);
+      this.setState({ isLoading: false });
+    }
   };
 
   render() {
@@ -29,23 +47,47 @@ class ErrorBoundary extends Component {
           flexDirection="column"
           alignItems="center"
           justifyContent="center"
-          minHeight="400px"
+          minHeight="100vh"
           textAlign="center"
           p={3}
+          sx={{
+            background: theme => theme.palette.background.default,
+            color: theme => theme.palette.text.primary
+          }}
         >
-          <Error color="error" sx={{ fontSize: 60, mb: 2 }} />
-          <Typography variant="h5" gutterBottom>
+          <Error color="error" sx={{ fontSize: 80, mb: 3 }} />
+          <Typography variant="h4" gutterBottom sx={{ mb: 2 }}>
             Oops! Something went wrong
           </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph>
-            {this.state.error?.message || 'An unexpected error occurred'}
+          <Typography variant="body1" color="text.secondary" paragraph sx={{ mb: 4, maxWidth: 500 }}>
+            {this.state.error?.message || 'An unexpected error occurred. Please try reloading the page.'}
           </Typography>
           <Button
             variant="contained"
             color="primary"
             onClick={this.handleReset}
+            disabled={this.state.isLoading}
+            sx={{
+              minWidth: 200,
+              py: 1.5,
+              position: 'relative'
+            }}
           >
-            Reload Page
+            {this.state.isLoading ? (
+              <>
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    position: 'absolute',
+                    left: '50%',
+                    marginLeft: '-12px'
+                  }}
+                />
+                <span style={{ opacity: 0 }}>Reload Page</span>
+              </>
+            ) : (
+              'Reload Page'
+            )}
           </Button>
         </Box>
       );
@@ -55,4 +97,4 @@ class ErrorBoundary extends Component {
   }
 }
 
-export default ErrorBoundary; 
+export default ErrorBoundary;
