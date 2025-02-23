@@ -2,9 +2,16 @@ services:
   - type: web
     name: socialrise-x-frontend
     env: static
-    buildCommand: npm install --legacy-peer-deps && npm run build
+    buildCommand: npm ci && npm run build
     staticPublishPath: ./build
     nodeVersion: 16.x
+    buildFilter:
+      paths:
+        - src/**/*.js
+        - src/**/*.jsx
+        - src/**/*.css
+        - public/**/*
+        - package*.json
     headers:
       - path: /*
         name: Cache-Control
@@ -16,3 +23,7 @@ services:
     envVars:
       - key: REACT_APP_API_URL
         sync: false
+      - key: NODE_ENV
+        value: production
+      - key: CI
+        value: false
