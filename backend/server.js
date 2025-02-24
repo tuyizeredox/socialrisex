@@ -87,7 +87,7 @@ app.use(errorHandler);
 // Handle unhandled routes
 // Add this before your routes
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://socialrisex.onrender.com');
+  res.header('Access-Control-Allow-Origin', 'https://socialrisex.vercel.app/');
   res.header('Access-Control-Allow-Credentials', true);
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
   res.header(
