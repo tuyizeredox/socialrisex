@@ -13,4 +13,4 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: FRONTEND_URL
-        value: https://socialrisex.onrender.com  # Update this line
+        value: https://socialrisex.vercel.app/  # Update this line
