@@ -117,13 +117,14 @@ export default function Referrals() {
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Team Earnings"
-            value={`RWF ${referralData?.stats.earnings || 0}`}
-            subtitle={`${referralData?.stats.active || 0} active × 2,800 RWF`}
-            icon={MonetizationOn}
-            color="info"
-          />
+     <StatCard
+  title="Team Earnings"
+  value={`RWF ${((referralData?.stats?.active ?? 0) * 2800).toLocaleString()}`}
+  subtitle={`${(referralData?.stats?.active ?? 0).toLocaleString()} active × 2,800 RWF`}
+  icon={MonetizationOn}
+  color="info"
+/>
+
         </Grid>
       </Grid>
 
