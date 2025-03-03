@@ -5,22 +5,31 @@ import {
   ListItemIcon,
   ListItemText,
   Box,
-  Divider
+  Divider,
+  IconButton,
+  Typography
 } from '@mui/material';
-import {
-  Dashboard,
-  VideoLibrary,
-  People,
-  AccountBalance,
-  AdminPanelSettings
+import { 
+  Dashboard, 
+  VideoLibrary, 
+  People, 
+  AccountBalance, 
+  AdminPanelSettings, 
+  Menu
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useState } from 'react';
 
 const drawerWidth = 240;
 
 export default function Sidebar({ isAdmin }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const [open, setOpen] = useState(true);
+
+  const toggleDrawer = () => {
+    setOpen(!open);
+  };
 
   const userMenuItems = [
     { text: 'Dashboard', icon: <Dashboard />, path: '/app/dashboard' },
@@ -39,19 +48,36 @@ export default function Sidebar({ isAdmin }) {
   const menuItems = isAdmin ? adminMenuItems : userMenuItems;
 
   return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: drawerWidth,
-        flexShrink: 0,
-        '& .MuiDrawer-paper': {
-          width: drawerWidth,
-          boxSizing: 'border-box',
-          mt: 8
-        },
-      }}
-    >
-      <Box sx={{ overflow: 'auto' }}>
+    <>
+      <IconButton
+        onClick={toggleDrawer}
+        sx={{ display: { xs: 'block', sm: 'none' }, position: 'absolute', top: 10, left: 10 }}
+      >
+        <Menu />
+      </IconButton>
+      <Drawer
+        variant={open ? "permanent" : "temporary"}
+        open={open}
+        onClose={toggleDrawer}
+        sx={{
+          width: open ? drawerWidth : 0,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+            mt: 8,
+          },
+        }}
+      >
+        <Box sx={{ overflow: 'auto', textAlign: 'center', p: 2 }}>
+          <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+            SocialRise X
+          </Typography>
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+            Elevate your influence
+          </Typography>
+        </Box>
+        <Divider />
         <List>
           {menuItems.map((item) => (
             <ListItem
@@ -65,7 +91,13 @@ export default function Sidebar({ isAdmin }) {
             </ListItem>
           ))}
         </List>
-      </Box>
-    </Drawer>
+        <Divider />
+        <Box sx={{ textAlign: 'center', p: 2 }}>
+          <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
+            "Your success starts here!"
+          </Typography>
+        </Box>
+      </Drawer>
+    </>
   );
-} 
+}
