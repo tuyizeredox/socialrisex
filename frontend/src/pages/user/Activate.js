@@ -6,6 +6,7 @@ import {
   Box,
   Button,
   Alert,
+  Divider,
   List,
   ListItem,
   ListItemIcon,
@@ -17,7 +18,10 @@ import {
 } from '@mui/material';
 import {
   Payment,
+  Phone,
+  WhatsApp,
   CheckCircle,
+  ArrowForward,
   Lock
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -81,56 +85,55 @@ export default function Activate() {
             <Typography variant="h6" gutterBottom>
               Payment Details
             </Typography>
-            <Typography variant="body1">
-              Visit the <strong>Help Center</strong> to get the number to pay on.
-            </Typography>
+            <List dense>
+              <ListItem>
+                <ListItemIcon>
+                  <Payment sx={{ color: 'inherit' }} />
+                </ListItemIcon>
+                <ListItemText 
+                  primary="Amount: 7,000 RWF"
+                  secondary="Amafaranga y'ishyirwa mu bikorwa: 7,000 RWF"
+                  secondaryTypographyProps={{ color: 'inherit' }}
+                />
+              </ListItem>
+              <ListItem>
+                <ListItemIcon>
+                  <Phone sx={{ color: 'inherit' }} />
+                </ListItemIcon>
+                <ListItemText 
+                  primary="MTN MoMo Pay Code: 348807"
+                  secondary="Izina: CLEMENTINE"
+                  secondaryTypographyProps={{ color: 'inherit' }}
+                />
+              </ListItem>
+            </List>
           </CardContent>
         </Card>
 
-        <Typography variant="h6" gutterBottom>
-          Payment Instructions / Amabwiriza yo Kwishyura
-        </Typography>
-
-        <Grid container spacing={3} mb={4}>
-          <Grid item xs={12} md={6}>
-            <Typography variant="subtitle1" gutterBottom fontWeight="bold">
-              In English:
-            </Typography>
-            <List>
-              <ListItem>
-                <ListItemIcon>
-                  <CheckCircle color="primary" />
-                </ListItemIcon>
-                <ListItemText primary="1. Dial *182*8*1# on your phone" />
-              </ListItem>
-              <ListItem>
-                <ListItemIcon>
-                  <CheckCircle color="primary" />
-                </ListItemIcon>
-                <ListItemText primary="2. Enter the MoMo Pay Code" />
-              </ListItem>
-              <ListItem>
-                <ListItemIcon>
-                  <CheckCircle color="primary" />
-                </ListItemIcon>
-                <ListItemText primary="3. Enter amount: 7,000 RWF" />
-              </ListItem>
-              <ListItem>
-                <ListItemIcon>
-                  <CheckCircle color="primary" />
-                </ListItemIcon>
-                <ListItemText primary="4. Confirm payment with your PIN" />
-              </ListItem>
-            </List>
-          </Grid>
-        </Grid>
+        <Box bgcolor="grey.100" p={3} borderRadius={1} mb={4} textAlign="center">
+          <Typography variant="h6" gutterBottom>
+            Need Help?
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<WhatsApp />}
+            href="https://wa.me/250791786228"
+            target="_blank"
+            sx={{ mb: 2 }}
+          >
+            Go to Help Center
+          </Button>
+          <Typography variant="body2" color="text.secondary">
+            Click the button above to contact support and submit your payment confirmation.
+          </Typography>
+        </Box>
 
         <Alert severity="success">
           <Typography variant="body1">
             Your account will be activated automatically after payment verification.
           </Typography>
           <Typography variant="body2" sx={{ mt: 1 }}>
-            Konti yawe izahita ikora nyuma yo kwemeza ko wishyuye.
+            Konti yawe izahita ikora nyuma yo kugenzura ko wishyuye.
           </Typography>
         </Alert>
       </Paper>
