@@ -6,7 +6,6 @@ import {
   Box,
   Button,
   Alert,
-  Divider,
   List,
   ListItem,
   ListItemIcon,
@@ -18,10 +17,7 @@ import {
 } from '@mui/material';
 import {
   Payment,
-  Phone,
-  WhatsApp,
   CheckCircle,
-  ArrowForward,
   Lock
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -77,7 +73,7 @@ export default function Activate() {
         </Box>
 
         <Alert severity="info" sx={{ mb: 4 }}>
-          To activate your account, you need to pay a one-time activation fee of 5,000 RWF
+          To activate your account, you need to pay a one-time activation fee of 7,000 RWF
         </Alert>
 
         <Card sx={{ mb: 4, bgcolor: 'primary.light', color: 'primary.contrastText' }}>
@@ -85,28 +81,9 @@ export default function Activate() {
             <Typography variant="h6" gutterBottom>
               Payment Details
             </Typography>
-            <List dense>
-              <ListItem>
-                <ListItemIcon>
-                  <Payment sx={{ color: 'inherit' }} />
-                </ListItemIcon>
-                <ListItemText 
-                  primary="Amount: 5,000 RWF"
-                  secondary="Amafaranga y'ishyirwa mu bikorwa: 5,000 RWF"
-                  secondaryTypographyProps={{ color: 'inherit' }}
-                />
-              </ListItem>
-              <ListItem>
-                <ListItemIcon>
-                  <Phone sx={{ color: 'inherit' }} />
-                </ListItemIcon>
-                <ListItemText 
-                  primary="MTN MoMo Pay Code: 348807"
-                  secondary="Izina: CLEMENTINE"
-                  secondaryTypographyProps={{ color: 'inherit' }}
-                />
-              </ListItem>
-            </List>
+            <Typography variant="body1">
+              Visit the <strong>Help Center</strong> to get the number to pay on.
+            </Typography>
           </CardContent>
         </Card>
 
@@ -130,13 +107,13 @@ export default function Activate() {
                 <ListItemIcon>
                   <CheckCircle color="primary" />
                 </ListItemIcon>
-                <ListItemText primary="2. Enter MoMo Pay Code: 348807" />
+                <ListItemText primary="2. Enter the MoMo Pay Code" />
               </ListItem>
               <ListItem>
                 <ListItemIcon>
                   <CheckCircle color="primary" />
                 </ListItemIcon>
-                <ListItemText primary="3. Enter amount: 5,000 RWF" />
+                <ListItemText primary="3. Enter amount: 7,000 RWF" />
               </ListItem>
               <ListItem>
                 <ListItemIcon>
@@ -144,81 +121,16 @@ export default function Activate() {
                 </ListItemIcon>
                 <ListItemText primary="4. Confirm payment with your PIN" />
               </ListItem>
-              <ListItem>
-                <ListItemIcon>
-                  <CheckCircle color="primary" />
-                </ListItemIcon>
-                <ListItemText primary="5. Take a screenshot of the payment confirmation message" />
-              </ListItem>
-            </List>
-          </Grid>
-
-          <Grid item xs={12} md={6}>
-            <Typography variant="subtitle1" gutterBottom fontWeight="bold">
-              Mu Kinyarwanda:
-            </Typography>
-            <List>
-              <ListItem>
-                <ListItemIcon>
-                  <CheckCircle color="primary" />
-                </ListItemIcon>
-                <ListItemText primary="1. Kanda *182*8*1# kuri telefoni yawe" />
-              </ListItem>
-              <ListItem>
-                <ListItemIcon>
-                  <CheckCircle color="primary" />
-                </ListItemIcon>
-                <ListItemText primary="2. Andika kode ya MoMo Pay: 348807" />
-              </ListItem>
-              <ListItem>
-                <ListItemIcon>
-                  <CheckCircle color="primary" />
-                </ListItemIcon>
-                <ListItemText primary="3. Andika amafaranga: 5,000 RWF" />
-              </ListItem>
-              <ListItem>
-                <ListItemIcon>
-                  <CheckCircle color="primary" />
-                </ListItemIcon>
-                <ListItemText primary="4. Emeza kwishyura ukoresheje PIN yawe" />
-              </ListItem>
-              <ListItem>
-                <ListItemIcon>
-                  <CheckCircle color="primary" />
-                </ListItemIcon>
-                <ListItemText primary="5. Fata ifoto y'ubutumwa bwemeza ko wishyuye" />
-              </ListItem>
             </List>
           </Grid>
         </Grid>
 
-        <Box bgcolor="grey.100" p={3} borderRadius={1} mb={4}>
-          <Typography variant="h6" gutterBottom>
-            After Payment / Nyuma yo Kwishyura
-          </Typography>
-          <Typography variant="body1" paragraph>
-            Send the payment screenshot to our support team via WhatsApp:
-          </Typography>
-          <Button
-            variant="contained"
-            startIcon={<WhatsApp />}
-            href="https://wa.me/250791786228"
-            target="_blank"
-            sx={{ mb: 2 }}
-          >
-            WhatsApp: 0791786228
-          </Button>
-          <Typography variant="body2" color="text.secondary">
-            Ohereza ifoto y'ubutumwa bwemeza ko wishyuye kuri WhatsApp: 0791786228
-          </Typography>
-        </Box>
-
         <Alert severity="success">
           <Typography variant="body1">
-            Your account will be activated within 24 hours after payment verification.
+            Your account will be activated automatically after payment verification.
           </Typography>
           <Typography variant="body2" sx={{ mt: 1 }}>
-            Konti yawe izakora mu masaha 24 nyuma yo kugenzura ko wishyuye.
+            Konti yawe izahita ikora nyuma yo kwemeza ko wishyuye.
           </Typography>
         </Alert>
       </Paper>
@@ -231,4 +143,4 @@ export default function Activate() {
       />
     </Container>
   );
-} 
+}
