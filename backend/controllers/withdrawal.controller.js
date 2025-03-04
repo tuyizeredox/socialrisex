@@ -17,27 +17,28 @@ export const createWithdrawal = async (req, res, next) => {
     }
 
     // Get total pending withdrawals
-    const pendingWithdrawals = await Withdrawal.aggregate([
-      {
-        $match: {
-          user: user._id,
-          status: 'pending'
-        }
-      },
-      {
-        $group: {
-          _id: null,
-          total: { $sum: '$amount' }
-        }
-      }
-    ]);
-
-    const pendingAmount = pendingWithdrawals[0]?.total || 0;
-    const availableBalance = user.earnings - pendingAmount;
-
-    if (availableBalance < amount) {
-      throw new ErrorResponse('Insufficient balance', 400);
+const pendingWithdrawals = await Withdrawal.aggregate([
+  {
+    $match: {
+      user: user._id,
+      status: 'pending'
     }
+  },
+  {
+    $group: {
+      _id: null,
+      total: { $sum: '$amount' }
+    }
+  }
+]);
+
+const pendingAmount = pendingWithdrawals.length > 0 ? pendingWithdrawals[0].total : 0;
+const availableBalance = (user.earnings || 0) + (user.referralEarnings || 0) - pendingAmount;
+
+if (availableBalance < amount) {
+  throw new ErrorResponse('Insufficient balance', 400);
+}
+
 
     // Check minimum withdrawal amount
     if (amount < 5000) {
@@ -114,7 +115,8 @@ export const getUserWithdrawals = async (req, res, next) => {
     // Calculate available balance
     const totalWithdrawn = withdrawnAmount[0]?.total || 0;
     const pendingWithdrawals = pendingAmount[0]?.total || 0;
-    const availableBalance = totalReferralEarnings - totalWithdrawn - pendingWithdrawals;
+    const availableBalance = user.earnings + (user.referralEarnings || 0) - pendingAmount;
+
 
     res.status(200).json({
       success: true,
@@ -234,15 +236,15 @@ export const processWithdrawal = async (req, res, next) => {
     }
 
     // If approving, check if user still has sufficient balance
-    if (status === 'approved') {
-      if (user.earnings < withdrawal.amount) {
-        throw new ErrorResponse('User has insufficient balance', 400);
-      }
+if (status === 'approved') {
+  const userBalance = user.earnings + (user.referralEarnings || 0);
+  if (userBalance < withdrawal.amount) {
+    throw new ErrorResponse('User has insufficient balance', 400);
+  }
+  user.earnings -= withdrawal.amount;
+  await user.save();
+}
 
-      // Deduct amount from user's earnings
-      user.earnings -= withdrawal.amount;
-      await user.save();
-    }
 
     // Update withdrawal status
     withdrawal.status = status;
