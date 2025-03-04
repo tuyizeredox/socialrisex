@@ -34,7 +34,7 @@ import { useAuth } from "../../context/AuthContext";
 
 const drawerWidth = 260;
 
-const MainLayout = () => {
+const AdminLayout = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const { user, logout } = useAuth();
@@ -57,14 +57,12 @@ const MainLayout = () => {
     );
   }
 
-  const menuItems = user
-    ? [
-        { text: "Dashboard", icon: <Dashboard />, path: "/app" },
-        { text: "Videos", icon: <VideoLibrary />, path: "/app/videos" },
-        { text: "Team", icon: <People />, path: "/app/referrals" },
-        { text: "Withdraw", icon: <AccountBalance />, path: "/app/withdraw" },
-      ]
-    : [];
+const menuItems = [
+    { text: 'Dashboard', icon: <Dashboard />, path: '/admin' },
+    { text: 'Users', icon: <People />, path: '/admin/users' },
+    { text: 'Videos', icon: <VideoLibrary />, path: '/admin/videos' },
+    { text: 'Withdrawals', icon: <Payment />, path: '/admin/withdrawals' }
+  ];
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -167,4 +165,4 @@ const MainLayout = () => {
   );
 };
 
-export default MainLayout;
+export default AdminLayout;
