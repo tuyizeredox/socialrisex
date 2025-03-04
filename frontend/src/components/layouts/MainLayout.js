@@ -13,10 +13,7 @@ import {
   Typography,
   Button,
   CircularProgress,
-  Fade,
   Divider,
-  useTheme as useMuiTheme,
-  alpha,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
@@ -30,11 +27,12 @@ import {
   Brightness7,
   Star,
   TrendingUp,
+  Favorite,
 } from "@mui/icons-material";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
 
-const drawerWidth = 240;
+const drawerWidth = 260;
 
 const MainLayout = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -43,7 +41,6 @@ const MainLayout = () => {
   const { mode, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
-  const muiTheme = useMuiTheme();
 
   useEffect(() => {
     if (location.pathname === "/app") {
@@ -79,163 +76,69 @@ const MainLayout = () => {
   };
 
   const drawer = (
-    <Box
-      sx={{
-        background: (theme) =>
-          `linear-gradient(${alpha(theme.palette.background.default, 0.97)}, ${alpha(
-            theme.palette.background.default,
-            0.97
-          )}), ${theme.palette.background.gradient}`,
-        height: "100%",
-        borderRight: "1px solid",
-        borderColor: "divider",
-      }}
-    >
-      <Toolbar>
-        <IconButton
-          onClick={handleDrawerToggle}
-          sx={{ display: { sm: "none" }, ml: "auto", color: "text.primary" }}
-        >
+    <Box sx={{ height: "100%", p: 2 }}>
+      <Toolbar sx={{ justifyContent: "space-between" }}>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: "primary.main" }}>SocialRise X</Typography>
+        <IconButton onClick={handleDrawerToggle} sx={{ display: { sm: "none" } }}>
           <CloseIcon />
         </IconButton>
       </Toolbar>
-      <List sx={{ px: 2 }}>
-        <Divider
-          sx={{
-            background: (theme) =>
-              `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-            height: "2px",
-            mb: 2,
-          }}
-        />
+      <Divider sx={{ my: 2 }} />
+      <List>
         {menuItems.map((item) => (
           <ListItem
-            component="button"
+            button
             key={item.text}
             onClick={() => navigate(item.path)}
             selected={location.pathname.startsWith(item.path)}
             sx={{
-              my: 1.5,
+              my: 1,
               borderRadius: 2,
-              padding: "12px 16px",
-              transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-              position: "relative",
-              overflow: "hidden",
-              border: "1px solid",
-              borderColor: (theme) =>
-                location.pathname.startsWith(item.path)
-                  ? alpha(theme.palette.primary.main, 0.3)
-                  : "transparent",
-              background: (theme) =>
-                location.pathname.startsWith(item.path)
-                  ? `linear-gradient(135deg, ${alpha(
-                      theme.palette.primary.main,
-                      0.12
-                    )}, ${alpha(theme.palette.primary.main, 0.05)})`
-                  : "transparent",
-              "&:hover": {
-                transform: "translateX(4px)",
-                borderColor: (theme) => alpha(theme.palette.primary.main, 0.5),
-                boxShadow: (theme) =>
-                  `0 4px 12px ${alpha(theme.palette.primary.main, 0.15)}`,
-              },
+              backgroundColor: location.pathname.startsWith(item.path) ? "primary.light" : "transparent",
+              "&:hover": { backgroundColor: "primary.main", color: "white" },
             }}
           >
-            <ListItemIcon
-              sx={{
-                minWidth: 40,
-                color: location.pathname.startsWith(item.path)
-                  ? "primary.main"
-                  : "text.secondary",
-              }}
-            >
+            <ListItemIcon sx={{ color: location.pathname.startsWith(item.path) ? "primary.dark" : "text.secondary" }}>
               {item.icon}
             </ListItemIcon>
-            <ListItemText
-              primary={item.text}
-              sx={{
-                "& .MuiListItemText-primary": {
-                  fontWeight: location.pathname.startsWith(item.path) ? 600 : 500,
-                },
-              }}
-            />
+            <ListItemText primary={item.text} sx={{ fontWeight: 600 }} />
           </ListItem>
         ))}
       </List>
-      <Divider
-        sx={{
-          background: (theme) =>
-            `linear-gradient(90deg, ${theme.palette.secondary.main}, ${theme.palette.primary.main})`,
-          height: "2px",
-          mt: 2,
-        }}
-      />
-      <Box
-        sx={{
-          p: 2,
-          mt: 2,
-          textAlign: "center",
-          color: "text.secondary",
-          fontStyle: "italic",
-        }}
-      >
-        <TrendingUp fontSize="large" sx={{ mb: 1, color: "primary.main" }} />
-        <Typography variant="body2">
-          "Reach your goals faster with SocialRise X!"
+      <Divider sx={{ my: 2 }} />
+      <Box textAlign="center" sx={{ color: "text.secondary" }}>
+        <TrendingUp fontSize="large" color="primary" />
+        <Typography variant="body2" mt={1}>
+          "Rise to success with SocialRise X!"
         </Typography>
-        <Star fontSize="large" sx={{ mt: 1, color: "secondary.main" }} />
+        <Favorite fontSize="large" color="secondary" sx={{ mt: 1 }} />
       </Box>
+      <Divider sx={{ my: 2 }} />
+      <Button
+        fullWidth
+        variant="contained"
+        color="error"
+        startIcon={<Logout />}
+        onClick={handleLogout}
+        sx={{ mt: 2 }}
+      >
+        Logout
+      </Button>
     </Box>
   );
 
   return (
     <Box sx={{ display: "flex" }}>
-      <AppBar
-        position="fixed"
-        elevation={0}
-        sx={{
-          background: (theme) =>
-            `linear-gradient(${alpha(theme.palette.background.default, 0.9)}, ${alpha(
-              theme.palette.background.default,
-              0.9
-            )}), ${theme.palette.background.gradient}`,
-          borderBottom: "1px solid",
-          borderColor: "divider",
-        }}
-      >
+      <AppBar position="fixed" sx={{ backgroundColor: "background.paper", boxShadow: 1 }}>
         <Toolbar>
           {user && (
-            <IconButton
-              color="inherit"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{
-                mr: 2,
-                display: { sm: "none" },
-              }}
-            >
+            <IconButton color="inherit" edge="start" onClick={handleDrawerToggle} sx={{ mr: 2, display: { sm: "none" } }}>
               <MenuIcon />
             </IconButton>
           )}
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{
-              flexGrow: 1,
-              background: (theme) =>
-                `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            SocialRise X
-          </Typography>
-          <IconButton
-            onClick={toggleTheme}
-            sx={{ color: muiTheme.palette.mode === "dark" ? "primary.light" : "primary.main" }}
-          >
-            {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
+          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 700, color: "primary.main" }}>SocialRise X</Typography>
+          <IconButton onClick={toggleTheme}>
+            {mode === "dark" ? <Brightness7 color="primary" /> : <Brightness4 color="secondary" />}
           </IconButton>
         </Toolbar>
       </AppBar>
@@ -247,35 +150,17 @@ const MainLayout = () => {
             open={mobileOpen}
             onClose={handleDrawerToggle}
             ModalProps={{ keepMounted: true }}
-            sx={{
-              display: { xs: "block", sm: "none" },
-              "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
-            }}
+            sx={{ display: { xs: "block", sm: "none" }, "& .MuiDrawer-paper": { width: drawerWidth } }}
           >
             {drawer}
           </Drawer>
-          <Drawer
-            variant="permanent"
-            sx={{
-              display: { xs: "none", sm: "block" },
-              "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
-            }}
-            open
-          >
+          <Drawer variant="permanent" sx={{ display: { xs: "none", sm: "block" }, "& .MuiDrawer-paper": { width: drawerWidth } }} open>
             {drawer}
           </Drawer>
         </Box>
       )}
 
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          mt: 8,
-        }}
-      >
+      <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` }, mt: 8 }}>
         <Outlet />
       </Box>
     </Box>
