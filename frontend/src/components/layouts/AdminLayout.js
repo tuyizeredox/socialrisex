@@ -26,6 +26,7 @@ import {
   Brightness4,
   Brightness7,
   Star,
+  Payment,  // This is the import for Payment
   TrendingUp,
   Favorite,
 } from "@mui/icons-material";
