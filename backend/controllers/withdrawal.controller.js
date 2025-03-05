@@ -33,7 +33,7 @@ const pendingWithdrawals = await Withdrawal.aggregate([
 ]);
 
 const pendingAmount = pendingWithdrawals.length > 0 ? pendingWithdrawals[0].total : 0;
-const availableBalance = (user.earnings || 0) + (user.referralEarnings || 0) - pendingAmount;
+const availableBalance = user.earnings - pendingAmount;
 
 if (availableBalance < amount) {
   throw new ErrorResponse('Insufficient balance', 400);
