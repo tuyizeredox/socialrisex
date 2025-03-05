@@ -1,6 +1,9 @@
+import express from 'express';
 import Withdrawal from '../models/Withdrawal.js';
 import User from '../models/User.js';
 import ErrorResponse from '../utils/errorResponse.js';
+
+const router = express.Router();
 
 // @desc    Create withdrawal request
 // @route   POST /api/withdrawals
@@ -13,7 +16,6 @@ export const createWithdrawal = async (req, res, next) => {
     const user = await User.findById(userId);
     if (!user) return next(new ErrorResponse('User not found', 404));
 
-    // Get total pending withdrawals
     const pendingWithdrawals = await Withdrawal.aggregate([
       { $match: { user: user._id, status: 'pending' } },
       { $group: { _id: null, total: { $sum: '$amount' } } }
@@ -100,3 +102,5 @@ export const processWithdrawal = async (req, res, next) => {
     next(error);
   }
 };
+
+export default router;
