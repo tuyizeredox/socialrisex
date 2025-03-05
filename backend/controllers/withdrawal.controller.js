@@ -13,7 +13,7 @@ export const createWithdrawal = async (req, res, next) => {
     // Fetch user
     const user = await User.findById(userId);
     if (!user) {
-      throw new ErrorResponse('User not found', 404);
+      return next(new ErrorResponse('User not found', 404));
     }
 
     // Get total pending withdrawals
@@ -36,12 +36,12 @@ export const createWithdrawal = async (req, res, next) => {
     const availableBalance = user.earnings + (user.referralEarnings || 0) - pendingAmount;
 
     if (availableBalance < amount) {
-      throw new ErrorResponse('Insufficient balance', 400);
+      return next(new ErrorResponse('Insufficient balance', 400));
     }
 
     // Check minimum withdrawal amount
     if (amount < 5000) {
-      throw new ErrorResponse('Minimum withdrawal amount is 5,000 RWF', 400);
+      return next(new ErrorResponse('Minimum withdrawal amount is 5,000 RWF', 400));
     }
 
     // Create withdrawal request
@@ -53,7 +53,6 @@ export const createWithdrawal = async (req, res, next) => {
       status: 'pending'
     });
 
-    // Populate user data
     await withdrawal.populate('user', 'name email earnings referralEarnings');
 
     res.status(201).json({
@@ -72,14 +71,13 @@ export const getUserWithdrawals = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id).populate('referrals');
     if (!user) {
-      throw new ErrorResponse('User not found', 404);
+      return next(new ErrorResponse('User not found', 404));
     }
 
     const withdrawals = await Withdrawal.find({ user: req.user._id })
       .populate('user', 'name email earnings referralEarnings')
       .sort('-createdAt');
 
-    // Get total pending and approved withdrawals
     const pendingAmount = await Withdrawal.aggregate([
       { $match: { user: req.user._id, status: 'pending' } },
       { $group: { _id: null, total: { $sum: '$amount' } } }
@@ -90,11 +88,9 @@ export const getUserWithdrawals = async (req, res, next) => {
       { $group: { _id: null, total: { $sum: '$amount' } } }
     ]);
 
-    // Calculate total referral earnings
     const activeReferrals = user.referrals.filter(ref => ref.isActive).length;
     const totalReferralEarnings = activeReferrals * 2800;
 
-    // Calculate available balance
     const totalWithdrawn = withdrawnAmount[0]?.total || 0;
     const totalPending = pendingAmount[0]?.total || 0;
     const availableBalance = user.earnings + totalReferralEarnings - totalPending;
