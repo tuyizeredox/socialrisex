@@ -65,7 +65,6 @@ export default function Withdraw() {
     try {
       setLoading(true);
       const response = await api.get('/withdrawals');
-      console.log("Fetched Balance Data:", response.data);
       const { data } = response.data;
 
       setBalance({
@@ -103,15 +102,18 @@ export default function Withdraw() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    const amount = Number(formData.amount) || 0;
-    const availableBalance = Number(balance.availableBalance) || 0;
-    console.log("Submitting withdrawal:", { amount, availableBalance });
+    const amount = Number(formData.amount);
+    const availableBalance = Number(balance.availableBalance);
+    console.log(`Attempting withdrawal: ${amount}, Available balance: ${availableBalance}`);
 
+    if (isNaN(amount) || amount <= 0) {
+      setError('Please enter a valid withdrawal amount.');
+      return;
+    }
     if (amount > availableBalance) {
       setError('Withdrawal amount cannot exceed your available balance');
       return;
     }
-
     if (amount < 5000) {
       setError('Minimum withdrawal amount is RWF 5,000');
       return;
@@ -162,6 +164,14 @@ export default function Withdraw() {
           <StatCard title="Available Balance" value={`RWF ${balance.availableBalance.toLocaleString()}`} icon={MonetizationOn} color="primary" />
         </Grid>
       </Grid>
+      <Paper sx={{ p: 3 }}>
+        <Typography variant="h6">Available Balance: RWF {balance.availableBalance.toLocaleString()}</Typography>
+        {error && <Alert severity="error">{error}</Alert>}
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+          <TextField fullWidth label="Amount (RWF)" name="amount" type="number" value={formData.amount} onChange={handleChange} required sx={{ mb: 2 }} />
+          <Button type="submit" variant="contained" fullWidth disabled={submitting || balance.availableBalance < 5000} startIcon={<MonetizationOn />}>{submitting ? 'Processing...' : 'Request Withdrawal'}</Button>
+        </Box>
+      </Paper>
     </Container>
   );
 }
