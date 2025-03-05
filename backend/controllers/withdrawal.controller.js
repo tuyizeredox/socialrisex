@@ -122,7 +122,7 @@ export const processWithdrawal = async (req, res, next) => {
     if (!user) return next(new ErrorResponse('User not found', 404));
 
     if (status === 'approved') {
-      const userBalance = user.earnings + (user.referralEarnings || 0);
+      const userBalance = availableBalance;
       if (userBalance < withdrawal.amount) return next(new ErrorResponse('User has insufficient balance', 400));
       user.earnings -= withdrawal.amount;
       await user.save();
