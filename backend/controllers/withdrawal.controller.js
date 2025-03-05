@@ -20,14 +20,14 @@ export const createWithdrawal = async (req, res, next) => {
     ]);
 
     const pendingAmount = pendingWithdrawals.length > 0 ? pendingWithdrawals[0].total : 0;
-    const availableBalance = user.earnings - pendingAmount;
-
-    if (availableBalance < amount) {
-      return next(new ErrorResponse('Insufficient balance', 400));
-    }
+    const availableBalance = (user.earnings || 0) - pendingAmount;
 
     if (amount < 5000) {
       return next(new ErrorResponse('Minimum withdrawal amount is 5,000 RWF', 400));
+    }
+
+    if (availableBalance < amount) {
+      return next(new ErrorResponse('Insufficient balance', 400));
     }
 
     const withdrawal = await Withdrawal.create({ user: userId, amount, paymentMethod, accountDetails });
@@ -59,51 +59,14 @@ export const getUserWithdrawals = async (req, res, next) => {
       { $group: { _id: null, total: { $sum: '$amount' } } }
     ]);
 
-    const user = await User.findById(userId).populate('referrals');
-    const activeReferrals = user.referrals.filter(ref => ref.isActive).length;
-    const totalReferralEarnings = activeReferrals * 2800;
-    const availableBalance = (user.earnings || 0) + totalReferralEarnings - (pendingAmount[0]?.total || 0);
+    const availableBalance = (req.user.earnings || 0) - (pendingAmount[0]?.total || 0);
 
     res.status(200).json({
       success: true,
-      data: { withdrawals, totalReferralEarnings, totalWithdrawn: withdrawnAmount[0]?.total || 0, pendingWithdrawals: pendingAmount[0]?.total || 0, availableBalance }
+      data: { withdrawals, totalWithdrawn: withdrawnAmount[0]?.total || 0, pendingWithdrawals: pendingAmount[0]?.total || 0, availableBalance }
     });
   } catch (error) {
     next(error);
-  }
-};
-
-// @desc    Get pending withdrawals (admin)
-// @route   GET /api/admin/withdrawals/pending
-// @access  Admin
-export const getPendingWithdrawals = async (req, res, next) => {
-  try {
-    const withdrawals = await Withdrawal.find({ status: 'pending' })
-      .populate('user', 'name email earnings referralEarnings')
-      .select('amount status accountDetails paymentMethod createdAt')
-      .sort('-createdAt')
-      .lean();
-
-    res.status(200).json({ success: true, count: withdrawals.length, data: withdrawals });
-  } catch (error) {
-    next(new ErrorResponse('Failed to fetch withdrawals', 500));
-  }
-};
-
-// @desc    Get all withdrawals (admin)
-// @route   GET /api/admin/withdrawals
-// @access  Admin
-export const getAllWithdrawals = async (req, res, next) => {
-  try {
-    const withdrawals = await Withdrawal.find()
-      .populate('user', 'name email earnings referralEarnings')
-      .select('amount status accountDetails paymentMethod createdAt')
-      .sort('-createdAt')
-      .lean();
-
-    res.status(200).json({ success: true, count: withdrawals.length, data: withdrawals });
-  } catch (error) {
-    next(new ErrorResponse('Failed to fetch withdrawals', 500));
   }
 };
 
@@ -122,8 +85,6 @@ export const processWithdrawal = async (req, res, next) => {
     if (!user) return next(new ErrorResponse('User not found', 404));
 
     if (status === 'approved') {
-      const userBalance = availableBalance;
-      if (userBalance < withdrawal.amount) return next(new ErrorResponse('User has insufficient balance', 400));
       user.earnings -= withdrawal.amount;
       await user.save();
     }
