@@ -45,6 +45,10 @@ export const processWithdrawal = async (id, data) => {
     const response = await api.put(`/admin/withdrawals/${id}`, data);
     return response.data;
   } catch (error) {
+    // Add more specific error handling
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
     throw error;
   }
 };
