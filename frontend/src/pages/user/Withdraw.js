@@ -60,6 +60,7 @@ export default function Withdraw() {
     accountNumber: '',
     accountName: ''
   });
+  const [isFirstWithdrawal, setIsFirstWithdrawal] = useState(true);
 
   const fetchData = useCallback(async () => {
     try {
@@ -74,6 +75,8 @@ export default function Withdraw() {
         availableBalance: data.availableBalance
       });
       
+      // Check if user has any previous withdrawals
+      setIsFirstWithdrawal(data.withdrawals.length === 0);
       setWithdrawals(data.withdrawals);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -86,25 +89,14 @@ export default function Withdraw() {
     }
   }, [showNotification]);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    setError(null);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Validate withdrawal amount
     const amount = Number(formData.amount);
-    if (amount > balance.availableBalance) {
+    
+    // Skip balance check for first-time withdrawal
+    if (!isFirstWithdrawal && amount > balance.availableBalance) {
       setError('Withdrawal amount cannot exceed your available balance');
       return;
     }
@@ -119,8 +111,9 @@ export default function Withdraw() {
 
     try {
       await api.post('/withdrawals', {
+        ...formData,
         amount,
-        paymentMethod: formData.paymentMethod,
+        isFirstWithdrawal,
         accountDetails: {
           accountName: formData.accountName,
           accountNumber: formData.accountNumber
@@ -147,6 +140,19 @@ export default function Withdraw() {
     }
   };
 
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    setError(null);
+  };
+
   if (loading) {
     return <Typography>Loading...</Typography>;
   }
@@ -159,7 +165,7 @@ export default function Withdraw() {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Total Referral Earnings"
-            value={RWF ${balance.totalReferralEarnings.toLocaleString()}}
+            value={`RWF ${balance.totalReferralEarnings.toLocaleString()}`}
             icon={MonetizationOn}
             color="success"
           />
@@ -167,7 +173,7 @@ export default function Withdraw() {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Total Withdrawn"
-            value={RWF ${balance.totalWithdrawn.toLocaleString()}}
+            value={`RWF ${balance.totalWithdrawn.toLocaleString()}`}
             icon={MonetizationOn}
             color="info"
           />
@@ -175,7 +181,7 @@ export default function Withdraw() {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Pending Withdrawals"
-            value={RWF ${balance.pendingWithdrawals.toLocaleString()}}
+            value={`RWF ${balance.pendingWithdrawals.toLocaleString()}`}
             icon={MonetizationOn}
             color="warning"
           />
@@ -183,7 +189,7 @@ export default function Withdraw() {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Available Balance"
-            value={RWF ${balance.availableBalance.toLocaleString()}}
+            value={`RWF ${balance.availableBalance.toLocaleString()}`}
             icon={MonetizationOn}
             color="primary"
           />
