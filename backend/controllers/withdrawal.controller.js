@@ -204,7 +204,7 @@ export const processWithdrawal = async (req, res, next) => {
   try {
     const { status, notes } = req.body;
     const withdrawal = await Withdrawal.findById(req.params.id)
-      .populate('user', 'name email earnings');
+      .populate('user', 'name email earnings referrals');
 
     if (!withdrawal) {
       throw new ErrorResponse('Withdrawal request not found', 404);
@@ -215,21 +215,57 @@ export const processWithdrawal = async (req, res, next) => {
       throw new ErrorResponse('This withdrawal has already been processed', 400);
     }
 
-    // Get user
-    const user = await User.findById(withdrawal.user._id);
+    // Get user with referrals
+    const user = await User.findById(withdrawal.user._id).populate('referrals');
     if (!user) {
       throw new ErrorResponse('User not found', 404);
     }
 
-    // If approving, check if user still has sufficient balance
-    if (status === 'approved') {
-      if (user.earnings < withdrawal.amount) {
-        throw new ErrorResponse('User has insufficient balance', 400);
-      }
+    // Calculate total available balance
+    const activeReferrals = user.referrals.filter(ref => ref.isActive).length;
+    const totalReferralEarnings = activeReferrals * 2800;
 
-      // Deduct amount from user's earnings
-      user.earnings -= withdrawal.amount;
-      await user.save();
+    // Get total approved withdrawals
+    const withdrawnAmount = await Withdrawal.aggregate([
+      {
+        $match: {
+          user: user._id,
+          status: 'approved',
+          _id: { $ne: withdrawal._id } // Exclude current withdrawal
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$amount' }
+        }
+      }
+    ]);
+
+    // Get pending withdrawals (excluding current one)
+    const pendingAmount = await Withdrawal.aggregate([
+      {
+        $match: {
+          user: user._id,
+          status: 'pending',
+          _id: { $ne: withdrawal._id }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$amount' }
+        }
+      }
+    ]);
+
+    const totalWithdrawn = withdrawnAmount[0]?.total || 0;
+    const pendingWithdrawals = pendingAmount[0]?.total || 0;
+    const availableBalance = totalReferralEarnings - totalWithdrawn - pendingWithdrawals;
+
+    // If approving, check if user has sufficient balance
+    if (status === 'approved' && withdrawal.amount > availableBalance) {
+      throw new ErrorResponse('User has insufficient balance', 400);
     }
 
     // Update withdrawal status
@@ -240,7 +276,7 @@ export const processWithdrawal = async (req, res, next) => {
     await withdrawal.save();
 
     // Populate updated withdrawal
-    await withdrawal.populate('user', 'name email earnings');
+    await withdrawal.populate('user', 'name email');
 
     res.status(200).json({
       success: true,
