@@ -2,7 +2,11 @@ import api from './api';
 
 export const createWithdrawal = async (withdrawalData) => {
   try {
-    const response = await api.post('/withdrawals', withdrawalData);
+    // Add a flag for first-time withdrawal
+    const response = await api.post('/withdrawals', {
+      ...withdrawalData,
+      isFirstWithdrawal: true // Add this flag
+    });
     return response.data;
   } catch (error) {
     throw error;
