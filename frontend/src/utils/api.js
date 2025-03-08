@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
-  timeout: 8000, // Reduced timeout for faster failure detection
+  timeout: 8000, // Timeout set to 8 seconds
   headers: {
     'Content-Type': 'application/json',
   },
@@ -15,6 +15,8 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    // Optionally, show a loading indicator here
+    document.body.classList.add('loading');
     return config;
   },
   (error) => Promise.reject(error)
@@ -22,9 +24,14 @@ api.interceptors.request.use(
 
 // Add response interceptor
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Hide the loading indicator after a successful request
+    document.body.classList.remove('loading');
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
+    document.body.classList.remove('loading'); // Remove loading indicator
 
     // Retry once if timeout or network failure occurs
     if (!originalRequest._retry && (error.code === 'ECONNABORTED' || !error.response)) {
@@ -32,7 +39,9 @@ api.interceptors.response.use(
       try {
         return await api(originalRequest);
       } catch (retryError) {
-        window.location.replace(window.location.href); // Full website reload on failure
+        alert('Request failed. Please reload the page and try again.');
+        // Optionally show a custom modal or notification to the user
+        setTimeout(() => window.location.reload(), 3000); // Reload after a brief wait
       }
     }
 
