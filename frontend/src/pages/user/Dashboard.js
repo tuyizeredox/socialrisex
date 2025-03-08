@@ -6,7 +6,9 @@ import {
   Button,
   Alert,
   Typography,
-  CircularProgress
+  CircularProgress,
+  Card,
+  CardContent,
 } from '@mui/material';
 import {
   MonetizationOn,
@@ -14,7 +16,9 @@ import {
   PlayCircle,
   Star,
   TrendingUp,
-  ArrowForward
+  ArrowForward,
+  Share,
+  Redeem,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
@@ -59,7 +63,7 @@ export default function Dashboard() {
           points: data.points || 0,
           videoPoints: data.videoPoints || 0,
           welcomeBonus: data.welcomeBonus || 3000,
-          earnings: referralEarnings || 0,
+          earnings: referralEarnings + (data.points || 0),
           referralEarnings: referralEarnings || 0,
           activeReferrals: data.activeReferrals || 0,
           referrals: data.referrals || 0,
@@ -110,19 +114,19 @@ export default function Dashboard() {
 
       <Grid container spacing={3}>
         <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Total Points"
-            value={`${(stats?.points || 0).toLocaleString()} pts`}
-            subtitle={`Including ${stats?.welcomeBonus || 0} welcome bonus`}
-            icon={MonetizationOn}
-            color="secondary"
+          <StatCard 
+            title="Total Points" 
+            value={`${stats.points.toLocaleString()} pts`} 
+            subtitle={`Including ${stats.welcomeBonus} welcome bonus | Worth RWF ${stats.points.toLocaleString()}`} 
+            icon={MonetizationOn} 
+            color="secondary" 
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Video Points"
-            value={`${(stats?.videoPoints || 0).toLocaleString()} pts`}
-            subtitle={`From ${stats?.videosWatched || 0} videos watched`}
+            value={`${stats.videoPoints.toLocaleString()} pts`}
+            subtitle={`From ${stats.videosWatched} videos watched | Worth RWF ${stats.videoPoints.toLocaleString()}`}
             icon={PlayCircle}
             color="info"
           />
@@ -130,8 +134,8 @@ export default function Dashboard() {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Total Earnings"
-            value={`RWF ${(stats?.earnings || 0).toLocaleString()}`}
-            subtitle="Keep growing your earnings!"
+            value={`RWF ${stats.earnings.toLocaleString()}`}
+            subtitle="Total from referrals and points"
             icon={MonetizationOn}
             color="success"
           />
@@ -139,28 +143,10 @@ export default function Dashboard() {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Team Members"
-            value={stats?.referrals || 0}
-            subtitle={`${stats?.activeReferrals || 0} active members`}
+            value={stats.referrals}
+            subtitle={`${stats.activeReferrals} active members`}
             icon={People}
             color="warning"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Top Rank"
-            value={`#${stats?.topRank || 0}`}
-            subtitle="Your current leaderboard position"
-            icon={TrendingUp}
-            color="primary"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Daily Bonus"
-            value={`RWF ${(stats?.dailyBonus || 0).toLocaleString()}`}
-            subtitle="Claim your daily reward!"
-            icon={Star}
-            color="info"
           />
         </Grid>
       </Grid>
@@ -181,6 +167,31 @@ export default function Dashboard() {
           Start Referring Now
         </Button>
       </Box>
+
+      <Grid container spacing={3} mt={4}>
+        <Grid item xs={12} sm={6} md={6}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" fontWeight={600}>🎁 Redeem Rewards</Typography>
+              <Typography variant="body2">Use your points to redeem exciting rewards.</Typography>
+              <Button variant="contained" color="success" sx={{ mt: 2 }} onClick={() => navigate('/app/rewards')}>
+                Redeem Now <Redeem sx={{ ml: 1 }} />
+              </Button>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={6}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" fontWeight={600}>📢 Share & Earn</Typography>
+              <Typography variant="body2">Share your referral link and earn rewards.</Typography>
+              <Button variant="contained" color="primary" sx={{ mt: 2 }}>
+                Share Now <Share sx={{ ml: 1 }} />
+              </Button>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
     </Container>
   );
 }
