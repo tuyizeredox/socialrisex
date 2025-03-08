@@ -135,7 +135,7 @@ export default function Dashboard() {
           <StatCard
             title="Total Earnings"
             value={`RWF ${stats.earnings.toLocaleString()}`}
-            subtitle="Total from referrals and points"
+            subtitle="Total from your team and points"
             icon={MonetizationOn}
             color="success"
           />
