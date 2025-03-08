@@ -2,10 +2,10 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
-  timeout: 10000, // Reduced timeout to 10 seconds for faster failure detection
+  timeout: 8000, // Reduced timeout for faster failure detection
   headers: {
-    'Content-Type': 'application/json'
-  }
+    'Content-Type': 'application/json',
+  },
 });
 
 // Add request interceptor
@@ -27,19 +27,19 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     // Retry once if timeout or network failure occurs
-    if ((error.code === 'ECONNABORTED' || !error.response) && !originalRequest._retry) {
+    if (!originalRequest._retry && (error.code === 'ECONNABORTED' || !error.response)) {
       originalRequest._retry = true;
       try {
         return await api(originalRequest);
       } catch (retryError) {
-        window.location.reload(); // Reload page on failure
+        window.location.replace(window.location.href); // Full website reload on failure
       }
     }
 
     // Handle unauthorized (token expired or invalid)
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      window.location.replace('/login'); // Full reload to clear session
     }
 
     return Promise.reject(error);
