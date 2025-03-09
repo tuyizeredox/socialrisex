@@ -1,20 +1,17 @@
 import cors from 'cors';
 
 const corsOptions = {
-  origin: 'https://socialrisex.vercel.app',
+  origin: 'https://socialrisex.vercel.app', // Your frontend URL
   credentials: true,
-  optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: [
     'Content-Type',
     'Authorization',
     'Accept',
     'Cache-Control',
-    'X-Requested-With'
+    'X-Requested-With',
   ],
-  exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
-  preflightContinue: false,
-  maxAge: 86400 // 24 hours
 };
 
-export default corsOptions;
+app.use(cors(corsOptions)); // Correctly apply CORS middleware
+app.options('*', cors(corsOptions)); // Handle preflight requests globally
