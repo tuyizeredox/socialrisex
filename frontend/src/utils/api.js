@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
-  timeout: 8000, // Timeout set to 8 seconds
+  timeout: 15000, // Increase timeout to 15 seconds to account for cold starts
   headers: {
     'Content-Type': 'application/json',
   },
@@ -20,34 +20,48 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Add response interceptor
+// Add response interceptor with improved retry logic
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response, // Return response directly
   async (error) => {
     const originalRequest = error.config;
 
-    // Retry once if timeout or network failure occurs
-    if (!originalRequest._retry && (error.code === 'ECONNABORTED' || !error.response)) {
-      originalRequest._retry = true;
+    // Retry logic for timeout or network errors
+    if (!originalRequest._retryCount) {
+      originalRequest._retryCount = 0; // Initialize retry count
+    }
+
+    if (
+      originalRequest._retryCount < 2 && // Allow up to 2 retries
+      (error.code === 'ECONNABORTED' || !error.response) // Timeout or no response
+    ) {
+      originalRequest._retryCount += 1;
+      await new Promise((resolve) => setTimeout(resolve, 1000 * originalRequest._retryCount)); // Exponential backoff: 1s, 2s
       try {
         return await api(originalRequest);
       } catch (retryError) {
-        // Optionally log the error to a monitoring service
-        console.error('Retry failed:', retryError);
+        console.error(`Retry ${originalRequest._retryCount} failed:`, retryError);
       }
     }
 
     // Handle unauthorized (token expired or invalid)
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
-      // Redirect user to login page without reloading
       window.location.assign('/login');
     }
 
     return Promise.reject(error);
   }
 );
+
+// Function to prefetch API (optional warmup)
+export const warmupBackend = async () => {
+  try {
+    await api.get('/health'); // Replace with your backend's health check endpoint
+    console.log('Backend warmed up successfully');
+  } catch (error) {
+    console.warn('Warmup failed:', error.message);
+  }
+};
 
 export default api;
