@@ -15,8 +15,6 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    // Optionally, show a loading indicator here
-    document.body.classList.add('loading');
     return config;
   },
   (error) => Promise.reject(error)
@@ -25,13 +23,10 @@ api.interceptors.request.use(
 // Add response interceptor
 api.interceptors.response.use(
   (response) => {
-    // Hide the loading indicator after a successful request
-    document.body.classList.remove('loading');
     return response;
   },
   async (error) => {
     const originalRequest = error.config;
-    document.body.classList.remove('loading'); // Remove loading indicator
 
     // Retry once if timeout or network failure occurs
     if (!originalRequest._retry && (error.code === 'ECONNABORTED' || !error.response)) {
@@ -39,16 +34,16 @@ api.interceptors.response.use(
       try {
         return await api(originalRequest);
       } catch (retryError) {
-        alert('Request failed. Please reload the page and try again.');
-        // Optionally show a custom modal or notification to the user
-        setTimeout(() => window.location.reload(), 3000); // Reload after a brief wait
+        // Optionally log the error to a monitoring service
+        console.error('Retry failed:', retryError);
       }
     }
 
     // Handle unauthorized (token expired or invalid)
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
-      window.location.replace('/login'); // Full reload to clear session
+      // Redirect user to login page without reloading
+      window.location.assign('/login');
     }
 
     return Promise.reject(error);
