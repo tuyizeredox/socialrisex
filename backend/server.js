@@ -9,13 +9,12 @@ import compression from 'compression';
 import cache from 'memory-cache'; // In-memory caching
 import apiRoutes from './routes/api.js'; // Route imports
 import errorHandler from './middleware/error.js'; // Error handler
-import corsOptions from './config/cors.js'; // CORS configuration
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load env vars
+// Load environment variables
 dotenv.config({ path: path.join(__dirname, './.env') });
 
 // Ensure MongoDB URI is loaded
@@ -30,7 +29,7 @@ const app = express();
 const connectDB = async () => {
   let retryAttempts = 5;
   let delay = 3000; // Delay in ms (3 seconds)
-  
+
   const connect = async () => {
     try {
       const conn = await mongoose.connect(process.env.MONGODB_URI, {
@@ -55,7 +54,25 @@ const connectDB = async () => {
 connectDB();
 
 // Middleware Setup
-app.use(cors(corsOptions)); // Handle CORS
+const corsOptions = {
+  origin: 'https://socialrisex.vercel.app', // Allow specific frontend origin
+  credentials: true, // Allow cookies or credentials
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Allowed HTTP methods
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'Accept',
+    'Cache-Control',
+    'X-Requested-With',
+  ], // Allowed headers
+  exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'], // Exposed headers
+  preflightContinue: false,
+  optionsSuccessStatus: 200, // Response status for preflight
+};
+
+app.use(cors(corsOptions)); // Apply CORS middleware
+app.options('*', cors(corsOptions)); // Handle preflight requests
+
 app.use(express.json()); // Parse JSON bodies
 
 // Logger middleware (only in development)
@@ -115,20 +132,6 @@ app.use((req, res, next) => {
 
 // Error handling middleware
 app.use(errorHandler);
-
-// CORS and other headers handling
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://socialrisex.vercel.app');
-  res.header('Access-Control-Allow-Credentials', true);
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control');
-  
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-  next();
-});
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
