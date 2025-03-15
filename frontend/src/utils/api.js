@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
-  timeout: 1000, // Reduced from 15s to 5s for faster failure detection
+  timeout: 10000, // Reduced from 15s to 5s for faster failure detection
   headers: {
     'Content-Type': 'application/json',
     'Cache-Control': 'no-cache', // Prevent caching issues
