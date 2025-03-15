@@ -118,7 +118,7 @@ export default function Login() {
               mb: 4
             }}
           >
-            Welcome to SocialRise X
+            Welcome to PRIME PESSA
           </Typography>
           
           {error && (
