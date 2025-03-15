@@ -2,66 +2,84 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
-  timeout: 1000, // Increase timeout to 15 seconds to account for cold starts
+  timeout: 1000, // Reduced from 15s to 5s for faster failure detection
   headers: {
     'Content-Type': 'application/json',
+    'Cache-Control': 'no-cache', // Prevent caching issues
+  },
+  // Optimize performance
+  transitional: {
+    silentJSONParsing: true, // Faster JSON parsing
+    forcedJSONParsing: false, // Skip parsing for non-JSON responses
   },
 });
 
-// Add request interceptor
+// Lightweight request interceptor (runs synchronously)
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Add response interceptor with improved retry logic
+// Optimized response interceptor with fast retry and reload
 api.interceptors.response.use(
-  (response) => response, // Return response directly
+  (response) => response,
   async (error) => {
-    const originalRequest = error.config;
+    const config = error.config;
 
-    // Retry logic for timeout or network errors
-    if (!originalRequest._retryCount) {
-      originalRequest._retryCount = 0; // Initialize retry count
-    }
+    // Initialize retry count if not present
+    config._retryCount = config._retryCount || 0;
 
+    // Fast retry logic for network issues
     if (
-      originalRequest._retryCount < 2 && // Allow up to 2 retries
-      (error.code === 'ECONNABORTED' || !error.response) // Timeout or no response
+      config._retryCount < 2 && 
+      (error.code === 'ECONNABORTED' || !error.response)
     ) {
-      originalRequest._retryCount += 1;
-      await new Promise((resolve) => setTimeout(resolve, 1000 * originalRequest._retryCount)); // Exponential backoff: 1s, 2s
-      try {
-        return await api(originalRequest);
-      } catch (retryError) {
-        console.error(`Retry ${originalRequest._retryCount} failed:`, retryError);
-      }
+      config._retryCount++;
+      // Linear backoff: 500ms, 1000ms (faster than exponential)
+      await new Promise((resolve) => setTimeout(resolve, 500 * config._retryCount));
+      return api(config);
     }
 
-    // Handle unauthorized (token expired or invalid)
+    // Handle 401 immediately
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       window.location.assign('/login');
+      return Promise.reject(error);
+    }
+
+    // Auto-reload after persistent failure
+    if (config._retryCount >= 2) {
+      const errorMessage = 'Network error: Please check your connection';
+      console.error(errorMessage, error);
+      
+      // Show error to user and reload
+      if (!document.getElementById('error-toast')) {
+        const toast = document.createElement('div');
+        toast.id = 'error-toast';
+        toast.style.cssText = 'position: fixed; bottom: 20px; left: 20px; padding: 10px; background: #ff4444; color: white; z-index: 1000;';
+        toast.textContent = errorMessage + ' - Reloading in 3 seconds...';
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+          document.body.removeChild(toast);
+          window.location.reload();
+        }, 3000);
+      }
     }
 
     return Promise.reject(error);
   }
 );
 
-// Function to prefetch API (optional warmup)
-export const warmupBackend = async () => {
-  try {
-    await api.get('/health'); // Replace with your backend's health check endpoint
-    console.log('Backend warmed up successfully');
-  } catch (error) {
-    console.warn('Warmup failed:', error.message);
-  }
+// Optimized warmup with minimal overhead
+export const warmupBackend = () => {
+  api.get('/health', { timeout: 2000 })
+    .then(() => console.log('Backend warmed up'))
+    .catch((error) => console.warn('Warmup failed:', error.message));
 };
 
 export default api;
