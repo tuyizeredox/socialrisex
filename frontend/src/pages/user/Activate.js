@@ -100,11 +100,17 @@ export default function Activate() {
                 <ListItemIcon>
                   <Phone sx={{ color: 'inherit' }} />
                 </ListItemIcon>
+                 <ListItemText 
+                  primary="Airtel Pay Code: 348807"
+                  secondary="Izina: STATISTICS CO LTD"
+                  secondaryTypographyProps={{ color: 'inherit' }}
+                />
                 <ListItemText 
                   primary="MTN MoMo Pay Code: 348807"
                   secondary="Izina: CLEMENTINE"
                   secondaryTypographyProps={{ color: 'inherit' }}
                 />
+                
               </ListItem>
             </List>
           </CardContent>
