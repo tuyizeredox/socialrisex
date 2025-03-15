@@ -55,7 +55,7 @@ connectDB();
 
 // Middleware Setup
 const corsOptions = {
-  origin: 'https://socialrisex.vercel.app', // Allow specific frontend origin
+  origin: 'https://primepessa.vercel.app', // Allow specific frontend origin
   credentials: true, // Allow cookies or credentials
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Allowed HTTP methods
   allowedHeaders: [
