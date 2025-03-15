@@ -105,6 +105,7 @@ export default function Activate() {
                   secondary="Izina: STATISTICS CO LTD"
                   secondaryTypographyProps={{ color: 'inherit' }}
                 />
+                  
                 <ListItemText 
                   primary="MTN MoMo Pay Code: 348807"
                   secondary="Izina: CLEMENTINE"
