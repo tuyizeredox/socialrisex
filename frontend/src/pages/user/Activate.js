@@ -85,7 +85,7 @@ export default function Activate() {
           <ListItemIcon><CheckCircle color="success" /></ListItemIcon>
           <ListItemText
             primary="Dial the code / Kanda kode"
-            secondary="Dial *182# and press call / Kanda *182# hanyuma ukande ubuto bwo guhamagara"
+            secondary="Dial *182# and press call / Kanda *182*8*1#"
           />
         </ListItem>
         <ListItem>
@@ -94,8 +94,8 @@ export default function Activate() {
             primary="Select payment option / Hitamo uburyo bwo kwishyura"
             secondary={
               provider === 'Airtel'
-                ? "Choose 'Airtel Money' (usually option 1 or 2) / Hitamo 'Airtel Money' (ubushobodzi ni 1 cyangwa 2)"
-                : "Choose 'MoMo Pay' (usually option 4) / Hitamo 'MoMo Pay' (ubushobodzi ni 4)"
+                ? "Choose 'Airtel Money'  / Hitamo 'Airtel Money' "
+                : "Choose 'MoMo Pay' / Hitamo 'MoMo Pay' "
             }
           />
         </ListItem>
@@ -123,8 +123,8 @@ export default function Activate() {
             primary="Confirm payment / Emeza ko wishyuye"
             secondary={
               provider === 'Airtel'
-                ? "Enter your Airtel Money PIN (4 digits) / Injiza PIN ya Airtel Money (imibare 4)"
-                : "Enter your MTN MoMo PIN (4 digits) / Injiza PIN ya MTN MoMo (imibare 4)"
+                ? "Enter your Airtel Money PIN  / Injiza PIN ya Airtel Money "
+                : "Enter your MTN MoMo PIN  / Injiza PIN ya MTN MoMo"
             }
           />
         </ListItem>
@@ -145,7 +145,7 @@ export default function Activate() {
       </List>
       <Box display="flex" alignItems="center" mt={2}>
         <Typography variant="body1" mr={1}>
-          Payment Number / Nimero yo kwishyurira: {number}
+          Payment Code / kode yo kwishyura: {number}
         </Typography>
         <IconButton onClick={() => copyToClipboard(number)} size="small">
           <ContentCopy />
@@ -188,7 +188,7 @@ export default function Activate() {
             <Collapse in={airtelOpen}>
               <Card sx={{ mt: 2, bgcolor: 'grey.100' }}>
                 <CardContent>
-                  {paymentSteps('Airtel', '0781234567')}
+                  {paymentSteps('Airtel', '*182*8*1*348807*7000#')}
                 </CardContent>
               </Card>
             </Collapse>
@@ -206,7 +206,7 @@ export default function Activate() {
             <Collapse in={mtnOpen}>
               <Card sx={{ mt: 2, bgcolor: 'grey.100' }}>
                 <CardContent>
-                  {paymentSteps('MTN', '0789876543')}
+                  {paymentSteps('MTN', '*182*8*1*348807*7000#')}
                 </CardContent>
               </Card>
             </Collapse>
