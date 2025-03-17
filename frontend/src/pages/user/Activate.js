@@ -105,7 +105,7 @@ export default function Activate() {
             primary="Enter merchant code / Injiza kode y’umucuruzi"
             secondary={
               provider === 'Airtel'
-                ? "Enter 348807 for STATISTICS CO LTD / Injiza 348807 kuri STATISTICS CO LTD"
+                ? "Enter 348807 for BONEVENTURE / Injiza 348807 BONEVENTURE"
                 : "Enter 348807 for CLEMENTINE / Injiza 348807 kuri CLEMENTINE"
             }
           />
@@ -171,7 +171,7 @@ export default function Activate() {
         </Box>
 
         <Alert severity="info" sx={{ mb: 4 }}>
-          To activate your account, pay a one-time fee of 7,000 RWF / Kugirango ukore konti yawe, shyura amafaranga y’ubwa mbere 7,000 RWF
+          To activate your account, pay a one-time fee of 7,000 RWF / Ishyura amafaranga  7,000 RWF yishyurwa rimwe gusa
         </Alert>
 
         <Grid container spacing={2} mb={4}>
@@ -216,7 +216,7 @@ export default function Activate() {
         <Card sx={{ mb: 4, bgcolor: 'primary.light', color: 'primary.contrastText' }}>
           <CardContent>
             <Typography variant="h6" gutterBottom>
-              Payment Details / Ibisobanuro byo Kwishyura
+              Payment Details / uburyo bwo Kwishyura
             </Typography>
             <List dense>
               <ListItem>
@@ -231,7 +231,7 @@ export default function Activate() {
                 <ListItemIcon><Phone sx={{ color: 'inherit' }} /></ListItemIcon>
                 <ListItemText
                   primary="Airtel Pay Code: *182*8*1*348807*7000# / MTN MoMo Pay Code: *182*8*1*348807*7000#"
-                  secondary="Izina: STATISTICS CO LTD (Airtel) / CLEMENTINE (MTN)"
+                  secondary="Izina: BONAVENTURE (Airtel) / CLEMENTINE (MTN)"
                   secondaryTypographyProps={{ color: 'inherit' }}
                 />
               </ListItem>
