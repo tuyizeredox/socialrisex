@@ -78,7 +78,7 @@ const MainLayout = () => {
   const drawer = (
     <Box sx={{ height: "100%", p: 2 }}>
       <Toolbar sx={{ justifyContent: "space-between" }}>
-        <Typography variant="h6" sx={{ fontWeight: 700, color: "primary.main" }}>SocialRise X</Typography>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: "primary.main" }}>PRIME PESSA</Typography>
         <IconButton onClick={handleDrawerToggle} sx={{ display: { sm: "none" } }}>
           <CloseIcon />
         </IconButton>
@@ -109,7 +109,7 @@ const MainLayout = () => {
       <Box textAlign="center" sx={{ color: "text.secondary" }}>
         <TrendingUp fontSize="large" color="primary" />
         <Typography variant="body2" mt={1}>
-          "Rise to success with SocialRise X!"
+          "Rise to success with PRIME PESSA!"
         </Typography>
         <Favorite fontSize="large" color="secondary" sx={{ mt: 1 }} />
       </Box>
