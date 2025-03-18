@@ -23,9 +23,11 @@ import { useAuth } from '../context/AuthContext';
 export default function Register() {
   const [formData, setFormData] = useState({
     fullName: '',
+    email: '',
     countryCode: '+250', // Default to Rwanda
     mobileNumber: '',
     password: '',
+    confirmPassword: '',
     referralCode: '',
     acceptTerms: false,
   });
@@ -58,6 +60,11 @@ export default function Register() {
   const validateForm = () => {
     const newErrors = {};
     if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(formData.email)) {
+      newErrors.email = 'Enter a valid email address';
+    }
     if (!formData.mobileNumber.trim()) {
       newErrors.mobileNumber = 'Phone number is required';
     } else if (!/^\d{9}$/.test(formData.mobileNumber)) {
@@ -67,6 +74,11 @@ export default function Register() {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
+    }
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Confirm password is required';
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
     }
     if (!formData.acceptTerms) {
       newErrors.acceptTerms = 'You must accept the terms';
@@ -94,11 +106,13 @@ export default function Register() {
       const fullPhone = `${formData.countryCode}${formData.mobileNumber}`;
       await register({
         fullName: formData.fullName,
+        email: formData.email,
         mobileNumber: fullPhone,
         password: formData.password,
+        confirmPassword: formData.confirmPassword, // Included for backend
         referralCode: formData.referralCode || undefined,
       });
-      navigate('/activate'); // Redirect to activation page
+      navigate('/activate'); // Assuming this is the next step
     } catch (err) {
       setServerError(err.message || 'Registration failed. Please try again.');
     } finally {
@@ -123,7 +137,7 @@ export default function Register() {
             Sign Up
           </Typography>
           <Typography variant="subtitle1" color="text.secondary">
-            Join Prime Pessa in a few simple steps!
+            Create your Prime Pessa account in minutes!
           </Typography>
         </Box>
 
@@ -142,6 +156,20 @@ export default function Register() {
             onChange={handleChange}
             error={!!errors.fullName}
             helperText={errors.fullName}
+            margin="normal"
+            variant="outlined"
+            sx={{ mb: 2 }}
+          />
+
+          <TextField
+            fullWidth
+            label="Email Address"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            error={!!errors.email}
+            helperText={errors.email}
             margin="normal"
             variant="outlined"
             sx={{ mb: 2 }}
@@ -187,6 +215,20 @@ export default function Register() {
             onChange={handleChange}
             error={!!errors.password}
             helperText={errors.password}
+            margin="normal"
+            variant="outlined"
+            sx={{ mb: 2 }}
+          />
+
+          <TextField
+            fullWidth
+            label="Confirm Password"
+            name="confirmPassword"
+            type="password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            error={!!errors.confirmPassword}
+            helperText={errors.confirmPassword}
             margin="normal"
             variant="outlined"
             sx={{ mb: 2 }}
