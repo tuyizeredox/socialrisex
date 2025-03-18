@@ -59,7 +59,7 @@ export default function Register() {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
+    if (!formData.fullName.trim()) newErrors.fullName = 'username is required';
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(formData.email)) {
@@ -150,7 +150,7 @@ export default function Register() {
         <Box component="form" onSubmit={handleSubmit}>
           <TextField
             fullWidth
-            label="Full Name"
+            label="Userame"
             name="fullName"
             value={formData.fullName}
             onChange={handleChange}
