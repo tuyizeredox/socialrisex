@@ -12,16 +12,14 @@ export const getStats = async (req, res, next) => {
       totalVideos,
       activeVideos,
       pendingWithdrawals,
-      totalPointsArray
+      totalPointsArray,
     ] = await Promise.all([
       User.countDocuments(),
       User.countDocuments({ isActive: true }),
       Video.countDocuments(),
       Video.countDocuments({ isActive: true }),
       Withdrawal.countDocuments({ status: 'pending' }),
-      User.aggregate([
-        { $group: { _id: null, total: { $sum: '$points' } } }
-      ])
+      User.aggregate([{ $group: { _id: null, total: { $sum: '$points' } } }]),
     ]);
 
     res.json({
@@ -30,7 +28,7 @@ export const getStats = async (req, res, next) => {
       totalVideos,
       activeVideos,
       pendingWithdrawals,
-      totalPoints: totalPointsArray[0]?.total || 0
+      totalPoints: totalPointsArray[0]?.total || 0,
     });
   } catch (error) {
     next(error);
@@ -48,14 +46,13 @@ export const getUsers = async (req, res, next) => {
       ? {
           $or: [
             { fullName: { $regex: search, $options: 'i' } },
-            { email: { $regex: search, $options: 'i' } }
-          ]
+            { email: { $regex: search, $options: 'i' } },
+          ],
         }
       : {};
 
     const total = await User.countDocuments(query);
-    
-    // Get users with referral counts
+
     const users = await User.aggregate([
       { $match: query },
       {
@@ -63,32 +60,31 @@ export const getUsers = async (req, res, next) => {
           from: 'users',
           localField: '_id',
           foreignField: 'referredBy',
-          as: 'referrals'
-        }
+          as: 'referrals',
+        },
       },
       {
         $addFields: {
-          referralCount: { $size: '$referrals' }
-        }
+          referralCount: { $size: '$referrals' },
+        },
       },
       {
         $project: {
           password: 0,
-          'referrals.password': 0
-        }
+          'referrals.password': 0,
+        },
       },
       { $sort: { createdAt: -1 } },
       { $skip: (page - 1) * limit },
-      { $limit: limit }
+      { $limit: limit },
     ]);
 
-    // Transform the data to ensure all fields exist
-    const transformedUsers = users.map(user => ({
+    const transformedUsers = users.map((user) => ({
       ...user,
       referralCount: user.referralCount || 0,
       earnings: user.earnings || 0,
       points: user.points || 0,
-      isActive: user.isActive || false
+      isActive: user.isActive || false,
     }));
 
     res.json({
@@ -97,8 +93,8 @@ export const getUsers = async (req, res, next) => {
         page,
         limit,
         total,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
     next(error);
@@ -107,11 +103,10 @@ export const getUsers = async (req, res, next) => {
 
 export const updateUser = async (req, res, next) => {
   try {
-    const user = await User.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    ).select('-password');
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    }).select('-password');
 
     if (!user) {
       throw new ErrorResponse('User not found', 404);
@@ -123,8 +118,25 @@ export const updateUser = async (req, res, next) => {
   }
 };
 
+export const deleteUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      throw new ErrorResponse('User not found', 404);
+    }
+
+    await user.deleteOne();
+    res.status(200).json({
+      success: true,
+      message: 'User deleted successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Video Management
-// Get all videos (admin)
 export const getAdminVideos = async (req, res, next) => {
   try {
     const videos = await Video.find()
@@ -133,14 +145,13 @@ export const getAdminVideos = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      videos
+      videos,
     });
   } catch (error) {
     next(error);
   }
 };
 
-// Helper function to extract YouTube ID from URL
 const extractYoutubeId = (url) => {
   try {
     const urlObj = new URL(url);
@@ -155,18 +166,15 @@ const extractYoutubeId = (url) => {
   }
 };
 
-// Create new video
 export const createVideo = async (req, res, next) => {
   try {
     const { title, youtubeUrl, pointsReward, minimumWatchTime, isActive } = req.body;
 
-    // Extract YouTube ID from URL
     const youtubeId = extractYoutubeId(youtubeUrl);
     if (!youtubeId) {
       throw new ErrorResponse('Invalid YouTube URL', 400);
     }
 
-    // Check if video with this YouTube ID already exists
     const existingVideo = await Video.findOne({ youtubeId });
     if (existingVideo) {
       throw new ErrorResponse('Video already exists', 400);
@@ -179,25 +187,23 @@ export const createVideo = async (req, res, next) => {
       pointsReward,
       minimumWatchTime,
       isActive,
-      addedBy: req.user._id
+      addedBy: req.user._id,
     });
 
     res.status(201).json({
       success: true,
-      data: video
+      data: video,
     });
   } catch (error) {
     next(error);
   }
 };
 
-// Update video
 export const updateVideo = async (req, res, next) => {
   try {
     const { youtubeUrl } = req.body;
     let update = { ...req.body };
 
-    // If YouTube URL is being updated, extract new YouTube ID
     if (youtubeUrl) {
       const youtubeId = extractYoutubeId(youtubeUrl);
       if (!youtubeId) {
@@ -206,11 +212,10 @@ export const updateVideo = async (req, res, next) => {
       update.youtubeId = youtubeId;
     }
 
-    const video = await Video.findByIdAndUpdate(
-      req.params.id,
-      update,
-      { new: true, runValidators: true }
-    );
+    const video = await Video.findByIdAndUpdate(req.params.id, update, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!video) {
       throw new ErrorResponse('Video not found', 404);
@@ -218,14 +223,13 @@ export const updateVideo = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: video
+      data: video,
     });
   } catch (error) {
     next(error);
   }
 };
 
-// Delete video
 export const deleteVideo = async (req, res, next) => {
   try {
     const video = await Video.findById(req.params.id);
@@ -237,7 +241,7 @@ export const deleteVideo = async (req, res, next) => {
     await video.deleteOne();
     res.status(200).json({
       success: true,
-      data: {}
+      data: {},
     });
   } catch (error) {
     next(error);
@@ -264,8 +268,8 @@ export const getPendingWithdrawals = async (req, res, next) => {
         page,
         limit,
         total,
-        pages: Math.ceil(total / limit)
-      }
+        pages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
     next(error);
