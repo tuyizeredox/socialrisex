@@ -97,7 +97,7 @@ export const getUserWithdrawals = async (req, res, next) => {
     
     // Calculate total referral earnings (2800 RWF per active referral)
     const activeReferrals = user.referrals.filter(ref => ref.isActive).length;
-    const totalReferralEarnings = activeReferrals * 2800;
+    const totalReferralEarnings = activeReferrals * 3200;
     
     // Calculate available balance
     const totalWithdrawn = withdrawnAmount[0]?.total || 0;
@@ -223,7 +223,7 @@ export const processWithdrawal = async (req, res, next) => {
 
     // Calculate total available balance
     const activeReferrals = user.referrals.filter(ref => ref.isActive).length;
-    const totalReferralEarnings = activeReferrals * 2800;
+    const totalReferralEarnings = activeReferrals * 3200;
 
     // Get total approved withdrawals
     const withdrawnAmount = await Withdrawal.aggregate([
