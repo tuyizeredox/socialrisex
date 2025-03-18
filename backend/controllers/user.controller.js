@@ -65,7 +65,7 @@ export const getUserStats = async (req, res, next) => {
 
     const welcomeBonus = 3000;
     const totalPoints = videoPoints + welcomeBonus;
-    const referralEarnings = activeReferrals * 2800;
+    const referralEarnings = activeReferrals * 3200;
 
     res.status(200).json({
       success: true,
@@ -204,7 +204,7 @@ export const getStats = async (req, res, next) => {
 
     const activeReferrals = referrals.filter(ref => ref.isActive);
 
-    const referralEarnings = activeReferrals.length * 2800; // 2800 RWF per active referral
+    const referralEarnings = activeReferrals.length * 3200; // 2800 RWF per active referral
 
 
 
