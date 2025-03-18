@@ -113,14 +113,14 @@ export default function Referrals() {
             value={referralData?.stats.active || 0}
             icon={PersonAdd}
             color="success"
-            subtitle="2,800 RWF per active member"
+            subtitle="3,200 RWF per active member"
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
      <StatCard
   title="Team Earnings"
-  value={`RWF ${((referralData?.stats?.active ?? 0) * 2800).toLocaleString()}`}
-  subtitle={`${(referralData?.stats?.active ?? 0).toLocaleString()} active × 2,800 RWF`}
+  value={`RWF ${((referralData?.stats?.active ?? 0) * 3200).toLocaleString()}`}
+  subtitle={`${(referralData?.stats?.active ?? 0).toLocaleString()} active × 3,200 RWF`}
   icon={MonetizationOn}
   color="info"
 />
@@ -182,7 +182,7 @@ export default function Referrals() {
                   )}
                 </TableCell>
                 <TableCell align="right">
-                  RWF {referral.isActive ? '2,800' : '0'}
+                  RWF {referral.isActive ? '3,200' : '0'}
                 </TableCell>
                 <TableCell align="right">
                   {new Date(referral.createdAt).toLocaleDateString()}
