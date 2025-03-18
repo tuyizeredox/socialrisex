@@ -16,7 +16,10 @@ import {
   Link,
   Alert,
   CircularProgress,
+  IconButton,
+  InputAdornment,
 } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -24,7 +27,7 @@ export default function Register() {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
-    countryCode: '+250', // Default to Rwanda
+    countryCode: '+250',
     mobileNumber: '',
     password: '',
     confirmPassword: '',
@@ -35,6 +38,8 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState('');
   const [isReferralLocked, setIsReferralLocked] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -47,7 +52,6 @@ export default function Register() {
     { code: '+255', label: 'Tanzania (+255)' },
   ];
 
-  // Autofill referral code from URL and lock it
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const refCode = params.get('ref');
@@ -59,7 +63,7 @@ export default function Register() {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.fullName.trim()) newErrors.fullName = 'username is required';
+    if (!formData.fullName.trim()) newErrors.fullName = 'Username is required';
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(formData.email)) {
@@ -93,7 +97,7 @@ export default function Register() {
       ...formData,
       [name]: type === 'checkbox' ? checked : value,
     });
-    setErrors({ ...errors, [name]: '' }); // Clear error on change
+    setErrors({ ...errors, [name]: '' });
   };
 
   const handleSubmit = async (e) => {
@@ -109,10 +113,10 @@ export default function Register() {
         email: formData.email,
         mobileNumber: fullPhone,
         password: formData.password,
-        confirmPassword: formData.confirmPassword, // Included for backend
+        confirmPassword: formData.confirmPassword,
         referralCode: formData.referralCode || undefined,
       });
-      navigate('/activate'); // Assuming this is the next step
+      navigate('/activate');
     } catch (err) {
       setServerError(err.message || 'Registration failed. Please try again.');
     } finally {
@@ -120,29 +124,59 @@ export default function Register() {
     }
   };
 
+  const toggleShowPassword = () => setShowPassword(!showPassword);
+  const toggleShowConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
+
   return (
-    <Container maxWidth="sm" sx={{ py: 6 }}>
+    <Container
+      maxWidth="sm"
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        py: 6,
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      }}
+    >
       <Paper
         sx={{
-          p: 4,
-          borderRadius: 3,
-          boxShadow: '0 6px 20px rgba(0,0,0,0.1)',
-          bgcolor: 'background.paper',
-          transition: 'transform 0.3s ease-in-out',
-          '&:hover': { transform: 'scale(1.02)' },
+          p: { xs: 3, sm: 5 },
+          borderRadius: 4,
+          boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
+          bgcolor: 'white',
+          transition: 'all 0.3s ease-in-out',
+          '&:hover': { transform: 'translateY(-5px)', boxShadow: '0 15px 40px rgba(0,0,0,0.2)' },
+          width: '100%',
         }}
       >
         <Box textAlign="center" mb={4}>
-          <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-            Sign Up
+          <Typography
+            variant="h3"
+            sx={{
+              fontWeight: 'bold',
+              background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
+            Join Prime Pessa
           </Typography>
-          <Typography variant="subtitle1" color="text.secondary">
-            Create your Prime Pessa account in minutes!
+          <Typography variant="subtitle1" color="text.secondary" sx={{ mt: 1 }}>
+            Start your journey with us today!
           </Typography>
         </Box>
 
         {serverError && (
-          <Alert severity="error" sx={{ mb: 3 }}>
+          <Alert
+            severity="error"
+            sx={{
+              mb: 3,
+              borderRadius: 2,
+              bgcolor: '#ffebee',
+              color: '#c62828',
+              '& .MuiAlert-icon': { color: '#c62828' },
+            }}
+          >
             {serverError}
           </Alert>
         )}
@@ -150,15 +184,21 @@ export default function Register() {
         <Box component="form" onSubmit={handleSubmit}>
           <TextField
             fullWidth
-            label="Userame"
+            label="Username"
             name="fullName"
             value={formData.fullName}
             onChange={handleChange}
             error={!!errors.fullName}
             helperText={errors.fullName}
-            margin="normal"
             variant="outlined"
-            sx={{ mb: 2 }}
+            sx={{
+              mb: 3,
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+                '&:hover fieldset': { borderColor: 'primary.main' },
+                '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+              },
+            }}
           />
 
           <TextField
@@ -170,19 +210,30 @@ export default function Register() {
             onChange={handleChange}
             error={!!errors.email}
             helperText={errors.email}
-            margin="normal"
             variant="outlined"
-            sx={{ mb: 2 }}
+            sx={{
+              mb: 3,
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+                '&:hover fieldset': { borderColor: 'primary.main' },
+                '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+              },
+            }}
           />
 
-          <Box display="flex" gap={2} mb={2}>
+          <Box display="flex" gap={2} mb={3}>
             <FormControl fullWidth sx={{ maxWidth: '30%' }}>
-              <InputLabel>Country</InputLabel>
+              <InputLabel sx={{ color: 'text.secondary' }}>Country</InputLabel>
               <Select
                 name="countryCode"
                 value={formData.countryCode}
                 onChange={handleChange}
                 label="Country"
+                sx={{
+                  borderRadius: 2,
+                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'primary.main' },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'primary.main' },
+                }}
               >
                 {countryCodes.map((country) => (
                   <MenuItem key={country.code} value={country.code}>
@@ -200,9 +251,15 @@ export default function Register() {
               onChange={handleChange}
               error={!!errors.mobileNumber}
               helperText={errors.mobileNumber || 'Enter 9 digits (e.g., 791786228)'}
-              margin="normal"
               variant="outlined"
               inputProps={{ maxLength: 9 }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  '&:hover fieldset': { borderColor: 'primary.main' },
+                  '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+                },
+              }}
             />
           </Box>
 
@@ -210,28 +267,58 @@ export default function Register() {
             fullWidth
             label="Password"
             name="password"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             value={formData.password}
             onChange={handleChange}
             error={!!errors.password}
             helperText={errors.password}
-            margin="normal"
             variant="outlined"
-            sx={{ mb: 2 }}
+            sx={{
+              mb: 3,
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+                '&:hover fieldset': { borderColor: 'primary.main' },
+                '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+              },
+            }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={toggleShowPassword} edge="end">
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
 
           <TextField
             fullWidth
             label="Confirm Password"
             name="confirmPassword"
-            type="password"
+            type={showConfirmPassword ? 'text' : 'password'}
             value={formData.confirmPassword}
             onChange={handleChange}
             error={!!errors.confirmPassword}
             helperText={errors.confirmPassword}
-            margin="normal"
             variant="outlined"
-            sx={{ mb: 2 }}
+            sx={{
+              mb: 3,
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+                '&:hover fieldset': { borderColor: 'primary.main' },
+                '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+              },
+            }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={toggleShowConfirmPassword} edge="end">
+                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
 
           <TextField
@@ -241,9 +328,15 @@ export default function Register() {
             value={formData.referralCode}
             onChange={handleChange}
             disabled={isReferralLocked}
-            margin="normal"
             variant="outlined"
-            sx={{ mb: 2 }}
+            sx={{
+              mb: 3,
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+                '&:hover fieldset': { borderColor: 'primary.main' },
+                '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+              },
+            }}
             helperText={isReferralLocked ? 'Provided via referral link' : ''}
           />
 
@@ -254,21 +347,22 @@ export default function Register() {
                 checked={formData.acceptTerms}
                 onChange={handleChange}
                 color="primary"
+                sx={{ '& .MuiSvgIcon-root': { fontSize: 28 } }}
               />
             }
             label={
-              <Typography variant="body2">
+              <Typography variant="body2" color="text.secondary">
                 I agree to the{' '}
-                <Link href="/terms" target="_blank" underline="hover">
+                <Link href="/terms" target="_blank" underline="hover" sx={{ color: 'primary.main' }}>
                   Terms of Service
                 </Link>{' '}
                 and{' '}
-                <Link href="/privacy" target="_blank" underline="hover">
+                <Link href="/privacy" target="_blank" underline="hover" sx={{ color: 'primary.main' }}>
                   Privacy Policy
                 </Link>
               </Typography>
             }
-            sx={{ mb: 2 }}
+            sx={{ mb: 3 }}
           />
           {errors.acceptTerms && (
             <FormHelperText error sx={{ ml: 4 }}>
@@ -286,17 +380,28 @@ export default function Register() {
               py: 1.5,
               fontSize: '1.1rem',
               fontWeight: 'bold',
-              bgcolor: 'primary.main',
-              '&:hover': { bgcolor: 'primary.dark', transform: 'translateY(-2px)' },
+              borderRadius: 2,
+              background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
+              boxShadow: '0 4px 15px rgba(25, 118, 210, 0.4)',
+              '&:hover': {
+                background: 'linear-gradient(45deg, #1565c0, #2196f3)',
+                transform: 'translateY(-3px)',
+                boxShadow: '0 6px 20px rgba(25, 118, 210, 0.6)',
+              },
               transition: 'all 0.3s ease-in-out',
             }}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : 'Register'}
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'Create Account'}
           </Button>
 
-          <Typography variant="body2" align="center" sx={{ mt: 3 }}>
+          <Typography variant="body2" align="center" sx={{ mt: 3, color: 'text.secondary' }}>
             Already have an account?{' '}
-            <Link component={RouterLink} to="/login" underline="hover">
+            <Link
+              component={RouterLink}
+              to="/login"
+              underline="hover"
+              sx={{ color: 'primary.main', fontWeight: 'medium' }}
+            >
               Sign in
             </Link>
           </Typography>
