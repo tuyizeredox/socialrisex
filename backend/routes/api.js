@@ -40,16 +40,19 @@ router.get('/withdrawals', withdrawalController.getUserWithdrawals);
 router.post('/withdrawals', withdrawalController.createWithdrawal);
 
 // Admin routes
-router.use('/admin', adminCheck);
+router.use('/admin', adminCheck); // Apply admin check middleware to all admin routes
 router.get('/admin/stats', adminController.getStats);
 router.get('/admin/users', adminController.getUsers);
 router.put('/admin/users/:id', adminController.updateUser);
+router.delete('/admin/users/:id', adminController.deleteUser); // New DELETE route for deleting users
 
-// Add these new admin video routes
+// Admin video routes
 router.get('/admin/videos', adminController.getAdminVideos);
 router.post('/admin/videos', adminController.createVideo);
 router.put('/admin/videos/:id', adminController.updateVideo);
 router.delete('/admin/videos/:id', adminController.deleteVideo);
+
+// Admin withdrawal routes
 router.get('/admin/withdrawals', withdrawalController.getAllWithdrawals);
 router.get('/admin/withdrawals/pending', withdrawalController.getPendingWithdrawals);
 router.put('/admin/withdrawals/:id', withdrawalController.processWithdrawal);
