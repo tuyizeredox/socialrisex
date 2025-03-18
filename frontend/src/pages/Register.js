@@ -1,321 +1,265 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link as RouterLink, useLocation } from 'react-router-dom';
 import {
   Container,
-  Box,
+  Paper,
   Typography,
+  Box,
   TextField,
   Button,
-  Alert,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormHelperText,
+  Checkbox,
+  FormControlLabel,
   Link,
-  Paper,
-  InputAdornment
+  Alert,
+  CircularProgress,
 } from '@mui/material';
+import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Register() {
   const [formData, setFormData] = useState({
     fullName: '',
-    email: '',
+    countryCode: '+250', // Default to Rwanda
     mobileNumber: '',
     password: '',
-    confirmPassword: '',
-    referralCode: ''
+    referralCode: '',
+    acceptTerms: false,
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState('');
+  const [isReferralLocked, setIsReferralLocked] = useState(false);
+
+  const { register } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { register } = useAuth();
 
+  const countryCodes = [
+    { code: '+250', label: 'Rwanda (+250)' },
+    { code: '+254', label: 'Kenya (+254)' },
+    { code: '+256', label: 'Uganda (+256)' },
+    { code: '+255', label: 'Tanzania (+255)' },
+  ];
+
+  // Autofill referral code from URL and lock it
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const refCode = params.get('ref');
     if (refCode) {
-      setFormData(prev => ({
-        ...prev,
-        referralCode: refCode
-      }));
+      setFormData((prev) => ({ ...prev, referralCode: refCode }));
+      setIsReferralLocked(true);
     }
-  }, [location]);
+  }, [location.search]);
 
   const validateForm = () => {
     const newErrors = {};
-    
-    // Validate mobile number
-    const mobileRegex = /^\+?[1-9]\d{1,14}$/;
-    if (!mobileRegex.test(formData.mobileNumber)) {
-      newErrors.mobileNumber = 'Please enter a valid mobile number with country code (e.g., +250700000000)';
+    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
+    if (!formData.mobileNumber.trim()) {
+      newErrors.mobileNumber = 'Phone number is required';
+    } else if (!/^\d{9}$/.test(formData.mobileNumber)) {
+      newErrors.mobileNumber = 'Enter a valid 9-digit phone number';
     }
-
-    // Validate email
-    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-    if (!emailRegex.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
     }
-
-    // Validate password
-    if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters long';
+    if (!formData.acceptTerms) {
+      newErrors.acceptTerms = 'You must accept the terms';
     }
-
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    
-    // Format mobile number if needed
-    if (name === 'mobileNumber') {
-      // Remove any non-digit characters except '+'
-      let formattedValue = value.replace(/[^\d+]/g, '');
-      // Ensure only one '+' at the start
-      if (formattedValue.startsWith('+')) {
-        formattedValue = '+' + formattedValue.substring(1).replace(/\+/g, '');
-      }
-      setFormData(prev => ({
-        ...prev,
-        [name]: formattedValue
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
-    }
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === 'checkbox' ? checked : value,
+    });
+    setErrors({ ...errors, [name]: '' }); // Clear error on change
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrors({});
-
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setLoading(true);
-
+    setServerError('');
     try {
+      const fullPhone = `${formData.countryCode}${formData.mobileNumber}`;
       await register({
         fullName: formData.fullName,
-        email: formData.email,
-        mobileNumber: formData.mobileNumber,
+        mobileNumber: fullPhone,
         password: formData.password,
-        referralCode: formData.referralCode || undefined
+        referralCode: formData.referralCode || undefined,
       });
-      navigate('/app');
+      navigate('/activate'); // Redirect to activation page
     } catch (err) {
-      setErrors({ submit: err.message });
+      setServerError(err.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box
+    <Container maxWidth="sm" sx={{ py: 6 }}>
+      <Paper
         sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          background: theme => theme.palette.background.gradient,
-          py: 8
+          p: 4,
+          borderRadius: 3,
+          boxShadow: '0 6px 20px rgba(0,0,0,0.1)',
+          bgcolor: 'background.paper',
+          transition: 'transform 0.3s ease-in-out',
+          '&:hover': { transform: 'scale(1.02)' },
         }}
       >
-        <Paper
-          elevation={24}
-          sx={{
-            p: 4,
-            width: '100%',
-            background: theme => `${theme.palette.background.paper}dd`,
-            backdropFilter: 'blur(10px)',
-            border: '1px solid',
-            borderColor: 'divider',
-            borderRadius: 2,
-            transition: 'transform 0.3s ease-in-out',
-            '&:hover': {
-              transform: 'scale(1.02)'
-            }
-          }}
-        >
-          <Typography
-            component="h1"
-            variant="h4"
-            align="center"
-            gutterBottom
-            sx={{
-              fontWeight: 700,
-              background: theme =>
-                `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              mb: 4
-            }}
-          >
-            Create Your Account
+        <Box textAlign="center" mb={4}>
+          <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+            Sign Up
           </Typography>
-          
-          {errors.submit && (
-            <Alert
-              severity="error"
-              sx={{
-                mb: 3,
-                animation: 'slideIn 0.5s ease-out',
-                '@keyframes slideIn': {
-                  from: { transform: 'translateY(-20px)', opacity: 0 },
-                  to: { transform: 'translateY(0)', opacity: 1 }
-                }
-              }}
-            >
-              {errors.submit}
-            </Alert>
-          )}
+          <Typography variant="subtitle1" color="text.secondary">
+            Join Prime Pessa in a few simple steps!
+          </Typography>
+        </Box>
 
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{
-              '& .MuiTextField-root': {
-                mb: 2,
-                '& .MuiOutlinedInput-root': {
-                  transition: 'transform 0.2s ease-in-out',
-                  '&:hover': {
-                    transform: 'translateY(-2px)'
-                  }
-                }
-              }
-            }}
-          >
+        {serverError && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {serverError}
+          </Alert>
+        )}
+
+        <Box component="form" onSubmit={handleSubmit}>
+          <TextField
+            fullWidth
+            label="Full Name"
+            name="fullName"
+            value={formData.fullName}
+            onChange={handleChange}
+            error={!!errors.fullName}
+            helperText={errors.fullName}
+            margin="normal"
+            variant="outlined"
+            sx={{ mb: 2 }}
+          />
+
+          <Box display="flex" gap={2} mb={2}>
+            <FormControl fullWidth sx={{ maxWidth: '30%' }}>
+              <InputLabel>Country</InputLabel>
+              <Select
+                name="countryCode"
+                value={formData.countryCode}
+                onChange={handleChange}
+                label="Country"
+              >
+                {countryCodes.map((country) => (
+                  <MenuItem key={country.code} value={country.code}>
+                    {country.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
             <TextField
-              margin="normal"
-              required
               fullWidth
-              id="fullName"
-              label="Full Name"
-              name="fullName"
-              autoComplete="name"
-              value={formData.fullName}
-              onChange={handleChange}
-              error={!!errors.fullName}
-              helperText={errors.fullName}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              value={formData.email}
-              onChange={handleChange}
-              error={!!errors.email}
-              helperText={errors.email}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="mobileNumber"
-              label="Mobile Number"
+              label="Phone Number"
               name="mobileNumber"
-              autoComplete="tel"
               value={formData.mobileNumber}
               onChange={handleChange}
               error={!!errors.mobileNumber}
-              helperText={errors.mobileNumber || "Include country code (e.g., +250700000000)"}
-              InputProps={{
-                startAdornment: formData.mobileNumber.startsWith('+') ? null : (
-                  <InputAdornment position="start">+</InputAdornment>
-                ),
-              }}
-            />
-            <TextField
+              helperText={errors.mobileNumber || 'Enter 9 digits (e.g., 791786228)'}
               margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              value={formData.password}
-              onChange={handleChange}
-              error={!!errors.password}
-              helperText={errors.password}
+              variant="outlined"
+              inputProps={{ maxLength: 9 }}
             />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="confirmPassword"
-              label="Confirm Password"
-              type="password"
-              id="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              error={!!errors.confirmPassword}
-              helperText={errors.confirmPassword}
-            />
-            <TextField
-              margin="normal"
-              fullWidth
-              name="referralCode"
-              label="Referral Code (Optional)"
-              id="referralCode"
-              value={formData.referralCode}
-              onChange={handleChange}
-              InputProps={{
-                readOnly: !!location.search.includes('ref='),
-              }}
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{
-                mt: 3,
-                mb: 2,
-                py: 1.5,
-                fontSize: '1.1rem',
-                fontWeight: 600,
-                transition: 'all 0.3s ease-in-out',
-                background: theme =>
-                  `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                '&:hover': {
-                  transform: 'translateY(-3px)',
-                  boxShadow: 6
-                }
-              }}
-              disabled={loading}
-            >
-              {loading ? 'Creating Account...' : 'Register'}
-            </Button>
-            <Box
-              sx={{
-                textAlign: 'center',
-                '& a': {
-                  color: 'primary.main',
-                  textDecoration: 'none',
-                  fontWeight: 500,
-                  transition: 'all 0.2s ease-in-out',
-                  '&:hover': {
-                    color: 'secondary.main'
-                  }
-                }
-              }}
-            >
-              <Link component={RouterLink} to="/login" variant="body1">
-                Already have an account? Sign in
-              </Link>
-            </Box>
           </Box>
-        </Paper>
-      </Box>
+
+          <TextField
+            fullWidth
+            label="Password"
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            error={!!errors.password}
+            helperText={errors.password}
+            margin="normal"
+            variant="outlined"
+            sx={{ mb: 2 }}
+          />
+
+          <TextField
+            fullWidth
+            label="Referral Code (Optional)"
+            name="referralCode"
+            value={formData.referralCode}
+            onChange={handleChange}
+            disabled={isReferralLocked}
+            margin="normal"
+            variant="outlined"
+            sx={{ mb: 2 }}
+            helperText={isReferralLocked ? 'Provided via referral link' : ''}
+          />
+
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="acceptTerms"
+                checked={formData.acceptTerms}
+                onChange={handleChange}
+                color="primary"
+              />
+            }
+            label={
+              <Typography variant="body2">
+                I agree to the{' '}
+                <Link href="/terms" target="_blank" underline="hover">
+                  Terms of Service
+                </Link>{' '}
+                and{' '}
+                <Link href="/privacy" target="_blank" underline="hover">
+                  Privacy Policy
+                </Link>
+              </Typography>
+            }
+            sx={{ mb: 2 }}
+          />
+          {errors.acceptTerms && (
+            <FormHelperText error sx={{ ml: 4 }}>
+              {errors.acceptTerms}
+            </FormHelperText>
+          )}
+
+          <Button
+            fullWidth
+            variant="contained"
+            type="submit"
+            disabled={loading}
+            sx={{
+              mt: 2,
+              py: 1.5,
+              fontSize: '1.1rem',
+              fontWeight: 'bold',
+              bgcolor: 'primary.main',
+              '&:hover': { bgcolor: 'primary.dark', transform: 'translateY(-2px)' },
+              transition: 'all 0.3s ease-in-out',
+            }}
+          >
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'Register'}
+          </Button>
+
+          <Typography variant="body2" align="center" sx={{ mt: 3 }}>
+            Already have an account?{' '}
+            <Link component={RouterLink} to="/login" underline="hover">
+              Sign in
+            </Link>
+          </Typography>
+        </Box>
+      </Paper>
     </Container>
   );
 }
