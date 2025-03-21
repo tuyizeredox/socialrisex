@@ -3,13 +3,13 @@
   "name": "PRIME PESSA",
   "icons": [
     {
-      "src": "Green and Yellow Modern Advertising Agency Logo (1) (1).png",
+      "src": "primepessa.jpeg",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/jpeg"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"
-} 
+}
