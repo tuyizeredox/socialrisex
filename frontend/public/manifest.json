@@ -3,7 +3,7 @@
   "name": "PRIME PESSA",
   "icons": [
     {
-      "src": "primepessa.jpeg",
+      "src": "/primepessa.jpeg",
       "sizes": "192x192",
       "type": "image/jpeg"
     }
