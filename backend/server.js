@@ -55,7 +55,7 @@ connectDB();
 
 // Middleware Setup
 const corsOptions = {
-  origin: ['http://localhost:3000', 'https://primepessa.vercel.app'], // Allow both local and production origins
+  origin: ['http://localhost:3000', 'https://worldwideearn.vercel.app'], // Allow both local and production origins
   credentials: true, // Allow cookies or credentials
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Allowed HTTP methods
   allowedHeaders: [
