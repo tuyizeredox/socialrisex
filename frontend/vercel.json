@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "framework": "create-react-app",
+  "buildCommand": "chmod +x node_modules/.bin/react-scripts && CI=false GENERATE_SOURCEMAP=false npm run build",
+  "installCommand": "npm install",
+  "outputDirectory": "build",
+  "devCommand": "npm run start",
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/favicon.ico"
+    },
+    {
+      "src": "/manifest.json",
+      "dest": "/manifest.json"
+    },
+    {
+      "src": "/socialRise.png",
+      "dest": "/socialRise.png"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
