@@ -31,6 +31,7 @@ import {
 import api from '../../utils/api';
 import PageHeader from '../../components/common/PageHeader';
 import StatCard from '../../components/common/StatCard';
+import worldwideLogo from '../../assets/worldwide.png';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
@@ -99,7 +100,7 @@ export default function AdminDashboard() {
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <img 
-                src="/worldwide.png" 
+                src={worldwideLogo} 
                 alt="Worldwide Earn" 
                 style={{ 
                   width: 60, 

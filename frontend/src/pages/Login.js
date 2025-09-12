@@ -17,6 +17,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import api from '../utils/api'; // Update this line - change from '../api' to '../utils/api'
+import worldwideLogo from '../assets/worldwide.png';
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -106,7 +107,7 @@ export default function Login() {
         >
           <Box sx={{ textAlign: 'center', mb: 4 }}>
             <img 
-              src="/worldwide.png" 
+              src={worldwideLogo} 
               alt="Worldwide Earn" 
               style={{ 
                 width: 80, 

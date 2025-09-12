@@ -33,6 +33,7 @@ import {
 } from "@mui/icons-material";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
+import worldwideLogo from '../../assets/worldwide.png';
 
 const drawerWidth = 260;
 
@@ -88,7 +89,7 @@ const menuItems = [
       <Toolbar sx={{ justifyContent: "space-between", mb: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <img 
-            src="/worldwide.png" 
+            src={worldwideLogo} 
             alt="Worldwide Earn" 
             style={{ 
               width: 32, 
@@ -159,7 +160,7 @@ const menuItems = [
         }}
       >
         <img 
-          src="/worldwide.png" 
+          src={worldwideLogo} 
           alt="Worldwide Earn" 
           style={{ 
             width: 40, 
@@ -228,7 +229,7 @@ const menuItems = [
           )}
           <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
             <img 
-              src="/worldwide.png" 
+              src={worldwideLogo} 
               alt="Worldwide Earn" 
               style={{ 
                 width: 32, 

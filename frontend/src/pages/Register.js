@@ -22,6 +22,7 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import worldwideLogo from '../assets/worldwide.png';
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -151,7 +152,7 @@ export default function Register() {
       >
         <Box textAlign="center" mb={4}>
           <img 
-            src="/worldwide.png" 
+            src={worldwideLogo} 
             alt="Worldwide Earn" 
             style={{ 
               width: 80, 

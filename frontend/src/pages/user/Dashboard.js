@@ -26,6 +26,7 @@ import PageHeader from '../../components/common/PageHeader';
 import StatCard from '../../components/common/StatCard';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
+import worldwideLogo from '../../assets/worldwide.png';
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -139,7 +140,7 @@ export default function Dashboard() {
       >
         <Box sx={{ position: 'relative', zIndex: 1 }}>
           <img 
-            src="/worldwide.png" 
+            src={worldwideLogo} 
             alt="Worldwide Earn" 
             style={{ 
               width: 80, 
