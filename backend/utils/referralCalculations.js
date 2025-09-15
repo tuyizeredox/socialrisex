@@ -3,8 +3,8 @@ import User from '../models/User.js';
 /**
  * Calculate multilevel referral earnings for a user
  * Level 1: 4000 RWF per active referral
- * Level 2: 1500 RWF per active referral  
- * Level 3: 1000 RWF per active referral
+ * Level 2: 2000 RWF per active referral  
+ * Level 3: 500 RWF per active referral
  * @param {string} userId - The user ID to calculate earnings for
  * @returns {Promise<Object>} Earnings breakdown and totals
  */
@@ -34,8 +34,8 @@ export const calculateMultilevelReferralEarnings = async (userId) => {
 
     const earnings = {
       level1: level1Count * 4000,
-      level2: level2Count * 1500,
-      level3: level3Count * 1000
+      level2: level2Count * 2000,
+      level3: level3Count * 500
     };
 
     const totalEarnings = earnings.level1 + earnings.level2 + earnings.level3;

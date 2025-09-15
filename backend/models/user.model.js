@@ -65,9 +65,20 @@ userSchema.pre('save', async function(next) {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
     
-    // Generate referral code if not exists
-    if (!this.referralCode) {
-      this.referralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+    // Generate referral code based on username if not exists
+    if (!this.referralCode && this.name) {
+      // Use name as referral code, removing spaces and making URL-friendly
+      let baseCode = this.name.replace(/\s+/g, '').toLowerCase();
+      let referralCode = baseCode;
+      let counter = 1;
+      
+      // Check for uniqueness and add numbers if needed
+      while (await mongoose.model('User').findOne({ referralCode, _id: { $ne: this._id } })) {
+        referralCode = `${baseCode}${counter}`;
+        counter++;
+      }
+      
+      this.referralCode = referralCode;
     }
     next();
   } catch (error) {

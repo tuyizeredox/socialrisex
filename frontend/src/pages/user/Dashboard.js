@@ -18,7 +18,6 @@ import {
   TrendingUp,
   ArrowForward,
   Share,
-  Redeem,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
@@ -115,12 +114,12 @@ export default function Dashboard() {
   }
 
   return (
-    <Container>
+    <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3 } }}>
       <Box 
         sx={{ 
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          borderRadius: 4,
-          p: 4,
+          borderRadius: { xs: 3, sm: 4 },
+          p: { xs: 3, sm: 4 },
           mb: 4,
           color: 'white',
           textAlign: 'center',
@@ -151,23 +150,49 @@ export default function Dashboard() {
               boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
             }}
           />
-          <Typography variant="h3" fontWeight={800} gutterBottom>
+          <Typography 
+            variant="h3" 
+            fontWeight={800} 
+            gutterBottom
+            sx={{ 
+              fontSize: { xs: '1.8rem', sm: '2.5rem', md: '3rem' },
+              lineHeight: 1.2 
+            }}
+          >
             Welcome back, {user.fullName}! 🌟
           </Typography>
-          <Typography variant="h6" sx={{ opacity: 0.9, mb: 2 }}>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              opacity: 0.9, 
+              mb: 2, 
+              fontSize: { xs: '1rem', sm: '1.25rem' },
+              px: { xs: 1, sm: 0 } 
+            }}
+          >
             Ready to earn more with Worldwide Earn?
           </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            gap: { xs: 1, sm: 2 }, 
+            flexWrap: 'wrap',
+            flexDirection: { xs: 'column', sm: 'row' }
+          }}>
             <Button
               variant="contained"
               size="large"
+              fullWidth={true}
               sx={{
                 bgcolor: 'rgba(255,255,255,0.2)',
                 backdropFilter: 'blur(10px)',
                 border: '1px solid rgba(255,255,255,0.3)',
                 borderRadius: 3,
                 px: 3,
+                py: { xs: 1.5, sm: 1 },
                 fontWeight: 'bold',
+                maxWidth: { sm: 200 },
+                fontSize: { xs: '0.9rem', sm: '1rem' },
                 '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' }
               }}
               onClick={() => navigate('/app/videos')}
@@ -177,13 +202,17 @@ export default function Dashboard() {
             <Button
               variant="contained"
               size="large"
+              fullWidth={true}
               sx={{
                 bgcolor: 'rgba(255,255,255,0.2)',
                 backdropFilter: 'blur(10px)',
                 border: '1px solid rgba(255,255,255,0.3)',
                 borderRadius: 3,
                 px: 3,
+                py: { xs: 1.5, sm: 1 },
                 fontWeight: 'bold',
+                maxWidth: { sm: 200 },
+                fontSize: { xs: '0.9rem', sm: '1rem' },
                 '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' }
               }}
               onClick={() => navigate('/app/referrals')}
@@ -202,19 +231,23 @@ export default function Dashboard() {
           color: 'white', 
           fontWeight: 'bold',
           borderRadius: 2,
-          '& .MuiAlert-icon': { color: 'white' }
+          fontSize: { xs: '0.85rem', sm: '0.875rem' },
+          '& .MuiAlert-icon': { color: 'white' },
+          '& .MuiAlert-message': {
+            padding: { xs: '4px 0', sm: '8px 0' }
+          }
         }}
       >
         🎉 Congratulations! You've received a RWF {stats.welcomeBonus} welcome bonus. Start earning more by watching videos and growing your team!
       </Alert>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={{ xs: 2, sm: 3 }}>
         <Grid item xs={12} sm={6} md={3}>
           <Card
             sx={{
               background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)',
-              borderRadius: 4,
-              p: 3,
+              borderRadius: { xs: 3, sm: 4 },
+              p: { xs: 2, sm: 3 },
               color: 'white',
               textAlign: 'center',
               boxShadow: '0 8px 32px rgba(255, 152, 0, 0.3)',
@@ -237,15 +270,33 @@ export default function Dashboard() {
               }
             }}
           >
-            <CardContent sx={{ position: 'relative', zIndex: 1 }}>
-              <MonetizationOn sx={{ fontSize: 48, mb: 1 }} />
-              <Typography variant="h4" fontWeight="bold">
+            <CardContent sx={{ position: 'relative', zIndex: 1, p: { xs: 2, sm: 3 } }}>
+              <MonetizationOn sx={{ fontSize: { xs: 36, sm: 48 }, mb: 1 }} />
+              <Typography 
+                variant="h4" 
+                fontWeight="bold"
+                sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}
+              >
                 {stats.points.toLocaleString()} pts
               </Typography>
-              <Typography variant="h6" fontWeight="bold" sx={{ opacity: 0.9 }}>
+              <Typography 
+                variant="h6" 
+                fontWeight="bold" 
+                sx={{ 
+                  opacity: 0.9,
+                  fontSize: { xs: '1rem', sm: '1.25rem' }
+                }}
+              >
                 Total Points
               </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.8, mt: 1 }}>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  opacity: 0.8, 
+                  mt: 1,
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                }}
+              >
                 Including {stats.welcomeBonus} welcome bonus
               </Typography>
             </CardContent>
@@ -255,8 +306,8 @@ export default function Dashboard() {
           <Card
             sx={{
               background: 'linear-gradient(135deg, #2196F3 0%, #21CBF3 100%)',
-              borderRadius: 4,
-              p: 3,
+              borderRadius: { xs: 3, sm: 4 },
+              p: { xs: 2, sm: 3 },
               color: 'white',
               textAlign: 'center',
               boxShadow: '0 8px 32px rgba(33, 150, 243, 0.3)',
@@ -267,15 +318,33 @@ export default function Dashboard() {
               }
             }}
           >
-            <CardContent>
-              <PlayCircle sx={{ fontSize: 48, mb: 1 }} />
-              <Typography variant="h4" fontWeight="bold">
+            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+              <PlayCircle sx={{ fontSize: { xs: 36, sm: 48 }, mb: 1 }} />
+              <Typography 
+                variant="h4" 
+                fontWeight="bold"
+                sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}
+              >
                 {stats.videoPoints.toLocaleString()} pts
               </Typography>
-              <Typography variant="h6" fontWeight="bold" sx={{ opacity: 0.9 }}>
+              <Typography 
+                variant="h6" 
+                fontWeight="bold" 
+                sx={{ 
+                  opacity: 0.9,
+                  fontSize: { xs: '1rem', sm: '1.25rem' }
+                }}
+              >
                 Video Points
               </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.8, mt: 1 }}>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  opacity: 0.8, 
+                  mt: 1,
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                }}
+              >
                 From {stats.videosWatched} videos watched
               </Typography>
             </CardContent>
@@ -285,8 +354,8 @@ export default function Dashboard() {
           <Card
             sx={{
               background: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
-              borderRadius: 4,
-              p: 3,
+              borderRadius: { xs: 3, sm: 4 },
+              p: { xs: 2, sm: 3 },
               color: 'white',
               textAlign: 'center',
               boxShadow: '0 8px 32px rgba(76, 175, 80, 0.3)',
@@ -297,18 +366,44 @@ export default function Dashboard() {
               }
             }}
           >
-            <CardContent>
-              <TrendingUp sx={{ fontSize: 48, mb: 1 }} />
-              <Typography variant="h4" fontWeight="bold">
+            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+              <TrendingUp sx={{ fontSize: { xs: 36, sm: 48 }, mb: 1 }} />
+              <Typography 
+                variant="h4" 
+                fontWeight="bold"
+                sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}
+              >
                 RWF {stats.referralEarnings.toLocaleString()}
               </Typography>
-              <Typography variant="h6" fontWeight="bold" sx={{ opacity: 0.9 }}>
+              <Typography 
+                variant="h6" 
+                fontWeight="bold" 
+                sx={{ 
+                  opacity: 0.9,
+                  fontSize: { xs: '1rem', sm: '1.25rem' }
+                }}
+              >
                 Referral Earnings
               </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.8, mt: 1 }}>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  opacity: 0.8, 
+                  mt: 1,
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                }}
+              >
                 L1: {stats.level1Count} • L2: {stats.level2Count} • L3: {stats.level3Count}
               </Typography>
-              <Typography variant="caption" sx={{ opacity: 0.7, display: 'block', mt: 0.5 }}>
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  opacity: 0.7, 
+                  display: 'block', 
+                  mt: 0.5,
+                  fontSize: { xs: '0.7rem', sm: '0.75rem' }
+                }}
+              >
                 RWF {stats.referralBreakdown.level1?.toLocaleString()} + {stats.referralBreakdown.level2?.toLocaleString()} + {stats.referralBreakdown.level3?.toLocaleString()}
               </Typography>
             </CardContent>
@@ -318,8 +413,8 @@ export default function Dashboard() {
           <Card
             sx={{
               background: 'linear-gradient(135deg, #9C27B0 0%, #673AB7 100%)',
-              borderRadius: 4,
-              p: 3,
+              borderRadius: { xs: 3, sm: 4 },
+              p: { xs: 2, sm: 3 },
               color: 'white',
               textAlign: 'center',
               boxShadow: '0 8px 32px rgba(156, 39, 176, 0.3)',
@@ -330,15 +425,33 @@ export default function Dashboard() {
               }
             }}
           >
-            <CardContent>
-              <People sx={{ fontSize: 48, mb: 1 }} />
-              <Typography variant="h4" fontWeight="bold">
+            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+              <People sx={{ fontSize: { xs: 36, sm: 48 }, mb: 1 }} />
+              <Typography 
+                variant="h4" 
+                fontWeight="bold"
+                sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}
+              >
                 {stats.referrals}
               </Typography>
-              <Typography variant="h6" fontWeight="bold" sx={{ opacity: 0.9 }}>
+              <Typography 
+                variant="h6" 
+                fontWeight="bold" 
+                sx={{ 
+                  opacity: 0.9,
+                  fontSize: { xs: '1rem', sm: '1.25rem' }
+                }}
+              >
                 Team Members
               </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.8, mt: 1 }}>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  opacity: 0.8, 
+                  mt: 1,
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                }}
+              >
                 {stats.activeReferrals} active members
               </Typography>
             </CardContent>
@@ -348,10 +461,10 @@ export default function Dashboard() {
       
       <Box 
         mt={4} 
-        p={4} 
+        p={{ xs: 3, sm: 4 }}
         sx={{
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          borderRadius: 3, 
+          borderRadius: { xs: 2, sm: 3 },
           boxShadow: 5, 
           textAlign: 'center',
           position: 'relative',
@@ -368,15 +481,40 @@ export default function Dashboard() {
           }
         }}
       >
-        <Typography variant="h4" fontWeight={800} color="white" sx={{ position: 'relative', zIndex: 1 }}>
+        <Typography 
+          variant="h4" 
+          fontWeight={800} 
+          color="white" 
+          sx={{ 
+            position: 'relative', 
+            zIndex: 1,
+            fontSize: { xs: '1.5rem', sm: '2rem' }
+          }}
+        >
           🚀 Multi-Level Referral System!
         </Typography>
-        <Typography variant="h6" mt={1} color="white" sx={{ position: 'relative', zIndex: 1, opacity: 0.9 }}>
+        <Typography 
+          variant="h6" 
+          mt={1} 
+          color="white" 
+          sx={{ 
+            position: 'relative', 
+            zIndex: 1, 
+            opacity: 0.9,
+            fontSize: { xs: '1rem', sm: '1.25rem' },
+            px: { xs: 1, sm: 0 }
+          }}
+        >
           Build your team and earn from 3 levels deep
         </Typography>
         <Box mt={2} sx={{ position: 'relative', zIndex: 1 }}>
-          <Typography variant="body1" color="white" fontWeight="bold">
-            💰 Level 1: 4,000 RWF | Level 2: 1,500 RWF | Level 3: 1,000 RWF
+          <Typography 
+            variant="body1" 
+            color="white" 
+            fontWeight="bold"
+            sx={{ fontSize: { xs: '0.85rem', sm: '1rem' } }}
+          >
+            💰 Level 1: 4,000 RWF | Level 2: 2,000 RWF | Level 3: 500 RWF
           </Typography>
         </Box>
         <Button 
@@ -384,13 +522,14 @@ export default function Dashboard() {
           size="large"
           sx={{ 
             mt: 3, 
-            px: 4,
-            py: 1.5,
+            px: { xs: 3, sm: 4 },
+            py: { xs: 1, sm: 1.5 },
             textTransform: 'none', 
             fontWeight: 'bold',
             borderRadius: 3,
             background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)',
             boxShadow: 3,
+            fontSize: { xs: '0.9rem', sm: '1rem' },
             '&:hover': {
               boxShadow: 5,
               transform: 'translateY(-2px)'
@@ -405,48 +544,9 @@ export default function Dashboard() {
         </Button>
       </Box>
 
-      <Grid container spacing={3} mt={4}>
-        <Grid item xs={12} sm={6} md={6}>
-          <Card 
-            sx={{ 
-              background: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
-              color: 'white',
-              borderRadius: 3,
-              boxShadow: 3,
-              transition: 'transform 0.3s ease',
-              '&:hover': { transform: 'translateY(-5px)', boxShadow: 5 }
-            }}
-          >
-            <CardContent sx={{ textAlign: 'center', p: 4 }}>
-              <Redeem sx={{ fontSize: 60, mb: 2 }} />
-              <Typography variant="h5" fontWeight={700} gutterBottom>🎁 Redeem Rewards</Typography>
-              <Typography variant="body1" sx={{ mb: 3, opacity: 0.9 }}>
-                Use your {stats.points.toLocaleString()} points to redeem exciting rewards.
-              </Typography>
-              <Button 
-                variant="contained" 
-                size="large"
-                sx={{ 
-                  background: 'rgba(255,255,255,0.2)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255,255,255,0.3)',
-                  color: 'white',
-                  fontWeight: 'bold',
-                  borderRadius: 3,
-                  px: 3,
-                  '&:hover': {
-                    background: 'rgba(255,255,255,0.3)',
-                  }
-                }} 
-                onClick={() => navigate('/app/rewards')}
-                endIcon={<ArrowForward />}
-              >
-                Redeem Now
-              </Button>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={6}>
+      <Box mt={4}>
+        <Grid container justifyContent="center">
+          <Grid item xs={12} sm={8} md={6}>
           <Card 
             sx={{ 
               background: 'linear-gradient(135deg, #2196F3 0%, #21CBF3 100%)',
@@ -457,10 +557,24 @@ export default function Dashboard() {
               '&:hover': { transform: 'translateY(-5px)', boxShadow: 5 }
             }}
           >
-            <CardContent sx={{ textAlign: 'center', p: 4 }}>
-              <Share sx={{ fontSize: 60, mb: 2 }} />
-              <Typography variant="h5" fontWeight={700} gutterBottom>📢 Share & Earn</Typography>
-              <Typography variant="body1" sx={{ mb: 3, opacity: 0.9 }}>
+            <CardContent sx={{ textAlign: 'center', p: { xs: 3, sm: 4 } }}>
+              <Share sx={{ fontSize: { xs: 48, sm: 60 }, mb: 2 }} />
+              <Typography 
+                variant="h5" 
+                fontWeight={700} 
+                gutterBottom
+                sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
+              >
+                📢 Share & Earn
+              </Typography>
+              <Typography 
+                variant="body1" 
+                sx={{ 
+                  mb: 3, 
+                  opacity: 0.9,
+                  fontSize: { xs: '0.9rem', sm: '1rem' }
+                }}
+              >
                 Share your referral link and build your earning team of {stats.referrals} members.
               </Typography>
               <Button 
@@ -473,7 +587,9 @@ export default function Dashboard() {
                   color: 'white',
                   fontWeight: 'bold',
                   borderRadius: 3,
-                  px: 3,
+                  px: { xs: 2, sm: 3 },
+                  py: { xs: 0.8, sm: 1 },
+                  fontSize: { xs: '0.85rem', sm: '1rem' },
                   '&:hover': {
                     background: 'rgba(255,255,255,0.3)',
                   }
@@ -485,16 +601,17 @@ export default function Dashboard() {
               </Button>
             </CardContent>
           </Card>
+          </Grid>
         </Grid>
-      </Grid>
+      </Box>
       
       {/* Multilevel Earnings Breakdown Section */}
       <Box 
         mt={4} 
-        p={4} 
+        p={{ xs: 3, sm: 4 }}
         sx={{
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          borderRadius: 3, 
+          borderRadius: { xs: 2, sm: 3 },
           boxShadow: 5, 
           color: 'white',
           position: 'relative',
@@ -511,37 +628,83 @@ export default function Dashboard() {
           }
         }}
       >
-        <Typography variant="h4" fontWeight={800} gutterBottom sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
+        <Typography 
+          variant="h4" 
+          fontWeight={800} 
+          gutterBottom 
+          sx={{ 
+            position: 'relative', 
+            zIndex: 1, 
+            textAlign: 'center',
+            fontSize: { xs: '1.5rem', sm: '2rem' }
+          }}
+        >
           💰 Your Multilevel Earnings Breakdown
         </Typography>
-        <Typography variant="h6" sx={{ position: 'relative', zIndex: 1, textAlign: 'center', opacity: 0.9, mb: 3 }}>
+        <Typography 
+          variant="h6" 
+          sx={{ 
+            position: 'relative', 
+            zIndex: 1, 
+            textAlign: 'center', 
+            opacity: 0.9, 
+            mb: 3,
+            fontSize: { xs: '1rem', sm: '1.25rem' },
+            px: { xs: 1, sm: 0 }
+          }}
+        >
           Track your earnings across all three levels of your referral network
         </Typography>
         
-        <Grid container spacing={3} sx={{ position: 'relative', zIndex: 1 }}>
+        <Grid container spacing={{ xs: 2, sm: 3 }} sx={{ position: 'relative', zIndex: 1 }}>
           <Grid item xs={12} md={4}>
             <Card
               sx={{
                 background: 'rgba(255,255,255,0.1)',
                 backdropFilter: 'blur(10px)',
                 border: '1px solid rgba(255,255,255,0.2)',
-                borderRadius: 3,
+                borderRadius: { xs: 2, sm: 3 },
                 color: 'white',
                 textAlign: 'center',
-                p: 2
+                p: { xs: 1.5, sm: 2 }
               }}
             >
               <CardContent>
-                <Typography variant="h3" fontWeight="bold" color="inherit">
+                <Typography 
+                  variant="h3" 
+                  fontWeight="bold" 
+                  color="inherit"
+                  sx={{ fontSize: { xs: '1.8rem', sm: '3rem' } }}
+                >
                   {stats.level1Count}
                 </Typography>
-                <Typography variant="h6" fontWeight="bold" sx={{ opacity: 0.9 }} gutterBottom>
+                <Typography 
+                  variant="h6" 
+                  fontWeight="bold" 
+                  sx={{ 
+                    opacity: 0.9,
+                    fontSize: { xs: '1rem', sm: '1.25rem' }
+                  }} 
+                  gutterBottom
+                >
                   Level 1 Members
                 </Typography>
-                <Typography variant="h5" fontWeight="bold" color="inherit">
+                <Typography 
+                  variant="h5" 
+                  fontWeight="bold" 
+                  color="inherit"
+                  sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
+                >
                   RWF {stats.referralBreakdown.level1?.toLocaleString() || 0}
                 </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.8, mt: 1 }}>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    opacity: 0.8, 
+                    mt: 1,
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                  }}
+                >
                   4,000 RWF per active member
                 </Typography>
               </CardContent>
@@ -554,24 +717,49 @@ export default function Dashboard() {
                 background: 'rgba(255,255,255,0.1)',
                 backdropFilter: 'blur(10px)',
                 border: '1px solid rgba(255,255,255,0.2)',
-                borderRadius: 3,
+                borderRadius: { xs: 2, sm: 3 },
                 color: 'white',
                 textAlign: 'center',
-                p: 2
+                p: { xs: 1.5, sm: 2 }
               }}
             >
               <CardContent>
-                <Typography variant="h3" fontWeight="bold" color="inherit">
+                <Typography 
+                  variant="h3" 
+                  fontWeight="bold" 
+                  color="inherit"
+                  sx={{ fontSize: { xs: '1.8rem', sm: '3rem' } }}
+                >
                   {stats.level2Count}
                 </Typography>
-                <Typography variant="h6" fontWeight="bold" sx={{ opacity: 0.9 }} gutterBottom>
+                <Typography 
+                  variant="h6" 
+                  fontWeight="bold" 
+                  sx={{ 
+                    opacity: 0.9,
+                    fontSize: { xs: '1rem', sm: '1.25rem' }
+                  }} 
+                  gutterBottom
+                >
                   Level 2 Members
                 </Typography>
-                <Typography variant="h5" fontWeight="bold" color="inherit">
+                <Typography 
+                  variant="h5" 
+                  fontWeight="bold" 
+                  color="inherit"
+                  sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
+                >
                   RWF {stats.referralBreakdown.level2?.toLocaleString() || 0}
                 </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.8, mt: 1 }}>
-                  1,500 RWF per active member
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    opacity: 0.8, 
+                    mt: 1,
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                  }}
+                >
+                  2,000 RWF per active member
                 </Typography>
               </CardContent>
             </Card>
@@ -583,24 +771,49 @@ export default function Dashboard() {
                 background: 'rgba(255,255,255,0.1)',
                 backdropFilter: 'blur(10px)',
                 border: '1px solid rgba(255,255,255,0.2)',
-                borderRadius: 3,
+                borderRadius: { xs: 2, sm: 3 },
                 color: 'white',
                 textAlign: 'center',
-                p: 2
+                p: { xs: 1.5, sm: 2 }
               }}
             >
               <CardContent>
-                <Typography variant="h3" fontWeight="bold" color="inherit">
+                <Typography 
+                  variant="h3" 
+                  fontWeight="bold" 
+                  color="inherit"
+                  sx={{ fontSize: { xs: '1.8rem', sm: '3rem' } }}
+                >
                   {stats.level3Count}
                 </Typography>
-                <Typography variant="h6" fontWeight="bold" sx={{ opacity: 0.9 }} gutterBottom>
+                <Typography 
+                  variant="h6" 
+                  fontWeight="bold" 
+                  sx={{ 
+                    opacity: 0.9,
+                    fontSize: { xs: '1rem', sm: '1.25rem' }
+                  }} 
+                  gutterBottom
+                >
                   Level 3 Members
                 </Typography>
-                <Typography variant="h5" fontWeight="bold" color="inherit">
+                <Typography 
+                  variant="h5" 
+                  fontWeight="bold" 
+                  color="inherit"
+                  sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
+                >
                   RWF {stats.referralBreakdown.level3?.toLocaleString() || 0}
                 </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.8, mt: 1 }}>
-                  1,000 RWF per active member
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    opacity: 0.8, 
+                    mt: 1,
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                  }}
+                >
+                  500 RWF per active member
                 </Typography>
               </CardContent>
             </Card>

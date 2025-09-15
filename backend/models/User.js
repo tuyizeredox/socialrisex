@@ -119,10 +119,25 @@ userSchema.methods.matchPassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Generate referral code
-userSchema.pre('save', function(next) {
-  if (!this.referralCode) {
-    this.referralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+// Generate referral code based on username
+userSchema.pre('save', async function(next) {
+  if (!this.referralCode && this.fullName) {
+    try {
+      // Use fullName as referral code, removing spaces and making URL-friendly
+      let baseCode = this.fullName.replace(/\s+/g, '').toLowerCase();
+      let referralCode = baseCode;
+      let counter = 1;
+      
+      // Check for uniqueness and add numbers if needed
+      while (await mongoose.model('User').findOne({ referralCode, _id: { $ne: this._id } })) {
+        referralCode = `${baseCode}${counter}`;
+        counter++;
+      }
+      
+      this.referralCode = referralCode;
+    } catch (error) {
+      return next(error);
+    }
   }
   next();
 });

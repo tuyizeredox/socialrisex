@@ -91,8 +91,8 @@ export default function Activate() {
   const paymentMethods = [
     {
       name: 'MTN MoMo',
-      code: '*182*8*1*348807*8000#',
-      recipient: 'CLEMENTINE',
+      code: '*182*8*1*000564*8000#',
+      recipient: 'N AND M SHOP LTD',
       color: '#FFC107',
       icon: '💛'
     }
@@ -141,7 +141,7 @@ export default function Activate() {
   // Show loading while checking transaction status
   if (checkingStatus) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Container maxWidth="lg" sx={{ py: 4, px: { xs: 2, sm: 3 } }}>
         <Box 
           sx={{ 
             display: 'flex', 
@@ -159,13 +159,13 @@ export default function Activate() {
   // Show pending transaction status if user has already submitted
   if (pendingTransaction) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Container maxWidth="lg" sx={{ py: 4, px: { xs: 2, sm: 3 } }}>
         {/* Header Section */}
         <Box
           sx={{
             background: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)',
-            borderRadius: 4,
-            p: 4,
+            borderRadius: { xs: 3, sm: 4 },
+            p: { xs: 3, sm: 4 },
             mb: 4,
             color: 'white',
             textAlign: 'center',
@@ -187,16 +187,21 @@ export default function Activate() {
             <Avatar
               sx={{
                 bgcolor: 'rgba(255,255,255,0.2)',
-                width: 80,
-                height: 80,
+                width: { xs: 60, sm: 80 },
+                height: { xs: 60, sm: 80 },
                 mx: 'auto',
                 mb: 2,
                 backdropFilter: 'blur(10px)'
               }}
             >
-              <Schedule sx={{ fontSize: 40 }} />
+              <Schedule sx={{ fontSize: { xs: 30, sm: 40 } }} />
             </Avatar>
-            <Typography variant="h3" fontWeight={800} gutterBottom>
+            <Typography 
+              variant="h3" 
+              fontWeight={800} 
+              gutterBottom
+              sx={{ fontSize: { xs: '1.8rem', sm: '2.5rem', md: '3rem' } }}
+            >
               ⏳ Activation Pending
             </Typography>
             <Typography variant="h6" sx={{ opacity: 0.9, mb: 2 }}>
@@ -463,28 +468,75 @@ export default function Activate() {
                       <Typography variant="h4" fontWeight={800} gutterBottom sx={{ color: '#FF8F00' }}>
                         {method.name}
                       </Typography>
-                      <Typography variant="h6" color="text.secondary" gutterBottom sx={{ fontWeight: 600 }}>
-                        Pay to: <strong>{method.recipient}</strong>
-                      </Typography>
+                      
+                      {/* Recipient Name - Enhanced */}
+                      <Box
+                        sx={{
+                          bgcolor: '#E3F2FD',
+                          border: '2px solid #2196F3',
+                          p: 2,
+                          borderRadius: 2,
+                          mb: 3,
+                          mx: 1
+                        }}
+                      >
+                        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.9rem' }}>
+                          Send Money To:
+                        </Typography>
+                        <Typography variant="h6" fontWeight={700} sx={{ color: '#1976D2' }}>
+                          {method.recipient}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#666', fontSize: '0.85rem', mt: 1 }}>
+                          (Make sure to send to this exact name)
+                        </Typography>
+                      </Box>
+
+                      {/* Payment Code - Enhanced */}
                       <Box
                         sx={{
                           bgcolor: '#FFECB3',
-                          border: '2px solid #FF8F00',
+                          border: '3px solid #FF8F00',
                           p: 3,
                           borderRadius: 2,
                           fontFamily: 'monospace',
-                          fontSize: '1.2rem',
+                          fontSize: '1.3rem',
                           fontWeight: 'bold',
                           color: '#E65100',
                           mt: 2,
-                          letterSpacing: 1
+                          letterSpacing: 1,
+                          boxShadow: '0 4px 12px rgba(255, 143, 0, 0.3)'
                         }}
                       >
                         {method.code}
                       </Box>
-                      <Typography variant="body2" sx={{ mt: 2, fontStyle: 'italic', color: 'text.secondary' }}>
-                        Dial the code above to make payment
+                      
+                      <Typography variant="body1" sx={{ mt: 2, fontWeight: 600, color: '#E65100' }}>
+                        📱 Dial this USSD code to send 8,000 RWF
                       </Typography>
+                      
+                      {/* Step by step instructions */}
+                      <Box sx={{ mt: 3, textAlign: 'left' }}>
+                        <Typography variant="body2" fontWeight={600} sx={{ mb: 2, color: '#FF8F00', textAlign: 'center' }}>
+                          🔸 Payment Steps:
+                        </Typography>
+                        <Box sx={{ pl: 2 }}>
+                          <Typography variant="body2" sx={{ mb: 1, color: '#666' }}>
+                            1. Dial: <strong>{method.code}</strong>
+                          </Typography>
+                          <Typography variant="body2" sx={{ mb: 1, color: '#666' }}>
+                            2. Confirm recipient: <strong>{method.recipient}</strong>
+                          </Typography>
+                          <Typography variant="body2" sx={{ mb: 1, color: '#666' }}>
+                            3. Enter amount: <strong>8000</strong>
+                          </Typography>
+                          <Typography variant="body2" sx={{ mb: 1, color: '#666' }}>
+                            4. Enter your PIN to complete
+                          </Typography>
+                          <Typography variant="body2" sx={{ color: '#4CAF50', fontWeight: 600 }}>
+                            5. Copy the transaction ID from the SMS
+                          </Typography>
+                        </Box>
+                      </Box>
                     </CardContent>
                   </Card>
                 </Box>
@@ -505,8 +557,12 @@ export default function Activate() {
               <Typography variant="h5" fontWeight={700} gutterBottom>
                 Submit Transaction ID for Admin Approval
               </Typography>
-              <Typography variant="body1" sx={{ mb: 3, opacity: 0.9 }}>
-                After making payment, enter your MTN MoMo transaction ID below. Our admin will verify and approve your account.
+              <Typography variant="body1" sx={{ mb: 2, opacity: 0.9 }}>
+                After making payment to <strong>N AND M SHOP LTD</strong> using code <strong>*182*8*1*000564*8000#</strong>, 
+                enter your MTN MoMo transaction ID below.
+              </Typography>
+              <Typography variant="body1" sx={{ mb: 3, opacity: 0.9, fontStyle: 'italic' }}>
+                💡 Find your transaction ID in the SMS confirmation message you received after payment.
               </Typography>
               
               <Box sx={{ maxWidth: 400, mx: 'auto' }}>

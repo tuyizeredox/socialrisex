@@ -128,11 +128,22 @@ export default function Videos() {
   
   // Update the render method to show watched status
   const renderVideoCard = (video) => (
-    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Card sx={{ 
+      height: '100%', 
+      display: 'flex', 
+      flexDirection: 'column',
+      borderRadius: { xs: 2, sm: 3 },
+      boxShadow: { xs: 2, sm: 3 },
+      transition: 'all 0.3s ease',
+      '&:hover': {
+        transform: { xs: 'none', sm: 'translateY(-4px)' },
+        boxShadow: { xs: 2, sm: 5 }
+      }
+    }}>
       <Box sx={{ position: 'relative' }}>
         <CardMedia
           component="img"
-          height="180"
+          height={{ xs: 150, sm: 180 }}
           image={`https://img.youtube.com/vi/${extractVideoId(video.youtubeUrl)}/hqdefault.jpg`}
           alt={video.title}
           sx={{ cursor: 'pointer' }}
@@ -154,31 +165,49 @@ export default function Videos() {
           </Box>
         )}
       </Box>
-      <CardContent sx={{ flexGrow: 1 }}>
+      <CardContent sx={{ 
+        flexGrow: 1,
+        p: { xs: 2, sm: 2 }
+      }}>
         {renderVideoStatus(video)}
-        <Typography gutterBottom variant="h6" component="div" noWrap>
+        <Typography 
+          gutterBottom 
+          variant="h6" 
+          component="div" 
+          noWrap
+          sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
+        >
           {video.title}
         </Typography>
         <Box display="flex" alignItems="center" mb={1}>
-          <Timer sx={{ mr: 1, fontSize: 20 }} />
-          <Typography variant="body2" color="text.secondary">
+          <Timer sx={{ mr: 1, fontSize: { xs: 16, sm: 20 } }} />
+          <Typography 
+            variant="body2" 
+            color="text.secondary"
+            sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+          >
             Min. watch time: {video.minimumWatchTime}s
           </Typography>
         </Box>
         <Box display="flex" alignItems="center">
-          <MonetizationOn sx={{ mr: 1, fontSize: 20 }} />
-          <Typography variant="body2" color="text.secondary">
+          <MonetizationOn sx={{ mr: 1, fontSize: { xs: 16, sm: 20 } }} />
+          <Typography 
+            variant="body2" 
+            color="text.secondary"
+            sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+          >
             {video.pointsReward} points
           </Typography>
         </Box>
       </CardContent>
-      <CardActions>
+      <CardActions sx={{ p: { xs: 1.5, sm: 2 } }}>
         {video.watched ? (
           <Chip
             icon={<CheckCircle />}
             label="Completed"
             color="success"
             size="small"
+            sx={{ fontSize: { xs: '0.7rem', sm: '0.8125rem' } }}
           />
         ) : (
           <Button
@@ -186,6 +215,11 @@ export default function Videos() {
             variant="contained"
             onClick={() => handleWatchVideo(video)}
             disabled={!user.isActive}
+            size={window.innerWidth < 600 ? 'small' : 'medium'}
+            sx={{ 
+              fontSize: { xs: '0.75rem', sm: '0.875rem' },
+              px: { xs: 2, sm: 3 }
+            }}
           >
             Watch Video
           </Button>
@@ -240,7 +274,7 @@ export default function Videos() {
   // Remove this duplicate declaration
   // const [filter, setFilter] = useState('all');
   return (
-    <Container>
+    <Container sx={{ px: { xs: 2, sm: 3 } }}>
       <PageHeader 
         title="Available Videos" 
         subtitle="Watch videos to earn points"
@@ -252,10 +286,18 @@ export default function Videos() {
         </Alert>
       )}
   
-      <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
+      <Box sx={{ 
+        mb: 3, 
+        display: 'flex', 
+        gap: { xs: 1, sm: 2 },
+        flexWrap: 'wrap',
+        justifyContent: { xs: 'center', sm: 'flex-start' }
+      }}>
         <Button
           variant={filter === 'all' ? 'contained' : 'outlined'}
           onClick={() => setFilter('all')}
+          size={window.innerWidth < 600 ? 'small' : 'medium'}
+          sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
         >
           All Videos
         </Button>
@@ -263,6 +305,8 @@ export default function Videos() {
           variant={filter === 'unwatched' ? 'contained' : 'outlined'}
           onClick={() => setFilter('unwatched')}
           startIcon={<PlayCircle />}
+          size={window.innerWidth < 600 ? 'small' : 'medium'}
+          sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
         >
           Unwatched
         </Button>
@@ -271,12 +315,14 @@ export default function Videos() {
           onClick={() => setFilter('watched')}
           startIcon={<CheckCircle />}
           color="success"
+          size={window.innerWidth < 600 ? 'small' : 'medium'}
+          sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
         >
           Watched
         </Button>
       </Box>
   
-      <Grid container spacing={3}>
+      <Grid container spacing={{ xs: 2, sm: 3 }}>
         {videos
           .filter(video => {
             if (filter === 'watched') return isVideoCompleted(video);

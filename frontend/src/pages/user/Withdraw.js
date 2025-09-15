@@ -158,10 +158,10 @@ export default function Withdraw() {
   }
 
   return (
-    <Container>
+    <Container sx={{ px: { xs: 2, sm: 3 } }}>
       <PageHeader title="Withdraw Earnings" />
       
-      <Grid container spacing={3} mb={4}>
+      <Grid container spacing={{ xs: 2, sm: 3 }} mb={4}>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Total Referral Earnings"
@@ -196,13 +196,22 @@ export default function Withdraw() {
         </Grid>
       </Grid>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={{ xs: 2, sm: 3 }}>
         <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
+          <Paper sx={{ p: { xs: 2, sm: 3 } }}>
+            <Typography 
+              variant="h6" 
+              gutterBottom
+              sx={{ fontSize: { xs: '1.125rem', sm: '1.25rem' } }}
+            >
               Available Balance
             </Typography>
-            <Typography variant="h4" color="primary" gutterBottom>
+            <Typography 
+              variant="h4" 
+              color="primary" 
+              gutterBottom
+              sx={{ fontSize: { xs: '1.75rem', sm: '2rem' } }}
+            >
               RWF {balance.availableBalance.toLocaleString()}
             </Typography>
 

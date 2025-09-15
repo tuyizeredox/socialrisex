@@ -73,13 +73,13 @@ export default function AdminDashboard() {
   }
 
   return (
-    <Container maxWidth="xl">
+    <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3 } }}>
       {/* Modern Header Section */}
       <Box 
         sx={{ 
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          borderRadius: 4,
-          p: 4,
+          borderRadius: { xs: 3, sm: 4 },
+          p: { xs: 3, sm: 4 },
           mb: 4,
           color: 'white',
           position: 'relative',
@@ -97,8 +97,20 @@ export default function AdminDashboard() {
         }}
       >
         <Box sx={{ position: 'relative', zIndex: 1 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: { xs: 'flex-start', sm: 'center' }, 
+            mb: 2,
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: { xs: 2, sm: 0 }
+          }}>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center',
+              flexDirection: { xs: 'column', sm: 'row' },
+              textAlign: { xs: 'center', sm: 'left' }
+            }}>
               <img 
                 src={worldwideLogo} 
                 alt="Worldwide Earn" 
@@ -107,26 +119,44 @@ export default function AdminDashboard() {
                   height: 60, 
                   borderRadius: '50%',
                   marginRight: 16,
+                  marginBottom: 8,
                   border: '3px solid rgba(255,255,255,0.3)',
                   boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
                 }}
               />
               <Box>
-                <Typography variant="h3" fontWeight={800} gutterBottom>
+                <Typography 
+                  variant="h3" 
+                  fontWeight={800} 
+                  gutterBottom
+                  sx={{ fontSize: { xs: '1.8rem', sm: '2.5rem', md: '3rem' } }}
+                >
                   🌐 Admin Control Center
                 </Typography>
-                <Typography variant="h6" sx={{ opacity: 0.9 }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    opacity: 0.9,
+                    fontSize: { xs: '1rem', sm: '1.25rem' }
+                  }}
+                >
                   Worldwide Earn Platform Management
                 </Typography>
               </Box>
             </Box>
             
-            <Box sx={{ display: 'flex', gap: 1 }}>
+            <Box sx={{ 
+              display: 'flex', 
+              gap: 1,
+              justifyContent: { xs: 'center', sm: 'flex-end' },
+              width: { xs: '100%', sm: 'auto' }
+            }}>
               <IconButton 
                 onClick={fetchStats}
                 sx={{ 
                   bgcolor: 'rgba(255,255,255,0.1)', 
                   color: 'white',
+                  size: { xs: 'small', sm: 'medium' },
                   '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' }
                 }}
               >
@@ -136,6 +166,7 @@ export default function AdminDashboard() {
                 sx={{ 
                   bgcolor: 'rgba(255,255,255,0.1)', 
                   color: 'white',
+                  size: { xs: 'small', sm: 'medium' },
                   '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' }
                 }}
               >
@@ -145,6 +176,7 @@ export default function AdminDashboard() {
                 sx={{ 
                   bgcolor: 'rgba(255,255,255,0.1)', 
                   color: 'white',
+                  size: { xs: 'small', sm: 'medium' },
                   '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' }
                 }}
               >
@@ -153,36 +185,51 @@ export default function AdminDashboard() {
             </Box>
           </Box>
           
-          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+          <Box sx={{ 
+            display: 'flex', 
+            gap: { xs: 1, sm: 2 }, 
+            flexWrap: 'wrap',
+            justifyContent: { xs: 'center', sm: 'flex-start' }
+          }}>
             <Chip
               icon={<Security />}
               label="System Status: Online"
+              size="small"
               sx={{
                 bgcolor: 'rgba(76, 175, 80, 0.2)',
                 color: 'white',
                 border: '1px solid rgba(76, 175, 80, 0.3)',
+                fontSize: { xs: '0.7rem', sm: '0.8125rem' },
+                '& .MuiChip-icon': {
+                  fontSize: { xs: '1rem', sm: '1.125rem' }
+                }
               }}
             />
             <Chip
               icon={<DashboardIcon />}
               label={`Last Updated: ${new Date().toLocaleTimeString()}`}
+              size="small"
               sx={{
                 bgcolor: 'rgba(255,255,255,0.1)',
                 color: 'white',
                 border: '1px solid rgba(255,255,255,0.2)',
+                fontSize: { xs: '0.7rem', sm: '0.8125rem' },
+                '& .MuiChip-icon': {
+                  fontSize: { xs: '1rem', sm: '1.125rem' }
+                }
               }}
             />
           </Box>
         </Box>
       </Box>
 
-      <Grid container spacing={4}>
+      <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
           <Card
             sx={{
               background: 'linear-gradient(135deg, #2196F3 0%, #21CBF3 100%)',
-              borderRadius: 4,
-              p: 3,
+              borderRadius: { xs: 3, sm: 4 },
+              p: { xs: 2, sm: 3 },
               color: 'white',
               textAlign: 'center',
               boxShadow: '0 8px 32px rgba(33, 150, 243, 0.3)',
@@ -195,15 +242,33 @@ export default function AdminDashboard() {
               overflow: 'hidden'
             }}
           >
-            <CardContent>
-              <People sx={{ fontSize: 48, mb: 1 }} />
-              <Typography variant="h4" fontWeight="bold">
+            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+              <People sx={{ fontSize: { xs: 36, sm: 48 }, mb: 1 }} />
+              <Typography 
+                variant="h4" 
+                fontWeight="bold"
+                sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}
+              >
                 {stats?.totalUsers?.toLocaleString() || 0}
               </Typography>
-              <Typography variant="h6" fontWeight="bold" sx={{ opacity: 0.9 }}>
+              <Typography 
+                variant="h6" 
+                fontWeight="bold" 
+                sx={{ 
+                  opacity: 0.9,
+                  fontSize: { xs: '1rem', sm: '1.25rem' }
+                }}
+              >
                 Total Users
               </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.8, mt: 1 }}>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  opacity: 0.8, 
+                  mt: 1,
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                }}
+              >
                 {stats?.activeUsers || 0} active members
               </Typography>
               <LinearProgress 
@@ -222,8 +287,8 @@ export default function AdminDashboard() {
           <Card
             sx={{
               background: 'linear-gradient(135deg, #00BCD4 0%, #0097A7 100%)',
-              borderRadius: 4,
-              p: 3,
+              borderRadius: { xs: 3, sm: 4 },
+              p: { xs: 2, sm: 3 },
               color: 'white',
               textAlign: 'center',
               boxShadow: '0 8px 32px rgba(0, 188, 212, 0.3)',
@@ -234,15 +299,33 @@ export default function AdminDashboard() {
               }
             }}
           >
-            <CardContent>
-              <VideoLibrary sx={{ fontSize: 48, mb: 1 }} />
-              <Typography variant="h4" fontWeight="bold">
+            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+              <VideoLibrary sx={{ fontSize: { xs: 36, sm: 48 }, mb: 1 }} />
+              <Typography 
+                variant="h4" 
+                fontWeight="bold"
+                sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}
+              >
                 {stats?.totalVideos?.toLocaleString() || 0}
               </Typography>
-              <Typography variant="h6" fontWeight="bold" sx={{ opacity: 0.9 }}>
+              <Typography 
+                variant="h6" 
+                fontWeight="bold" 
+                sx={{ 
+                  opacity: 0.9,
+                  fontSize: { xs: '1rem', sm: '1.25rem' }
+                }}
+              >
                 Total Videos
               </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.8, mt: 1 }}>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  opacity: 0.8, 
+                  mt: 1,
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                }}
+              >
                 {stats?.activeVideos || 0} currently active
               </Typography>
               <LinearProgress 
@@ -261,8 +344,8 @@ export default function AdminDashboard() {
           <Card
             sx={{
               background: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
-              borderRadius: 4,
-              p: 3,
+              borderRadius: { xs: 3, sm: 4 },
+              p: { xs: 2, sm: 3 },
               color: 'white',
               textAlign: 'center',
               boxShadow: '0 8px 32px rgba(76, 175, 80, 0.3)',
@@ -273,8 +356,8 @@ export default function AdminDashboard() {
               }
             }}
           >
-            <CardContent>
-              <MonetizationOn sx={{ fontSize: 48, mb: 1 }} />
+            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+              <MonetizationOn sx={{ fontSize: { xs: 36, sm: 48 }, mb: 1 }} />
               <Typography variant="h4" fontWeight="bold">
                 {stats?.totalPoints?.toLocaleString() || 0}
               </Typography>
@@ -297,8 +380,8 @@ export default function AdminDashboard() {
           <Card
             sx={{
               background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)',
-              borderRadius: 4,
-              p: 3,
+              borderRadius: { xs: 3, sm: 4 },
+              p: { xs: 2, sm: 3 },
               color: 'white',
               textAlign: 'center',
               boxShadow: '0 8px 32px rgba(255, 152, 0, 0.3)',
@@ -309,8 +392,8 @@ export default function AdminDashboard() {
               }
             }}
           >
-            <CardContent>
-              <AccountBalance sx={{ fontSize: 48, mb: 1 }} />
+            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+              <AccountBalance sx={{ fontSize: { xs: 36, sm: 48 }, mb: 1 }} />
               <Typography variant="h4" fontWeight="bold">
                 {stats?.pendingWithdrawals?.toLocaleString() || 0}
               </Typography>
@@ -341,8 +424,8 @@ export default function AdminDashboard() {
           <Card
             sx={{
               background: 'linear-gradient(135deg, #9C27B0 0%, #673AB7 100%)',
-              borderRadius: 4,
-              p: 3,
+              borderRadius: { xs: 3, sm: 4 },
+              p: { xs: 2, sm: 3 },
               color: 'white',
               textAlign: 'center',
               boxShadow: '0 8px 32px rgba(156, 39, 176, 0.3)',
@@ -355,8 +438,8 @@ export default function AdminDashboard() {
             }}
             onClick={() => window.location.href = '/admin/transactions'}
           >
-            <CardContent>
-              <Receipt sx={{ fontSize: 48, mb: 1 }} />
+            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+              <Receipt sx={{ fontSize: { xs: 36, sm: 48 }, mb: 1 }} />
               <Typography variant="h4" fontWeight="bold">
                 {stats?.pendingTransactions?.toLocaleString() || 0}
               </Typography>

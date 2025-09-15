@@ -24,10 +24,25 @@ export const register = async (req, res, next) => {
       throw new ErrorResponse('Mobile number already registered', 400);
     }
 
+    // Check if username (fullName) already exists
+    const existingName = await User.findOne({ 
+      fullName: { $regex: new RegExp(`^${fullName.trim()}$`, 'i') }
+    });
+
+    if (existingName) {
+      throw new ErrorResponse('This name already exists. Please use another name.', 400);
+    }
+
     // Find referrer if referral code provided
     let referredBy;
     if (referralCode) {
-      referredBy = await User.findOne({ referralCode });
+      // Try finding by referralCode first (username-based), then by fullName
+      referredBy = await User.findOne({ 
+        $or: [
+          { referralCode: referralCode.toLowerCase() },
+          { fullName: { $regex: new RegExp(`^${referralCode}$`, 'i') } }
+        ]
+      });
     }
 
     // Create user
@@ -36,8 +51,8 @@ export const register = async (req, res, next) => {
       email,
       mobileNumber,
       password,
-      referredBy: referredBy?._id,
-      referralCode: crypto.randomBytes(3).toString('hex').toUpperCase()
+      referredBy: referredBy?._id
+      // referralCode will be auto-generated from fullName in the pre-save hook
     });
 
     sendTokenResponse(user, 201, res);
