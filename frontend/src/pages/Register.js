@@ -19,9 +19,10 @@ import {
   IconButton,
   InputAdornment,
 } from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { Visibility, VisibilityOff, Person } from '@mui/icons-material';
 import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import api from '../utils/api';
 import worldwideLogo from '../assets/worldwide.png';
 
 export default function Register() {
@@ -41,6 +42,7 @@ export default function Register() {
   const [isReferralLocked, setIsReferralLocked] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [referrerName, setReferrerName] = useState('');
 
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -53,12 +55,25 @@ export default function Register() {
     { code: '+255', label: 'Tanzania (+255)' },
   ];
 
+  const fetchReferrerName = async (referralCode) => {
+    try {
+      // Since we don't have a specific API to get referrer info by code,
+      // we'll use the referral code as the display name
+      // In a real-world scenario, you might want to add a backend endpoint for this
+      setReferrerName(referralCode);
+    } catch (error) {
+      console.log('Could not fetch referrer name:', error);
+      setReferrerName(referralCode);
+    }
+  };
+
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const refCode = params.get('ref');
     if (refCode) {
       setFormData((prev) => ({ ...prev, referralCode: refCode }));
       setIsReferralLocked(true);
+      fetchReferrerName(refCode);
     }
   }, [location.search]);
 
@@ -334,24 +349,40 @@ export default function Register() {
             }}
           />
 
-          <TextField
-            fullWidth
-            label="Referral Code (Optional)"
+          {/* Hidden referral field for background processing */}
+          <input
+            type="hidden"
             name="referralCode"
             value={formData.referralCode}
-            onChange={handleChange}
-            disabled={isReferralLocked}
-            variant="outlined"
-            sx={{
-              mb: 3,
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 2,
-                '&:hover fieldset': { borderColor: 'primary.main' },
-                '&.Mui-focused fieldset': { borderColor: 'primary.main' },
-              },
-            }}
-            helperText={isReferralLocked ? 'Provided via referral link' : ''}
           />
+
+          {/* Show referrer info if present */}
+          {referrerName && (
+            <Box
+              sx={{
+                mb: 3,
+                p: 2,
+                borderRadius: 2,
+                backgroundColor: 'primary.50',
+                border: '1px solid',
+                borderColor: 'primary.200',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+              }}
+            >
+              <Person sx={{ color: 'primary.main' }} />
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  color: 'primary.dark',
+                  fontWeight: 'medium'
+                }}
+              >
+                Referred by: <strong>{referrerName}</strong>
+              </Typography>
+            </Box>
+          )}
 
           <FormControlLabel
             control={
