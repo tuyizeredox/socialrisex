@@ -30,7 +30,12 @@ import {
   Switch,
   FormControlLabel,
   Grid,
-  Alert
+  Alert,
+  Card,
+  CardContent,
+  Avatar,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import {
   Visibility,
@@ -41,6 +46,9 @@ import {
   People,
   Delete,
   Edit,
+  FilterList,
+  Download,
+  Upload
 } from '@mui/icons-material';
 import api from '../../utils/api';
 import PageHeader from '../../components/common/PageHeader';
@@ -57,6 +65,7 @@ export default function UserManagement() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState('');
   const [pagination, setPagination] = useState({ page: 0, limit: 10, total: 0 });
+  const [viewMode, setViewMode] = useState('table'); // 'table' or 'cards'
   
   // Delete dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -79,6 +88,8 @@ export default function UserManagement() {
 
   const { showNotification } = useNotification();
   const debouncedSearch = useDebounce(search, 500);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const fetchUsers = async () => {
     try {
@@ -351,126 +362,510 @@ export default function UserManagement() {
     },
   ];
 
-  return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <PageHeader
-        title="User Management"
-        breadcrumbs={[
-          { label: 'Dashboard', path: '/admin' },
-          { label: 'Users', path: '/admin/users' },
-        ]}
-        action={
-          <Button
-            variant="contained"
-            startIcon={<PersonAdd />}
-            sx={{
-              borderRadius: 2,
-              background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
-              '&:hover': { background: 'linear-gradient(45deg, #1565c0, #2196f3)' },
-            }}
-            onClick={() => {/* Handle add user */}}
-          >
-            Add User
-          </Button>
+  const renderUserCard = (user) => (
+    <Card
+      key={user._id}
+      sx={{
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(247,247,247,0.9) 100%)',
+        backdropFilter: 'blur(10px)',
+        borderRadius: 4,
+        boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+        border: '1px solid rgba(255,255,255,0.2)',
+        transition: 'all 0.3s ease',
+        position: 'relative',
+        overflow: 'hidden',
+        '&:hover': {
+          transform: 'translateY(-8px)',
+          boxShadow: '0 16px 40px rgba(0,0,0,0.2)',
+        },
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 4,
+          background: user.isActive 
+            ? 'linear-gradient(90deg, #4CAF50, #81C784)'
+            : 'linear-gradient(90deg, #f44336, #ef5350)',
         }
-      />
-
-      <Paper
-        sx={{
-          p: 3,
-          borderRadius: 3,
-          boxShadow: '0 6px 20px rgba(0,0,0,0.1)',
-          bgcolor: 'background.paper',
-          mt: 3,
-        }}
-      >
-        <Box mb={3}>
-          <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="Search users by name or email..."
-            value={search}
-            onChange={(e) => handleSearch(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search sx={{ color: 'grey.500' }} />
-                </InputAdornment>
-              ),
-            }}
+      }}
+    >
+      <CardContent sx={{ p: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
+          <Avatar
             sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 2,
-                '&:hover fieldset': { borderColor: 'primary.main' },
-                '&.Mui-focused fieldset': { borderColor: 'primary.main' },
-              },
+              width: 60,
+              height: 60,
+              bgcolor: user.isActive ? 'primary.main' : 'grey.400',
+              fontSize: '1.5rem',
+              fontWeight: 'bold'
             }}
-          />
+          >
+            {user.fullName?.charAt(0) || 'U'}
+          </Avatar>
+          <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <Typography variant="h6" fontWeight="bold" noWrap>
+                {user.fullName}
+              </Typography>
+              {user.role === 'admin' && (
+                <Chip
+                  size="small"
+                  label="👨‍💼 Admin"
+                  sx={{
+                    background: 'linear-gradient(45deg, #FF6B6B, #4ECDC4)',
+                    color: 'white',
+                    fontWeight: 700,
+                    fontSize: '0.7rem'
+                  }}
+                />
+              )}
+            </Box>
+            <Typography variant="body2" color="text.secondary" noWrap>
+              {user.email}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {user.mobileNumber}
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+            <Chip
+              label={user.isActive ? "🟢 Active" : "🔴 Inactive"}
+              size="small"
+              sx={{
+                bgcolor: user.isActive ? 'success.light' : 'error.light',
+                color: user.isActive ? 'success.contrastText' : 'error.contrastText',
+                fontWeight: 'bold',
+                fontSize: '0.75rem'
+              }}
+            />
+            <Chip
+              label={user.isVerified ? "✅ Verified" : "⏳ Pending"}
+              size="small"
+              sx={{
+                bgcolor: user.isVerified ? 'info.light' : 'warning.light',
+                color: user.isVerified ? 'info.contrastText' : 'warning.contrastText',
+                fontWeight: 'bold',
+                fontSize: '0.75rem'
+              }}
+            />
+          </Box>
         </Box>
 
-        {users.length === 0 && !loading ? (
-          <EmptyState
-            icon={People}
-            title="No Users Found"
-            description={
-              search ? 'No users match your search criteria' : 'There are no users registered yet'
-            }
-          />
-        ) : (
-          <Box>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    {columns.map((col) => (
-                      <TableCell
-                        key={col.field}
-                        sx={{ fontWeight: 'bold', color: 'text.primary', bgcolor: 'grey.100' }}
-                      >
-                        {col.label}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {loading ? (
-                    <TableRow>
-                      <TableCell colSpan={columns.length} align="center">
-                        <CircularProgress />
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    users.map((row) => (
-                      <TableRow
-                        key={row._id}
-                        sx={{
-                          '&:hover': { bgcolor: 'grey.50', transition: 'background 0.2s' },
-                        }}
-                      >
-                        {columns.map((col) => (
-                          <TableCell key={col.field}>
-                            {col.render ? col.render(row) : row[col.field]}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={pagination.total}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handlePageChange}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              sx={{ mt: 2 }}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="h6" fontWeight="bold" color="primary.main">
+              {user.points?.toLocaleString() || 0}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Points Earned
+            </Typography>
+          </Box>
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="h6" fontWeight="bold" color="success.main">
+              RWF {user.earnings?.toLocaleString() || 0}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Total Earnings
+            </Typography>
+          </Box>
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="h6" fontWeight="bold" color="info.main">
+              {user.referralCount || 0}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Referrals
+            </Typography>
+          </Box>
+        </Box>
+
+        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mt: 2 }}>
+          <Tooltip title="View Details">
+            <IconButton
+              size="small"
+              sx={{
+                bgcolor: 'primary.light',
+                color: 'primary.contrastText',
+                '&:hover': { bgcolor: 'primary.main' }
+              }}
+            >
+              <Visibility fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Edit User">
+            <IconButton
+              size="small"
+              onClick={() => openEditDialog(user)}
+              sx={{
+                bgcolor: 'warning.light',
+                color: 'warning.contrastText',
+                '&:hover': { bgcolor: 'warning.main' }
+              }}
+            >
+              <Edit fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete User">
+            <IconButton
+              size="small"
+              onClick={() => openDeleteDialog(user)}
+              sx={{
+                bgcolor: 'error.light',
+                color: 'error.contrastText',
+                '&:hover': { bgcolor: 'error.main' }
+              }}
+            >
+              <Delete fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Box>
+
+        {user.referralCode && (
+          <Box sx={{ mt: 2, p: 1, bgcolor: 'grey.100', borderRadius: 1 }}>
+            <Typography variant="caption" color="text.secondary">
+              Referral Code:
+            </Typography>
+            <Chip
+              label={user.referralCode}
+              variant="outlined"
+              size="small"
+              onClick={() => {
+                navigator.clipboard.writeText(user.referralCode);
+                showNotification('Referral code copied!', 'success');
+              }}
+              sx={{
+                ml: 1,
+                cursor: 'pointer',
+                fontSize: '0.7rem',
+                '&:hover': { bgcolor: 'primary.light', color: 'primary.contrastText' }
+              }}
             />
           </Box>
         )}
+      </CardContent>
+    </Card>
+  );
+
+  return (
+    <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 4 } }}>
+      {/* Modern Header */}
+      <Box 
+        sx={{ 
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          borderRadius: { xs: 3, sm: 4 },
+          p: { xs: 3, sm: 4 },
+          mb: 4,
+          color: 'white',
+          position: 'relative',
+          overflow: 'hidden',
+          boxShadow: '0 20px 40px rgba(102, 126, 234, 0.3)',
+        }}
+      >
+        <Box sx={{ position: 'relative', zIndex: 1 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: { xs: 'flex-start', sm: 'center' },
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: { xs: 2, sm: 0 },
+            mb: 2
+          }}>
+            <Box>
+              <Typography 
+                variant="h3" 
+                fontWeight={800} 
+                gutterBottom
+                sx={{ fontSize: { xs: '1.8rem', sm: '2.5rem', md: '3rem' } }}
+              >
+                👥 Community Management
+              </Typography>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  opacity: 0.9,
+                  fontSize: { xs: '1rem', sm: '1.25rem' }
+                }}
+              >
+                {users.length} brave adventurers in the quest
+              </Typography>
+            </Box>
+            
+            <Box sx={{ 
+              display: 'flex', 
+              gap: 1,
+              flexWrap: 'wrap',
+              justifyContent: { xs: 'center', sm: 'flex-end' }
+            }}>
+              <Button
+                variant="contained"
+                startIcon={<PersonAdd />}
+                sx={{
+                  bgcolor: 'rgba(255,255,255,0.2)',
+                  color: 'white',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  '&:hover': { 
+                    bgcolor: 'rgba(255,255,255,0.3)',
+                    transform: 'translateY(-2px)'
+                  }
+                }}
+                onClick={() => {/* Handle add user */}}
+              >
+                Invite New Hero
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<Download />}
+                sx={{
+                  borderColor: 'rgba(255,255,255,0.5)',
+                  color: 'white',
+                  '&:hover': { 
+                    borderColor: 'white',
+                    bgcolor: 'rgba(255,255,255,0.1)'
+                  }
+                }}
+              >
+                Export
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Search and Controls */}
+      <Paper
+        sx={{
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(247,247,247,0.9) 100%)',
+          backdropFilter: 'blur(20px)',
+          borderRadius: 4,
+          p: { xs: 2, sm: 3 },
+          mb: 3,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+          border: '1px solid rgba(255,255,255,0.2)',
+        }}
+      >
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} md={8}>
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="🔍 Search heroes by name, email, or referral code..."
+              value={search}
+              onChange={(e) => handleSearch(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search sx={{ color: 'primary.main' }} />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 3,
+                  bgcolor: 'rgba(255,255,255,0.8)',
+                  '&:hover fieldset': { borderColor: 'primary.main' },
+                  '&.Mui-focused fieldset': { borderColor: 'primary.main' },
+                },
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Box sx={{ display: 'flex', gap: 1, justifyContent: { xs: 'center', md: 'flex-end' } }}>
+              <Button
+                variant={viewMode === 'table' ? 'contained' : 'outlined'}
+                onClick={() => setViewMode('table')}
+                size="small"
+                sx={{ minWidth: 'auto', px: 2 }}
+              >
+                📋 Table
+              </Button>
+              <Button
+                variant={viewMode === 'cards' ? 'contained' : 'outlined'}
+                onClick={() => setViewMode('cards')}
+                size="small"
+                sx={{ minWidth: 'auto', px: 2 }}
+              >
+                🎴 Cards
+              </Button>
+              <IconButton
+                sx={{
+                  bgcolor: 'primary.light',
+                  color: 'primary.contrastText',
+                  '&:hover': { bgcolor: 'primary.main' }
+                }}
+              >
+                <FilterList />
+              </IconButton>
+            </Box>
+          </Grid>
+        </Grid>
       </Paper>
+
+      {/* Content Area */}
+      {users.length === 0 && !loading ? (
+        <Paper
+          sx={{
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(247,247,247,0.9) 100%)',
+            backdropFilter: 'blur(20px)',
+            borderRadius: 4,
+            p: 4,
+            textAlign: 'center',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+            border: '1px solid rgba(255,255,255,0.2)',
+          }}
+        >
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+            <Avatar
+              sx={{
+                width: 80,
+                height: 80,
+                bgcolor: 'primary.light',
+                fontSize: '2rem'
+              }}
+            >
+              👥
+            </Avatar>
+            <Typography variant="h4" fontWeight="bold" color="text.primary">
+              No Heroes Found
+            </Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 400 }}>
+              {search 
+                ? 'No heroes match your search criteria. Try adjusting your search terms.'
+                : 'The adventure hasn\'t begun yet! Invite your first heroes to join the quest.'
+              }
+            </Typography>
+            {!search && (
+              <Button
+                variant="contained"
+                startIcon={<PersonAdd />}
+                size="large"
+                sx={{
+                  mt: 2,
+                  background: 'linear-gradient(45deg, #667eea, #764ba2)',
+                  '&:hover': { 
+                    background: 'linear-gradient(45deg, #5a6fd8, #6a4190)',
+                    transform: 'translateY(-2px)'
+                  }
+                }}
+              >
+                Invite First Hero
+              </Button>
+            )}
+          </Box>
+        </Paper>
+      ) : (
+        <Box>
+          {/* Loading State */}
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+              <CircularProgress size={60} />
+            </Box>
+          ) : (
+            <>
+              {/* Cards View for Mobile or when selected */}
+              {(isMobile || viewMode === 'cards') && (
+                <Grid container spacing={3}>
+                  {users.map((user) => (
+                    <Grid item xs={12} sm={6} lg={4} key={user._id}>
+                      {renderUserCard(user)}
+                    </Grid>
+                  ))}
+                </Grid>
+              )}
+
+              {/* Table View for Desktop */}
+              {!isMobile && viewMode === 'table' && (
+                <Paper
+                  sx={{
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(247,247,247,0.9) 100%)',
+                    backdropFilter: 'blur(20px)',
+                    borderRadius: 4,
+                    overflow: 'hidden',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                  }}
+                >
+                  <TableContainer>
+                    <Table>
+                      <TableHead>
+                        <TableRow sx={{ bgcolor: 'primary.main' }}>
+                          {columns.map((col) => (
+                            <TableCell
+                              key={col.field}
+                              sx={{ 
+                                fontWeight: 'bold', 
+                                color: 'white',
+                                fontSize: '0.9rem'
+                              }}
+                            >
+                              {col.label}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {users.map((row, index) => (
+                          <TableRow
+                            key={row._id}
+                            sx={{
+                              bgcolor: index % 2 === 0 ? 'rgba(0,0,0,0.02)' : 'rgba(0,0,0,0.04)',
+                              '&:hover': { 
+                                bgcolor: 'primary.light',
+                                '& .MuiTableCell-root': { color: 'primary.contrastText' },
+                                transform: 'scale(1.01)',
+                                transition: 'all 0.2s ease'
+                              }
+                            }}
+                          >
+                            {columns.map((col) => (
+                              <TableCell 
+                                key={col.field}
+                                sx={{ fontSize: '0.85rem' }}
+                              >
+                                {col.render ? col.render(row) : row[col.field]}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Paper>
+              )}
+
+              {/* Pagination */}
+              <Paper
+                sx={{
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(247,247,247,0.9) 100%)',
+                  backdropFilter: 'blur(20px)',
+                  borderRadius: 4,
+                  mt: 3,
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                }}
+              >
+                <TablePagination
+                  rowsPerPageOptions={[5, 10, 25, 50]}
+                  component="div"
+                  count={pagination.total}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onPageChange={handlePageChange}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                  sx={{ 
+                    '& .MuiTablePagination-toolbar': { px: 3 },
+                    '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                      fontSize: '0.9rem',
+                      fontWeight: 500
+                    }
+                  }}
+                />
+              </Paper>
+            </>
+          )}
+        </Box>
+      )}
 
       {/* Edit User Dialog */}
       <Dialog

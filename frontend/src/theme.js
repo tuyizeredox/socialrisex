@@ -16,6 +16,19 @@ export const getTheme = (mode) => createTheme({
       dark: mode === 'dark' ? '#db2777' : '#be185d',
       contrastText: '#ffffff'
     },
+    // Enhanced gamification colors
+    gamification: {
+      gold: '#FFD700',
+      silver: '#C0C0C0',
+      bronze: '#CD7F32',
+      diamond: '#B9F2FF',
+      emerald: '#50C878',
+      ruby: '#E0115F',
+      experience: '#9C27B0',
+      achievement: '#FF6F00',
+      streak: '#4CAF50',
+      bonus: '#FF9800'
+    },
     success: {
       main: mode === 'dark' ? '#10b981' : '#059669',
       light: mode === 'dark' ? '#34d399' : '#10b981',
@@ -90,15 +103,51 @@ export const getTheme = (mode) => createTheme({
   shape: {
     borderRadius: 8
   },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 960,
+      lg: 1280,
+      xl: 1920,
+    },
+  },
   components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        html: {
+          fontSize: '16px',
+          '@media (max-width: 600px)': {
+            fontSize: '14px',
+          }
+        },
+        body: {
+          fontSize: '1rem',
+          lineHeight: 1.6,
+          overflowX: 'hidden',
+          '-webkit-font-smoothing': 'antialiased',
+          '-moz-osx-font-smoothing': 'grayscale',
+        },
+        '*': {
+          boxSizing: 'border-box',
+        }
+      }
+    },
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
+          borderRadius: 12,
           textTransform: 'none',
-          fontWeight: 500,
-          padding: '8px 16px',
-          transition: 'all 0.2s ease-in-out',
+          fontWeight: 600,
+          padding: '12px 24px',
+          minHeight: '48px',
+          fontSize: '1rem',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          '@media (max-width: 600px)': {
+            padding: '10px 16px',
+            minHeight: '44px',
+            fontSize: '0.875rem',
+          },
           '&:hover': {
             transform: 'translateY(-1px)',
             boxShadow: mode === 'dark' 
@@ -156,16 +205,39 @@ export const getTheme = (mode) => createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
+          borderRadius: 16,
           boxShadow: mode === 'dark'
-            ? '0 4px 8px rgba(0,0,0,0.4)'
-            : '0 4px 8px rgba(0,0,0,0.1)',
-          transition: 'all 0.3s ease-in-out',
-          '&:hover': {
-            transform: 'translateY(-2px)',
+            ? '0 8px 32px rgba(0,0,0,0.3)'
+            : '0 4px 20px rgba(0,0,0,0.08)',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          overflow: 'hidden',
+          position: 'relative',
+          '@media (max-width: 600px)': {
+            borderRadius: 12,
             boxShadow: mode === 'dark'
-              ? '0 8px 16px rgba(0,0,0,0.6)'
-              : '0 8px 16px rgba(0,0,0,0.1)'
+              ? '0 4px 16px rgba(0,0,0,0.2)'
+              : '0 2px 12px rgba(0,0,0,0.06)',
+          },
+          '&:hover': {
+            transform: 'translateY(-4px) scale(1.02)',
+            boxShadow: mode === 'dark'
+              ? '0 16px 48px rgba(0,0,0,0.4)'
+              : '0 8px 32px rgba(0,0,0,0.12)'
+          },
+          '&.gamification-card': {
+            background: mode === 'dark'
+              ? 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)'
+              : 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '4px',
+              background: 'linear-gradient(90deg, #FFD700, #FF6F00, #4CAF50, #2196F3, #9C27B0)',
+              zIndex: 1
+            }
           }
         }
       }

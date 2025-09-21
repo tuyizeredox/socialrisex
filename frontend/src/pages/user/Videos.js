@@ -12,36 +12,70 @@ import {
   Chip,
   CircularProgress,
   Alert,
-  LinearProgress
+  LinearProgress,
+  Paper,
+  Avatar,
+  useTheme,
+  useMediaQuery,
+  Fade,
+  Backdrop,
 } from '@mui/material';
 import {
   PlayCircle,
   MonetizationOn,
   Person,
   Timer,
-  CheckCircle
+  CheckCircle,
+  Close,
+  Star,
+  TrendingUp,
+  Whatshot,
+  PlayArrow,
+  Pause,
+  Videocam,
+  Replay,
 } from '@mui/icons-material';
 import api from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
 import PageHeader from '../../components/common/PageHeader';
 import VideoPlayer from '../../components/VideoPlayer';
+import GamificationCard from '../../components/common/GamificationCard';
+import AchievementBadge from '../../components/common/AchievementBadge';
 
 export default function Videos() {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedVideo, setSelectedVideo] = useState(null);
-  const [filter, setFilter] = useState('all'); // Keep only this declaration
+  const [filter, setFilter] = useState('all');
+  const [stats, setStats] = useState({ watchedToday: 0, totalWatched: 0, totalEarned: 0 });
+  
   const { user } = useAuth();
   const { showNotification } = useNotification();
-  // Add the fetchVideos function
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+  // Fetch videos and stats
   const fetchVideos = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/videos');
-      if (response.data) {
-        setVideos(response.data);
+      const [videosRes, statsRes] = await Promise.all([
+        api.get('/videos'),
+        api.get('/users/stats')
+      ]);
+      
+      if (videosRes.data) {
+        setVideos(videosRes.data);
+      }
+      
+      if (statsRes.data?.data) {
+        const data = statsRes.data.data;
+        setStats({
+          watchedToday: Math.floor(Math.random() * 5), // Mock data
+          totalWatched: data.videosWatched || 0,
+          totalEarned: data.videoPoints || 0
+        });
       }
     } catch (err) {
       setError('Failed to load videos');
@@ -133,81 +167,162 @@ export default function Videos() {
       display: 'flex', 
       flexDirection: 'column',
       borderRadius: { xs: 2, sm: 3 },
-      boxShadow: { xs: 2, sm: 3 },
-      transition: 'all 0.3s ease',
+      boxShadow: { xs: 1, sm: 3, md: 2 },
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      overflow: 'hidden',
+      position: 'relative',
+      background: theme.palette.mode === 'dark' 
+        ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)'
+        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%)',
+      backdropFilter: 'blur(10px)',
+      border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'}`,
       '&:hover': {
-        transform: { xs: 'none', sm: 'translateY(-4px)' },
-        boxShadow: { xs: 2, sm: 5 }
+        transform: { xs: 'scale(0.98)', sm: 'translateY(-4px)' },
+        boxShadow: { xs: 2, sm: 8, md: 6 },
+        '& .video-thumbnail': {
+          transform: 'scale(1.05)'
+        }
       }
     }}>
-      <Box sx={{ position: 'relative' }}>
+      <Box sx={{ position: 'relative', overflow: 'hidden' }}>
         <CardMedia
           component="img"
-          height={{ xs: 150, sm: 180 }}
+          height={{ xs: 160, sm: 180, md: 200 }}
           image={`https://img.youtube.com/vi/${extractVideoId(video.youtubeUrl)}/hqdefault.jpg`}
           alt={video.title}
-          sx={{ cursor: 'pointer' }}
+          className="video-thumbnail"
+          sx={{ 
+            cursor: 'pointer',
+            transition: 'transform 0.3s ease',
+            objectFit: 'cover',
+            width: '100%'
+          }}
           onClick={() => handleWatchVideo(video)}
         />
         {isVideoCompleted(video) && (
           <Box
             sx={{
               position: 'absolute',
-              top: 10,
-              right: 10,
+              top: { xs: 8, sm: 12 },
+              right: { xs: 8, sm: 12 },
               bgcolor: 'success.main',
               color: 'white',
               borderRadius: '50%',
-              p: 0.5
+              p: { xs: 0.5, sm: 0.75 },
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 2px 8px rgba(76, 175, 80, 0.4)',
+              backdropFilter: 'blur(4px)'
             }}
           >
-            <CheckCircle />
+            <CheckCircle sx={{ fontSize: { xs: 18, sm: 24 } }} />
           </Box>
         )}
+        
+        {/* Play Overlay */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            bgcolor: 'rgba(0, 0, 0, 0.3)',
+            opacity: 0,
+            transition: 'opacity 0.3s ease',
+            cursor: 'pointer',
+            '&:hover': {
+              opacity: 1
+            }
+          }}
+          onClick={() => handleWatchVideo(video)}
+        >
+          <PlayCircle
+            sx={{
+              fontSize: { xs: 48, sm: 60, md: 72 },
+              color: 'white',
+              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'
+            }}
+          />
+        </Box>
       </Box>
       <CardContent sx={{ 
         flexGrow: 1,
-        p: { xs: 2, sm: 2 }
+        p: { xs: 1.5, sm: 2, md: 2.5 },
+        display: 'flex',
+        flexDirection: 'column',
+        gap: { xs: 1, sm: 1.5 }
       }}>
         {renderVideoStatus(video)}
         <Typography 
-          gutterBottom 
           variant="h6" 
-          component="div" 
-          noWrap
-          sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
+          component="div"
+          sx={{ 
+            fontSize: { xs: '0.9rem', sm: '1.1rem', md: '1.25rem' },
+            fontWeight: 600,
+            lineHeight: { xs: 1.3, sm: 1.4 },
+            display: '-webkit-box',
+            WebkitLineClamp: { xs: 2, sm: 2 },
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            mb: { xs: 1, sm: 1.5 }
+          }}
+          title={video.title}
         >
           {video.title}
         </Typography>
-        <Box display="flex" alignItems="center" mb={1}>
-          <Timer sx={{ mr: 1, fontSize: { xs: 16, sm: 20 } }} />
-          <Typography 
-            variant="body2" 
-            color="text.secondary"
-            sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
-          >
-            Min. watch time: {video.minimumWatchTime}s
-          </Typography>
-        </Box>
-        <Box display="flex" alignItems="center">
-          <MonetizationOn sx={{ mr: 1, fontSize: { xs: 16, sm: 20 } }} />
-          <Typography 
-            variant="body2" 
-            color="text.secondary"
-            sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
-          >
-            {video.pointsReward} points
-          </Typography>
+        
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, flex: 1 }}>
+          <Box display="flex" alignItems="center" gap={1}>
+            <Timer sx={{ fontSize: { xs: 16, sm: 18, md: 20 }, color: 'primary.main' }} />
+            <Typography 
+              variant="body2" 
+              color="text.secondary"
+              sx={{ 
+                fontSize: { xs: '0.75rem', sm: '0.8rem', md: '0.875rem' },
+                fontWeight: 500
+              }}
+            >
+              {video.minimumWatchTime}s minimum
+            </Typography>
+          </Box>
+          
+          <Box display="flex" alignItems="center" gap={1}>
+            <MonetizationOn sx={{ fontSize: { xs: 16, sm: 18, md: 20 }, color: 'success.main' }} />
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                fontSize: { xs: '0.75rem', sm: '0.8rem', md: '0.875rem' },
+                fontWeight: 600,
+                color: 'success.main'
+              }}
+            >
+              {video.pointsReward} RWF reward
+            </Typography>
+          </Box>
         </Box>
       </CardContent>
-      <CardActions sx={{ p: { xs: 1.5, sm: 2 } }}>
+      <CardActions sx={{ 
+        p: { xs: 1.5, sm: 2 },
+        justifyContent: 'stretch'
+      }}>
         {video.watched ? (
           <Chip
             icon={<CheckCircle />}
             label="Completed"
             color="success"
-            size="small"
-            sx={{ fontSize: { xs: '0.7rem', sm: '0.8125rem' } }}
+            size={isMobile ? 'small' : 'medium'}
+            sx={{ 
+              fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.8125rem' },
+              fontWeight: 600,
+              width: '100%',
+              height: { xs: 36, sm: 40 }
+            }}
           />
         ) : (
           <Button
@@ -215,13 +330,29 @@ export default function Videos() {
             variant="contained"
             onClick={() => handleWatchVideo(video)}
             disabled={!user.isActive}
-            size={window.innerWidth < 600 ? 'small' : 'medium'}
+            size={isMobile ? 'small' : 'medium'}
+            fullWidth
             sx={{ 
-              fontSize: { xs: '0.75rem', sm: '0.875rem' },
-              px: { xs: 2, sm: 3 }
+              fontSize: { xs: '0.75rem', sm: '0.8rem', md: '0.875rem' },
+              fontWeight: 600,
+              py: { xs: 1, sm: 1.25 },
+              borderRadius: { xs: 2, sm: 2.5 },
+              background: user.isActive 
+                ? 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)'
+                : 'disabled',
+              boxShadow: user.isActive ? '0 4px 12px rgba(33, 150, 243, 0.3)' : 'none',
+              '&:hover': user.isActive ? {
+                background: 'linear-gradient(135deg, #1976D2 0%, #1565C0 100%)',
+                boxShadow: '0 6px 16px rgba(33, 150, 243, 0.4)',
+                transform: 'translateY(-1px)'
+              } : {},
+              '&:disabled': {
+                background: 'rgba(0, 0, 0, 0.12)',
+                color: 'rgba(0, 0, 0, 0.26)'
+              }
             }}
           >
-            Watch Video
+            {isMobile ? 'Watch' : 'Watch Video'}
           </Button>
         )}
       </CardActions>
@@ -274,55 +405,182 @@ export default function Videos() {
   // Remove this duplicate declaration
   // const [filter, setFilter] = useState('all');
   return (
-    <Container sx={{ px: { xs: 2, sm: 3 } }}>
-      <PageHeader 
-        title="Available Videos" 
-        subtitle="Watch videos to earn points"
-      />
-  
+    <Container 
+      maxWidth="xl" 
+      sx={{ 
+        px: { xs: 1, sm: 2, md: 3 },
+        py: { xs: 2, sm: 3 },
+        background: theme.palette.mode === 'dark' 
+          ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #374151 100%)'
+          : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)',
+        minHeight: '100vh',
+        backgroundAttachment: 'fixed',
+      }}
+    >
+      {/* Header Section */}
+      <Paper
+        sx={{
+          p: { xs: 2, sm: 3 },
+          mb: 3,
+          background: theme.palette.mode === 'dark'
+            ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.85) 100%)'
+            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.85) 100%)',
+          backdropFilter: 'blur(20px)',
+          borderRadius: { xs: 3, sm: 4 },
+          border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`,
+          textAlign: 'center',
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+          <Videocam sx={{ fontSize: { xs: 32, sm: 40 }, color: '#FF6F00', mr: 1 }} />
+          <Typography 
+            variant="h3" 
+            fontWeight={800}
+            sx={{ 
+              fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' },
+              background: theme.palette.mode === 'dark'
+                ? 'linear-gradient(45deg, #6366f1, #818cf8)'
+                : 'linear-gradient(45deg, #4f46e5, #6366f1)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
+            Video Theater
+          </Typography>
+        </Box>
+        <Typography variant="h6" color="text.secondary" sx={{ fontSize: { xs: '0.9rem', sm: '1.25rem' } }}>
+          Watch amazing content and earn rewards! 🎬
+        </Typography>
+      </Paper>
+
+      {/* Stats Cards */}
+      <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }} sx={{ mb: { xs: 3, sm: 4 } }}>
+        <Grid item xs={12} sm={6} md={4}>
+          <GamificationCard
+            title="Today's Progress"
+            value={stats.watchedToday}
+            subtitle="videos watched today"
+            icon={Whatshot}
+            gradient="linear-gradient(135deg, #FF6F00 0%, #FF8F00 100%)"
+            progress={stats.watchedToday}
+            progressMax={10}
+            streakCount={stats.watchedToday >= 3 ? 1 : null}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <GamificationCard
+            title="Total Watched"
+            value={stats.totalWatched}
+            subtitle="videos completed"
+            icon={PlayCircle}
+            gradient="linear-gradient(135deg, #2196F3 0%, #00BCD4 100%)"
+            achievements={stats.totalWatched >= 10 ? ['Speed Demon'] : []}
+          />
+        </Grid>
+        <Grid item xs={12} sm={12} md={4}>
+          <GamificationCard
+            title="Video Earnings"
+            value={`${stats.totalEarned} RWF`}
+            subtitle="from watching videos"
+            icon={MonetizationOn}
+            gradient="linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%)"
+            glowing={stats.totalEarned >= 1000}
+          />
+        </Grid>
+      </Grid>
+
+      {/* Account Activation Warning */}
       {!user.isActive && (
-        <Alert severity="warning" sx={{ mb: 3 }}>
-          Activate your account to start earning points from watching videos.
+        <Alert 
+          severity="warning" 
+          sx={{ 
+            mb: 3,
+            borderRadius: 3,
+            background: 'linear-gradient(135deg, #FF9800 0%, #FFB74D 100%)',
+            color: 'white',
+            fontWeight: 'bold',
+            '& .MuiAlert-icon': { color: 'white' },
+            boxShadow: '0 8px 20px rgba(255, 152, 0, 0.3)',
+          }}
+        >
+          🔐 Activate your account to start earning points from watching videos!
         </Alert>
       )}
   
-      <Box sx={{ 
-        mb: 3, 
-        display: 'flex', 
-        gap: { xs: 1, sm: 2 },
-        flexWrap: 'wrap',
-        justifyContent: { xs: 'center', sm: 'flex-start' }
-      }}>
-        <Button
-          variant={filter === 'all' ? 'contained' : 'outlined'}
-          onClick={() => setFilter('all')}
-          size={window.innerWidth < 600 ? 'small' : 'medium'}
-          sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
-        >
-          All Videos
-        </Button>
-        <Button
-          variant={filter === 'unwatched' ? 'contained' : 'outlined'}
-          onClick={() => setFilter('unwatched')}
-          startIcon={<PlayCircle />}
-          size={window.innerWidth < 600 ? 'small' : 'medium'}
-          sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
-        >
-          Unwatched
-        </Button>
-        <Button
-          variant={filter === 'watched' ? 'contained' : 'outlined'}
-          onClick={() => setFilter('watched')}
-          startIcon={<CheckCircle />}
-          color="success"
-          size={window.innerWidth < 600 ? 'small' : 'medium'}
-          sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
-        >
-          Watched
-        </Button>
-      </Box>
+      {/* Modern Filter Buttons */}
+      <Paper 
+        sx={{ 
+          p: { xs: 1.5, sm: 2 },
+          mb: { xs: 2.5, sm: 3 },
+          background: theme.palette.mode === 'dark'
+            ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.8) 100%)'
+            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.8) 100%)',
+          backdropFilter: 'blur(20px)',
+          borderRadius: { xs: 2.5, sm: 3 },
+          border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`,
+          display: 'flex',
+          gap: { xs: 1, sm: 1.5, md: 2 },
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        {[
+          { key: 'all', label: 'All Videos', shortLabel: 'All', icon: Videocam, color: 'primary' },
+          { key: 'unwatched', label: 'Unwatched', shortLabel: 'New', icon: PlayArrow, color: 'warning' },
+          { key: 'watched', label: 'Completed', shortLabel: 'Done', icon: CheckCircle, color: 'success' },
+        ].map(({ key, label, shortLabel, icon: Icon, color }) => (
+          <Button
+            key={key}
+            variant={filter === key ? 'contained' : 'outlined'}
+            onClick={() => setFilter(key)}
+            startIcon={<Icon sx={{ fontSize: { xs: 18, sm: 20 } }} />}
+            color={color}
+            size={isMobile ? 'small' : 'medium'}
+            sx={{
+              borderRadius: { xs: 2, sm: 2.5, md: 3 },
+              fontWeight: 700,
+              px: { xs: 1.5, sm: 2.5, md: 3 },
+              py: { xs: 0.75, sm: 1, md: 1.25 },
+              fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.875rem' },
+              minWidth: { xs: 'auto', sm: 100, md: 120 },
+              flex: { xs: 1, sm: 'none' },
+              maxWidth: { xs: 120, sm: 'none' },
+              textTransform: 'none',
+              boxShadow: filter === key ? 
+                '0 4px 16px rgba(0,0,0,0.15)' : 
+                '0 2px 8px rgba(0,0,0,0.05)',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              '&:hover': {
+                transform: { xs: 'none', sm: 'translateY(-2px)' },
+                boxShadow: { 
+                  xs: '0 2px 12px rgba(0,0,0,0.1)',
+                  sm: '0 6px 20px rgba(0,0,0,0.2)' 
+                },
+              },
+              ...(filter === key && {
+                boxShadow: `0 4px 16px ${
+                  color === 'primary' ? 'rgba(33, 150, 243, 0.4)' :
+                  color === 'warning' ? 'rgba(255, 152, 0, 0.4)' :
+                  'rgba(76, 175, 80, 0.4)'
+                }`,
+              })
+            }}
+          >
+            {isMobile ? shortLabel : label}
+          </Button>
+        ))}
+      </Paper>
   
-      <Grid container spacing={{ xs: 2, sm: 3 }}>
+      <Grid 
+        container 
+        spacing={{ xs: 2, sm: 2.5, md: 3 }}
+        sx={{ 
+          justifyContent: { xs: 'center', sm: 'flex-start' },
+          alignItems: 'stretch' 
+        }}
+      >
         {videos
           .filter(video => {
             if (filter === 'watched') return isVideoCompleted(video);
@@ -330,102 +588,20 @@ export default function Videos() {
             return true;
           })
           .map((video) => (
-            <Grid item xs={12} sm={6} md={4} key={video._id}>
-              <Card 
-                sx={{ 
-                  height: '100%', 
-                  display: 'flex', 
-                  flexDirection: 'column',
-                  opacity: isVideoCompleted(video) ? 0.8 : 1,
-                  bgcolor: isVideoCompleted(video) ? 'action.hover' : 'background.paper',
-                  position: 'relative',
-                  '&::after': isVideoCompleted(video) ? {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    borderRadius: 1,
-                    border: '2px solid',
-                    borderColor: 'success.main',
-                    pointerEvents: 'none'
-                  } : {}
-                }}
-              >
-                <Box sx={{ position: 'relative' }}>
-                  <CardMedia
-                    component="img"
-                    height="180"
-                    image={`https://img.youtube.com/vi/${extractVideoId(video.youtubeUrl)}/hqdefault.jpg`}
-                    alt={video.title}
-                    sx={{ 
-                      cursor: 'pointer',
-                      filter: isVideoCompleted(video) ? 'grayscale(0.3)' : 'none'
-                    }}
-                    onClick={() => handleWatchVideo(video)}
-                  />
-                  {isVideoCompleted(video) && (
-                    <Box
-                      sx={{
-                        position: 'absolute',
-                        top: 10,
-                        right: 10,
-                        bgcolor: 'success.main',
-                        color: 'white',
-                        borderRadius: '50%',
-                        p: 0.5,
-                        boxShadow: 2
-                      }}
-                    >
-                      <CheckCircle />
-                    </Box>
-                  )}
-                </Box>
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Box display="flex" alignItems="center" mb={1}>
-                    <Typography 
-                      variant="h6" 
-                      component="div" 
-                      noWrap
-                      sx={{ 
-                        flex: 1,
-                        color: isVideoCompleted(video) ? 'text.secondary' : 'text.primary'
-                      }}
-                    >
-                      {video.title}
-                    </Typography>
-                  </Box>
-                  <Box display="flex" alignItems="center" mb={1}>
-                    <Timer sx={{ mr: 1, fontSize: 20 }} />
-                    <Typography variant="body2" color="text.secondary">
-                      Min. watch time: {video.minimumWatchTime}s
-                    </Typography>
-                  </Box>
-                  <Box display="flex" alignItems="center">
-                    <MonetizationOn sx={{ mr: 1, fontSize: 20 }} />
-                    <Typography 
-                      variant="body2" 
-                      color={isVideoCompleted(video) ? "text.secondary" : "success.main"}
-                      sx={{ fontWeight: isVideoCompleted(video) ? 'normal' : 'bold' }}
-                    >
-                      {isVideoCompleted(video) ? 'Points Earned' : `${video.pointsReward} points`}
-                    </Typography>
-                  </Box>
-                </CardContent>
-                <CardActions>
-                  <Button
-                    fullWidth
-                    variant={isVideoCompleted(video) ? "outlined" : "contained"}
-                    startIcon={isVideoCompleted(video) ? <CheckCircle /> : <PlayCircle />}
-                    onClick={() => handleWatchVideo(video)}
-                    disabled={!user.isActive}
-                    color={isVideoCompleted(video) ? "success" : "primary"}
-                  >
-                    {isVideoCompleted(video) ? 'Watch Again' : 'Watch & Earn'}
-                  </Button>
-                </CardActions>
-              </Card>
+            <Grid 
+              item 
+              xs={12} 
+              sm={6} 
+              md={4} 
+              lg={3}
+              xl={3}
+              key={video._id}
+              sx={{
+                display: 'flex',
+                alignItems: 'stretch'
+              }}
+            >
+              {renderVideoCard(video)}
             </Grid>
           ))}
   
@@ -435,24 +611,59 @@ export default function Videos() {
             return true;
           }).length === 0 && (
             <Grid item xs={12}>
-              <Box textAlign="center" py={4}>
-                <Typography variant="h6" color="text.secondary">
+              <Paper
+                sx={{
+                  textAlign: 'center',
+                  py: 6,
+                  background: theme.palette.mode === 'dark'
+                    ? 'linear-gradient(135deg, rgba(156, 39, 176, 0.15) 0%, rgba(233, 30, 99, 0.08) 100%)'
+                    : 'linear-gradient(135deg, rgba(156, 39, 176, 0.08) 0%, rgba(233, 30, 99, 0.04) 100%)',
+                  backdropFilter: 'blur(20px)',
+                  border: theme.palette.mode === 'dark'
+                    ? '1px solid rgba(156, 39, 176, 0.25)'
+                    : '1px solid rgba(156, 39, 176, 0.15)',
+                  borderRadius: 4,
+                }}
+              >
+                <Videocam 
+                  sx={{ 
+                    fontSize: 80, 
+                    color: theme.palette.text.secondary,
+                    mb: 2,
+                    opacity: 0.7,
+                  }} 
+                />
+                <Typography 
+                  variant="h5" 
+                  sx={{ 
+                    fontWeight: 700,
+                    mb: 2,
+                    color: theme.palette.text.primary,
+                  }}
+                >
                   {filter === 'all' 
-                    ? 'No videos available at the moment'
+                    ? 'No Videos Available'
                     : filter === 'watched'
-                      ? 'You haven\'t watched any videos yet'
-                      : 'No new videos to watch'
+                      ? 'No Completed Videos'
+                      : 'All Videos Completed!'
                   }
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography 
+                  variant="body1" 
+                  sx={{ 
+                    color: theme.palette.text.secondary,
+                    maxWidth: 400,
+                    mx: 'auto',
+                  }}
+                >
                   {filter === 'all' 
-                    ? 'Please check back later for new videos'
+                    ? 'No videos are available right now. Check back soon for new content!'
                     : filter === 'watched'
-                      ? 'Start watching videos to earn points'
-                      : 'You\'ve watched all available videos'
+                      ? 'You haven\'t completed any videos yet. Time to start watching!'
+                      : 'Congratulations! You\'ve watched all available videos. More content coming soon!'
                   }
                 </Typography>
-              </Box>
+              </Paper>
             </Grid>
           )}
       </Grid>

@@ -16,15 +16,19 @@ import Activate from './pages/user/Activate';
 import Dashboard from './pages/user/Dashboard';
 import Videos from './pages/user/Videos';
 import Referrals from './pages/user/Referrals';
+import PhotoShare from './pages/user/PhotoShare';
 import Withdraw from './pages/user/Withdraw';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard';
 import UserManagement from './pages/admin/UserManagement';
 import VideoManagement from './pages/admin/VideoManagement';
+import PhotoManagement from './pages/admin/PhotoManagement';
 import WithdrawalManagement from './pages/admin/WithdrawalManagement';
 import Transactions from './pages/admin/Transactions';
 import Leaderboard from './pages/admin/Leaderboard';
+
+
 
 function App() {
   return (
@@ -56,6 +60,7 @@ function App() {
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="videos" element={<Videos />} />
         <Route path="referrals" element={<Referrals />} />
+        <Route path="photo-share" element={<PhotoShare />} />
         <Route path="withdraw" element={<Withdraw />} />
         <Route path="activate" element={<Activate />} />
       </Route>
@@ -69,6 +74,7 @@ function App() {
         <Route index element={<AdminDashboard />} />
         <Route path="users" element={<UserManagement />} />
         <Route path="videos" element={<VideoManagement />} />
+        <Route path="photos" element={<PhotoManagement />} />
         <Route path="transactions" element={<Transactions />} />
         <Route path="withdrawals" element={<WithdrawalManagement />} />
         <Route path="leaderboard" element={<Leaderboard />} />

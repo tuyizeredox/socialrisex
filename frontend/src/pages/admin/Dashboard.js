@@ -31,6 +31,9 @@ import {
 import api from '../../utils/api';
 import PageHeader from '../../components/common/PageHeader';
 import StatCard from '../../components/common/StatCard';
+import GamificationCard from '../../components/common/GamificationCard';
+import ProgressRing from '../../components/common/ProgressRing';
+import AchievementBadge from '../../components/common/AchievementBadge';
 import worldwideLogo from '../../assets/worldwide.png';
 
 export default function AdminDashboard() {
@@ -223,198 +226,304 @@ export default function AdminDashboard() {
         </Box>
       </Box>
 
+      {/* Admin Statistics Grid */}
       <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card
+          <GamificationCard
+            variant="modern"
+            glowing={true}
             sx={{
-              background: 'linear-gradient(135deg, #2196F3 0%, #21CBF3 100%)',
-              borderRadius: { xs: 3, sm: 4 },
-              p: { xs: 2, sm: 3 },
-              color: 'white',
+              background: 'linear-gradient(135deg, rgba(33, 150, 243, 0.15) 0%, rgba(33, 203, 243, 0.1) 100%)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(33, 150, 243, 0.3)',
               textAlign: 'center',
-              boxShadow: '0 8px 32px rgba(33, 150, 243, 0.3)',
-              transition: 'all 0.3s ease',
-              '&:hover': { 
-                transform: 'translateY(-8px) scale(1.02)',
-                boxShadow: '0 16px 40px rgba(33, 150, 243, 0.4)'
-              },
+              color: 'white',
               position: 'relative',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'linear-gradient(135deg, #2196F3 0%, #21CBF3 100%)',
+                opacity: 0.8,
+                zIndex: -1,
+              }
             }}
           >
-            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
-              <People sx={{ fontSize: { xs: 36, sm: 48 }, mb: 1 }} />
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+              <People sx={{ fontSize: { xs: 36, sm: 48 }, color: 'white' }} />
+            </Box>
+            
+            <ProgressRing
+              progress={(stats?.activeUsers || 0) / Math.max(stats?.totalUsers || 1, 1) * 100}
+              size={120}
+              strokeWidth={8}
+              color="#ffffff"
+              backgroundColor="rgba(255,255,255,0.2)"
+              showPercentage={false}
+              sx={{ mb: 2 }}
+            >
               <Typography 
                 variant="h4" 
                 fontWeight="bold"
-                sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}
+                sx={{ 
+                  fontSize: { xs: '1.5rem', sm: '2rem' },
+                  color: 'white'
+                }}
               >
                 {stats?.totalUsers?.toLocaleString() || 0}
               </Typography>
-              <Typography 
-                variant="h6" 
-                fontWeight="bold" 
-                sx={{ 
-                  opacity: 0.9,
-                  fontSize: { xs: '1rem', sm: '1.25rem' }
-                }}
-              >
-                Total Users
-              </Typography>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  opacity: 0.8, 
-                  mt: 1,
-                  fontSize: { xs: '0.75rem', sm: '0.875rem' }
-                }}
-              >
-                {stats?.activeUsers || 0} active members
-              </Typography>
-              <LinearProgress 
-                variant="determinate" 
-                value={stats?.activeUsers && stats?.totalUsers ? (stats.activeUsers / stats.totalUsers) * 100 : 0}
-                sx={{ 
-                  mt: 2, 
-                  bgcolor: 'rgba(255,255,255,0.2)',
-                  '& .MuiLinearProgress-bar': { bgcolor: 'rgba(255,255,255,0.8)' }
-                }}
-              />
-            </CardContent>
-          </Card>
+            </ProgressRing>
+
+            <Typography 
+              variant="h6" 
+              fontWeight="bold" 
+              sx={{ 
+                color: 'white',
+                mb: 1,
+                fontSize: { xs: '1rem', sm: '1.25rem' }
+              }}
+            >
+              Community Members
+            </Typography>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: 'rgba(255,255,255,0.9)', 
+                fontSize: { xs: '0.75rem', sm: '0.875rem' }
+              }}
+            >
+              {stats?.activeUsers || 0} active today
+            </Typography>
+          </GamificationCard>
         </Grid>
+        
         <Grid item xs={12} sm={6} md={3}>
-          <Card
+          <GamificationCard
+            variant="modern"
+            glowing={true}
             sx={{
-              background: 'linear-gradient(135deg, #00BCD4 0%, #0097A7 100%)',
-              borderRadius: { xs: 3, sm: 4 },
-              p: { xs: 2, sm: 3 },
-              color: 'white',
+              background: 'linear-gradient(135deg, rgba(0, 188, 212, 0.15) 0%, rgba(0, 151, 167, 0.1) 100%)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(0, 188, 212, 0.3)',
               textAlign: 'center',
-              boxShadow: '0 8px 32px rgba(0, 188, 212, 0.3)',
-              transition: 'all 0.3s ease',
-              '&:hover': { 
-                transform: 'translateY(-8px) scale(1.02)',
-                boxShadow: '0 16px 40px rgba(0, 188, 212, 0.4)'
+              color: 'white',
+              position: 'relative',
+              overflow: 'hidden',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'linear-gradient(135deg, #00BCD4 0%, #0097A7 100%)',
+                opacity: 0.8,
+                zIndex: -1,
               }
             }}
           >
-            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
-              <VideoLibrary sx={{ fontSize: { xs: 36, sm: 48 }, mb: 1 }} />
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+              <VideoLibrary sx={{ fontSize: { xs: 36, sm: 48 }, color: 'white' }} />
+            </Box>
+            
+            <ProgressRing
+              progress={(stats?.activeVideos || 0) / Math.max(stats?.totalVideos || 1, 1) * 100}
+              size={120}
+              strokeWidth={8}
+              color="#ffffff"
+              backgroundColor="rgba(255,255,255,0.2)"
+              showPercentage={false}
+              sx={{ mb: 2 }}
+            >
               <Typography 
                 variant="h4" 
                 fontWeight="bold"
-                sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}
+                sx={{ 
+                  fontSize: { xs: '1.5rem', sm: '2rem' },
+                  color: 'white'
+                }}
               >
                 {stats?.totalVideos?.toLocaleString() || 0}
               </Typography>
-              <Typography 
-                variant="h6" 
-                fontWeight="bold" 
-                sx={{ 
-                  opacity: 0.9,
-                  fontSize: { xs: '1rem', sm: '1.25rem' }
-                }}
-              >
-                Total Videos
-              </Typography>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  opacity: 0.8, 
-                  mt: 1,
-                  fontSize: { xs: '0.75rem', sm: '0.875rem' }
-                }}
-              >
-                {stats?.activeVideos || 0} currently active
-              </Typography>
-              <LinearProgress 
-                variant="determinate" 
-                value={stats?.activeVideos && stats?.totalVideos ? (stats.activeVideos / stats.totalVideos) * 100 : 0}
-                sx={{ 
-                  mt: 2, 
-                  bgcolor: 'rgba(255,255,255,0.2)',
-                  '& .MuiLinearProgress-bar': { bgcolor: 'rgba(255,255,255,0.8)' }
-                }}
-              />
-            </CardContent>
-          </Card>
+            </ProgressRing>
+
+            <Typography 
+              variant="h6" 
+              fontWeight="bold" 
+              sx={{ 
+                color: 'white',
+                mb: 1,
+                fontSize: { xs: '1rem', sm: '1.25rem' }
+              }}
+            >
+              Video Quests
+            </Typography>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: 'rgba(255,255,255,0.9)', 
+                fontSize: { xs: '0.75rem', sm: '0.875rem' }
+              }}
+            >
+              {stats?.activeVideos || 0} currently active
+            </Typography>
+          </GamificationCard>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Card
+          <GamificationCard
+            variant="modern"
+            glowing={true}
             sx={{
-              background: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
-              borderRadius: { xs: 3, sm: 4 },
-              p: { xs: 2, sm: 3 },
-              color: 'white',
+              background: 'linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(69, 160, 73, 0.1) 100%)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(76, 175, 80, 0.3)',
               textAlign: 'center',
-              boxShadow: '0 8px 32px rgba(76, 175, 80, 0.3)',
-              transition: 'all 0.3s ease',
-              '&:hover': { 
-                transform: 'translateY(-8px) scale(1.02)',
-                boxShadow: '0 16px 40px rgba(76, 175, 80, 0.4)'
+              color: 'white',
+              position: 'relative',
+              overflow: 'hidden',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
+                opacity: 0.8,
+                zIndex: -1,
               }
             }}
           >
-            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
-              <MonetizationOn sx={{ fontSize: { xs: 36, sm: 48 }, mb: 1 }} />
-              <Typography variant="h4" fontWeight="bold">
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+              <MonetizationOn sx={{ fontSize: { xs: 36, sm: 48 }, color: 'white' }} />
+            </Box>
+            
+            <Box sx={{ position: 'relative', mb: 2 }}>
+              <Typography 
+                variant="h4" 
+                fontWeight="bold"
+                sx={{ 
+                  fontSize: { xs: '1.5rem', sm: '2rem' },
+                  color: 'white',
+                  mb: 1
+                }}
+              >
                 {stats?.totalPoints?.toLocaleString() || 0}
               </Typography>
-              <Typography variant="h6" fontWeight="bold" sx={{ opacity: 0.9 }}>
-                Points Distributed
-              </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.8, mt: 1 }}>
-                Across all users
-              </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 1 }}>
-                <TrendingUp sx={{ fontSize: 16, mr: 0.5 }} />
-                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                  +12% this month
-                </Typography>
-              </Box>
-            </CardContent>
-          </Card>
+              {stats?.pointsGrowthPercentage && (
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
+                  <TrendingUp sx={{ fontSize: 20, mr: 0.5, color: '#81C784' }} />
+                  <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#81C784' }}>
+                    +{stats.pointsGrowthPercentage}% growth
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+
+            <Typography 
+              variant="h6" 
+              fontWeight="bold" 
+              sx={{ 
+                color: 'white',
+                mb: 1,
+                fontSize: { xs: '1rem', sm: '1.25rem' }
+              }}
+            >
+              Reward Tokens
+            </Typography>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: 'rgba(255,255,255,0.9)', 
+                fontSize: { xs: '0.75rem', sm: '0.875rem' }
+              }}
+            >
+              Distributed to players
+            </Typography>
+          </GamificationCard>
         </Grid>
+        
         <Grid item xs={12} sm={6} md={3}>
-          <Card
+          <GamificationCard
+            variant="modern"
+            glowing={true}
             sx={{
-              background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)',
-              borderRadius: { xs: 3, sm: 4 },
-              p: { xs: 2, sm: 3 },
-              color: 'white',
+              background: 'linear-gradient(135deg, rgba(255, 152, 0, 0.15) 0%, rgba(255, 87, 34, 0.1) 100%)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 152, 0, 0.3)',
               textAlign: 'center',
-              boxShadow: '0 8px 32px rgba(255, 152, 0, 0.3)',
-              transition: 'all 0.3s ease',
-              '&:hover': { 
-                transform: 'translateY(-8px) scale(1.02)',
-                boxShadow: '0 16px 40px rgba(255, 152, 0, 0.4)'
+              color: 'white',
+              position: 'relative',
+              overflow: 'hidden',
+              cursor: 'pointer',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)',
+                opacity: 0.8,
+                zIndex: -1,
               }
             }}
           >
-            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
-              <AccountBalance sx={{ fontSize: { xs: 36, sm: 48 }, mb: 1 }} />
-              <Typography variant="h4" fontWeight="bold">
-                {stats?.pendingWithdrawals?.toLocaleString() || 0}
-              </Typography>
-              <Typography variant="h6" fontWeight="bold" sx={{ opacity: 0.9 }}>
-                Pending Withdrawals
-              </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.8, mt: 1 }}>
-                RWF {stats?.pendingAmount?.toLocaleString() || 0}
-              </Typography>
-              <Chip
-                label="Action Required"
-                size="small"
-                sx={{
-                  mt: 1,
-                  bgcolor: 'rgba(255,255,255,0.2)',
-                  color: 'white',
-                  fontWeight: 'bold'
-                }}
-              />
-            </CardContent>
-          </Card>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+              <AccountBalance sx={{ fontSize: { xs: 36, sm: 48 }, color: 'white' }} />
+            </Box>
+            
+            <Typography 
+              variant="h4" 
+              fontWeight="bold"
+              sx={{ 
+                fontSize: { xs: '1.5rem', sm: '2rem' },
+                color: 'white',
+                mb: 1
+              }}
+            >
+              {stats?.pendingWithdrawals?.toLocaleString() || 0}
+            </Typography>
+
+            <Typography 
+              variant="h6" 
+              fontWeight="bold" 
+              sx={{ 
+                color: 'white',
+                mb: 1,
+                fontSize: { xs: '1rem', sm: '1.25rem' }
+              }}
+            >
+              Pending Cashouts
+            </Typography>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: 'rgba(255,255,255,0.9)', 
+                fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                mb: 1
+              }}
+            >
+              RWF {stats?.pendingAmount?.toLocaleString() || 0}
+            </Typography>
+            <Chip
+              label="⚠️ Action Required"
+              size="small"
+              sx={{
+                bgcolor: 'rgba(255,255,255,0.2)',
+                color: 'white',
+                fontWeight: 'bold',
+                fontSize: '0.75rem',
+                '&:hover': {
+                  bgcolor: 'rgba(255,255,255,0.3)',
+                }
+              }}
+            />
+          </GamificationCard>
         </Grid>
       </Grid>
 

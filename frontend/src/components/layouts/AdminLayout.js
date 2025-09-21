@@ -30,6 +30,7 @@ import {
   TrendingUp,
   Favorite,
   EmojiEvents,
+  CloudUpload,
 } from "@mui/icons-material";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
@@ -64,6 +65,7 @@ const menuItems = [
     { text: 'Dashboard', icon: <Dashboard />, path: '/admin' },
     { text: 'Users', icon: <People />, path: '/admin/users' },
     { text: 'Videos', icon: <VideoLibrary />, path: '/admin/videos' },
+    { text: 'Photo Upload', icon: <CloudUpload />, path: '/admin/photos' },
     { text: 'Transactions', icon: <AccountBalance />, path: '/admin/transactions' },
     { text: 'Withdrawals', icon: <Payment />, path: '/admin/withdrawals' },
     { text: 'Leaderboard', icon: <EmojiEvents />, path: '/admin/leaderboard' }

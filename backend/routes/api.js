@@ -7,6 +7,7 @@ import * as userController from '../controllers/user.controller.js';
 import * as videoController from '../controllers/video.controller.js';
 import * as withdrawalController from '../controllers/withdrawal.controller.js';
 import * as adminController from '../controllers/admin.controller.js';
+import * as photoController from '../controllers/photo.controller.js';
 
 const router = express.Router();
 
@@ -31,11 +32,16 @@ router.get('/users/referrals', userController.getReferrals);
 router.get('/users/referral-info', userController.getReferralInfo);
 router.get('/users/pending-activation', userController.checkPendingActivation);
 router.post('/users/activate', userController.activateAccount);
+router.post('/users/share-photo', userController.sharePhoto);
+router.get('/users/photo-shares', userController.getUserPhotoShares);
 
 // Video routes
 router.get('/videos', videoController.getVideos);
 router.get('/videos/available', videoController.getAvailableVideos);
 router.post('/videos/:id/complete', videoController.completeVideo);
+
+// Photo routes
+router.get('/photos/available', photoController.getAvailablePhotos);
 
 // Withdrawal routes
 router.get('/withdrawals', withdrawalController.getUserWithdrawals);
@@ -67,5 +73,13 @@ router.put('/admin/transactions/:id', adminController.processTransaction);
 // Admin leaderboard routes
 router.get('/admin/leaderboard', adminController.getLeaderboard);
 router.get('/admin/referrers/:userId', adminController.getReferrerDetails);
+
+// Admin photo routes
+router.get('/admin/photos', photoController.getAllPhotos);
+router.post('/admin/photos', photoController.upload.single('image'), photoController.createPhoto);
+router.put('/admin/photos/:id', photoController.upload.single('image'), photoController.updatePhoto);
+router.delete('/admin/photos/:id', photoController.deletePhoto);
+router.patch('/admin/photos/:id/toggle-status', photoController.togglePhotoStatus);
+router.get('/admin/photo-stats', photoController.getPhotoStats);
 
 export default router;

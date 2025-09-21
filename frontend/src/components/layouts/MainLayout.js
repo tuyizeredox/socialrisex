@@ -29,7 +29,7 @@ import {
   Star,
   TrendingUp,
   Favorite,
-  Wallet,
+  PhotoCamera,
   SupportAgent,
   Share,
   ArrowForwardIos,
@@ -68,10 +68,8 @@ const MainLayout = () => {
         { text: 'Dashboard', icon: <Dashboard />, path: '/app/dashboard' },
         { text: 'Videos', icon: <VideoLibrary />, path: '/app/videos' },
         { text: 'Team', icon: <People />, path: '/app/referrals' },
-        { text: 'Wallet', icon: <Wallet />, path: '/app/wallet' },
+        { text: 'Photo Share', icon: <PhotoCamera />, path: '/app/photo-share' },
         { text: 'Withdraw', icon: <AccountBalance />, path: '/app/withdraw' },
-        { text: 'Refer & Earn', icon: <Share />, path: '/app/refer' },
-        { text: 'Support', icon: <SupportAgent />, path: '/app/support' },
       ]
     : [];
 
@@ -93,16 +91,34 @@ const MainLayout = () => {
     <Box
       sx={{
         height: '100%',
-        bgcolor: mode === 'dark' ? '#1a1a1a' : '#ffffff',
+        background: mode === 'dark' 
+          ? 'linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%)'
+          : 'linear-gradient(180deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
         p: 2,
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between',
-        boxShadow: 'inset 0 0 10px rgba(0,0,0,0.05)',
+        boxShadow: mode === 'dark' 
+          ? 'inset 0 0 20px rgba(0,0,0,0.3), 0 0 30px rgba(103, 126, 234, 0.1)'
+          : 'inset 0 0 20px rgba(255,255,255,0.2), 0 0 30px rgba(103, 126, 234, 0.2)',
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: mode === 'dark'
+            ? 'radial-gradient(circle at 50% 50%, rgba(103, 126, 234, 0.1) 0%, transparent 50%)'
+            : 'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%)',
+          pointerEvents: 'none',
+          zIndex: 1,
+        }
       }}
     >
-      <Box>
-        <Toolbar sx={{ justifyContent: 'space-between', mb: 2 }}>
+      {/* Header Section */}
+      <Box sx={{ position: 'relative', zIndex: 2 }}>
+        <Toolbar sx={{ justifyContent: 'space-between', mb: 1, px: 0 }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <img 
               src={worldwideLogo} 
@@ -113,9 +129,12 @@ const MainLayout = () => {
               variant="h5"
               sx={{
                 fontWeight: 700,
-                background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
+                background: mode === 'dark'
+                  ? 'linear-gradient(45deg, #667eea, #764ba2)'
+                  : 'linear-gradient(45deg, #ffffff, #f8fafc)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
+                textShadow: mode === 'dark' ? 'none' : '0 1px 2px rgba(0,0,0,0.1)',
               }}
             >
               Worldwide Earn
@@ -123,13 +142,32 @@ const MainLayout = () => {
           </Box>
           <IconButton
             onClick={handleDrawerToggle}
-            sx={{ display: { sm: 'none' }, color: 'primary.main' }}
+            sx={{ 
+              display: { sm: 'none' }, 
+              color: mode === 'dark' ? '#667eea' : 'white',
+              '&:hover': {
+                backgroundColor: mode === 'dark' ? 'rgba(102, 126, 234, 0.1)' : 'rgba(255, 255, 255, 0.1)',
+              }
+            }}
           >
             <CloseIcon />
           </IconButton>
         </Toolbar>
-        <Divider sx={{ my: 2, bgcolor: mode === 'dark' ? '#333' : '#e0e0e0' }} />
-        <List>
+        <Divider sx={{ 
+          mb: 2, 
+          bgcolor: mode === 'dark' 
+            ? 'rgba(102, 126, 234, 0.3)' 
+            : 'rgba(255, 255, 255, 0.3)',
+          height: 1,
+          boxShadow: mode === 'dark' 
+            ? '0 1px 2px rgba(102, 126, 234, 0.2)' 
+            : '0 1px 2px rgba(255, 255, 255, 0.5)'
+        }} />
+      </Box>
+
+      {/* Navigation Section */}
+      <Box sx={{ position: 'relative', zIndex: 2, flex: 1 }}>
+        <List sx={{ py: 0 }}>
           {menuItems.map((item) => (
             <ListItem
               button
@@ -138,20 +176,42 @@ const MainLayout = () => {
               sx={{
                 my: 1,
                 borderRadius: 2,
-                backgroundColor: location.pathname === item.path ? 'primary.main' : 'transparent',
-                color: location.pathname === item.path ? 'white' : 'text.primary',
+                backgroundColor: location.pathname === item.path 
+                  ? mode === 'dark' 
+                    ? 'rgba(102, 126, 234, 0.8)' 
+                    : 'rgba(255, 255, 255, 0.2)'
+                  : 'transparent',
+                color: location.pathname === item.path 
+                  ? 'white' 
+                  : mode === 'dark' ? '#e1e5e9' : '#ffffff',
+                backdropFilter: location.pathname === item.path ? 'blur(10px)' : 'none',
+                boxShadow: location.pathname === item.path 
+                  ? mode === 'dark' 
+                    ? '0 4px 8px rgba(102, 126, 234, 0.3)' 
+                    : '0 4px 8px rgba(255, 255, 255, 0.3)'
+                  : 'none',
                 '&:hover': {
-                  backgroundColor: 'primary.light',
+                  backgroundColor: mode === 'dark' 
+                    ? 'rgba(102, 126, 234, 0.6)' 
+                    : 'rgba(255, 255, 255, 0.15)',
                   color: 'white',
                   transform: 'translateX(5px)',
                   transition: 'all 0.2s ease-in-out',
+                  backdropFilter: 'blur(10px)',
+                  boxShadow: mode === 'dark' 
+                    ? '0 6px 12px rgba(102, 126, 234, 0.4)' 
+                    : '0 6px 12px rgba(255, 255, 255, 0.4)',
                 },
                 transition: 'all 0.2s ease-in-out',
               }}
             >
               <ListItemIcon
                 sx={{
-                  color: location.pathname === item.path ? 'white' : 'primary.main',
+                  color: location.pathname === item.path 
+                    ? 'white' 
+                    : mode === 'dark' 
+                      ? '#667eea' 
+                      : '#ffffff',
                   minWidth: '40px',
                 }}
               >
@@ -166,14 +226,40 @@ const MainLayout = () => {
         </List>
       </Box>
 
-      <Box>
-        <Divider sx={{ my: 2, bgcolor: mode === 'dark' ? '#333' : '#e0e0e0' }} />
-        <Box textAlign="center" sx={{ color: 'text.secondary', py: 2 }}>
-          <TrendingUp sx={{ fontSize: 30, color: 'primary.main' }} />
-          <Typography variant="body2" sx={{ mt: 1, fontStyle: 'italic' }}>
+      {/* Footer Section */}
+      <Box sx={{ position: 'relative', zIndex: 2, mt: 'auto' }}>
+        <Divider sx={{ 
+          my: 2, 
+          bgcolor: mode === 'dark' 
+            ? 'rgba(102, 126, 234, 0.3)' 
+            : 'rgba(255, 255, 255, 0.3)',
+          height: 1,
+          boxShadow: mode === 'dark' 
+            ? '0 1px 2px rgba(102, 126, 234, 0.2)' 
+            : '0 1px 2px rgba(255, 255, 255, 0.5)'
+        }} />
+        <Box textAlign="center" sx={{ 
+          color: mode === 'dark' ? '#e1e5e9' : 'rgba(255, 255, 255, 0.9)', 
+          py: 2 
+        }}>
+          <TrendingUp sx={{ 
+            fontSize: 30, 
+            color: mode === 'dark' ? '#667eea' : '#ffffff',
+            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+          }} />
+          <Typography variant="body2" sx={{ 
+            mt: 1, 
+            fontStyle: 'italic',
+            textShadow: '0 1px 2px rgba(0,0,0,0.3)'
+          }}>
             "Earn Worldwide with Worldwide Earn!"
           </Typography>
-          <Star sx={{ fontSize: 30, color: 'secondary.main', mt: 1 }} />
+          <Star sx={{ 
+            fontSize: 30, 
+            color: mode === 'dark' ? '#f093fb' : '#ffffff', 
+            mt: 1,
+            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+          }} />
         </Box>
         <Button
           fullWidth
@@ -185,10 +271,22 @@ const MainLayout = () => {
             borderRadius: 2,
             py: 1.2,
             fontWeight: 'bold',
-            background: 'linear-gradient(45deg, #d32f2f, #f44336)',
+            background: mode === 'dark' 
+              ? 'linear-gradient(45deg, #d32f2f, #f44336)'
+              : 'linear-gradient(45deg, rgba(211, 47, 47, 0.9), rgba(244, 67, 54, 0.9))',
+            backdropFilter: 'blur(10px)',
+            border: mode === 'dark' ? 'none' : '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: mode === 'dark' 
+              ? '0 4px 8px rgba(211, 47, 47, 0.3)'
+              : '0 4px 8px rgba(255, 255, 255, 0.3)',
             '&:hover': {
-              background: 'linear-gradient(45deg, #b71c1c, #d32f2f)',
+              background: mode === 'dark'
+                ? 'linear-gradient(45deg, #b71c1c, #d32f2f)'
+                : 'linear-gradient(45deg, rgba(183, 28, 28, 0.9), rgba(211, 47, 47, 0.9))',
               transform: 'scale(1.02)',
+              boxShadow: mode === 'dark' 
+                ? '0 6px 12px rgba(211, 47, 47, 0.4)'
+                : '0 6px 12px rgba(255, 255, 255, 0.4)',
             },
             transition: 'all 0.3s ease-in-out',
           }}

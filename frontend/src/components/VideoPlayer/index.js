@@ -9,7 +9,9 @@ import {
   LinearProgress,
   CircularProgress,
   Chip,
-  Alert
+  Alert,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import { Close as CloseIcon, CheckCircle } from '@mui/icons-material';
 
@@ -18,6 +20,9 @@ const VideoPlayer = ({ videoId, onComplete, minimumWatchTime, onClose, title, is
   const [loading, setLoading] = useState(true);
   const playerRef = useRef(null);
   const intervalRef = useRef(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
 
   useEffect(() => {
     const loadYouTubeAPI = async () => {
@@ -112,39 +117,87 @@ const VideoPlayer = ({ videoId, onComplete, minimumWatchTime, onClose, title, is
   return (
     <Dialog 
       open 
-      maxWidth="md" 
+      maxWidth={isMobile ? 'sm' : 'md'} 
       fullWidth 
+      fullScreen={isMobile}
       onClose={onClose}
-      // Add these props for better performance
       keepMounted
       disablePortal
+      sx={{
+        '& .MuiDialog-paper': {
+          borderRadius: isMobile ? 0 : 2,
+          margin: isMobile ? 0 : 2,
+          maxHeight: isMobile ? '100vh' : '90vh',
+          height: isMobile ? '100%' : 'auto',
+        }
+      }}
     >
-      <DialogTitle>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="h6">{title}</Typography>
-          <Box display="flex" alignItems="center">
+      <DialogTitle sx={{ p: { xs: 2, sm: 3 } }}>
+        <Box 
+          display="flex" 
+          justifyContent="space-between" 
+          alignItems="flex-start"
+          gap={2}
+        >
+          <Typography 
+            variant={isMobile ? 'h6' : 'h5'} 
+            sx={{ 
+              fontSize: { xs: '1.1rem', sm: '1.25rem', md: '1.5rem' },
+              fontWeight: 600,
+              lineHeight: 1.3,
+              flex: 1,
+              pr: 1
+            }}
+          >
+            {title}
+          </Typography>
+          <Box display="flex" alignItems="center" gap={1}>
             {isCompleted && (
               <Chip
-                icon={<CheckCircle />}
-                label="Already Completed"
+                icon={<CheckCircle sx={{ fontSize: { xs: 16, sm: 18 } }} />}
+                label={isMobile ? "Done" : "Already Completed"}
                 color="success"
-                size="small"
-                sx={{ mr: 1 }}
+                size={isMobile ? "small" : "medium"}
+                sx={{ 
+                  fontSize: { xs: '0.7rem', sm: '0.8rem' },
+                  height: { xs: 28, sm: 32 }
+                }}
               />
             )}
-            <IconButton onClick={onClose} size="small">
-              <CloseIcon />
+            <IconButton 
+              onClick={onClose} 
+              size={isMobile ? "small" : "medium"}
+              sx={{
+                color: 'text.secondary',
+                '&:hover': {
+                  bgcolor: 'action.hover'
+                }
+              }}
+            >
+              <CloseIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
             </IconButton>
           </Box>
         </Box>
       </DialogTitle>
-      <DialogContent>
+      <DialogContent 
+        sx={{ 
+          p: { xs: 2, sm: 3 },
+          display: 'flex',
+          flexDirection: 'column',
+          height: isMobile ? '100%' : 'auto',
+          overflow: 'hidden'
+        }}
+      >
         <Box 
-          mb={2} 
           sx={{ 
             position: 'relative',
-            paddingTop: '56.25%', // 16:9 aspect ratio
-            bgcolor: 'black'
+            paddingTop: isMobile ? '75%' : '56.25%', // Different aspect ratio for mobile
+            bgcolor: '#000',
+            borderRadius: { xs: 1, sm: 2 },
+            overflow: 'hidden',
+            mb: { xs: 2, sm: 3 },
+            flex: isMobile ? 1 : 'none',
+            maxHeight: isMobile ? '50vh' : 'none'
           }}
         >
           {loading && (
@@ -153,10 +206,14 @@ const VideoPlayer = ({ videoId, onComplete, minimumWatchTime, onClose, title, is
                 position: 'absolute',
                 top: '50%',
                 left: '50%',
-                transform: 'translate(-50%, -50%)'
+                transform: 'translate(-50%, -50%)',
+                zIndex: 2
               }}
             >
-              <CircularProgress />
+              <CircularProgress 
+                size={isMobile ? 40 : 60}
+                sx={{ color: 'white' }}
+              />
             </Box>
           )}
           <Box 
@@ -166,36 +223,108 @@ const VideoPlayer = ({ videoId, onComplete, minimumWatchTime, onClose, title, is
               top: 0,
               left: 0,
               width: '100%',
-              height: '100%'
+              height: '100%',
+              zIndex: 1
             }}
           />
         </Box>
-        {loading ? (
-          <Box display="flex" justifyContent="center" p={3}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <>
-            <Box mb={2}>
-              <div id="youtube-player" />
-            </Box>
-            <Box display="flex" alignItems="center" justifyContent="space-between">
-              <Box flex={1} mr={2}>
+        {!loading && (
+          <Box 
+            sx={{ 
+              display: 'flex', 
+              flexDirection: 'column',
+              gap: { xs: 2, sm: 2.5 },
+              flex: isMobile ? 'none' : 'auto'
+            }}
+          >
+            <Box 
+              sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'space-between',
+                gap: { xs: 1.5, sm: 2 },
+                p: { xs: 2, sm: 2.5 },
+                bgcolor: 'background.paper',
+                borderRadius: { xs: 1.5, sm: 2 },
+                border: '1px solid',
+                borderColor: 'divider'
+              }}
+            >
+              <Box sx={{ flex: 1, mr: { xs: 1.5, sm: 2 } }}>
+                <Box 
+                  display="flex" 
+                  alignItems="center" 
+                  justifyContent="space-between"
+                  mb={1}
+                >
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary"
+                    sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+                  >
+                    Progress
+                  </Typography>
+                  <Typography 
+                    variant="body2" 
+                    color="text.primary"
+                    sx={{ 
+                      fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                      fontWeight: 600
+                    }}
+                  >
+                    {watchTime}/{minimumWatchTime}s
+                  </Typography>
+                </Box>
                 <LinearProgress
                   variant="determinate"
-                  value={(watchTime / minimumWatchTime) * 100}
+                  value={Math.min((watchTime / minimumWatchTime) * 100, 100)}
+                  sx={{
+                    height: { xs: 6, sm: 8 },
+                    borderRadius: { xs: 3, sm: 4 },
+                    bgcolor: 'action.hover',
+                    '& .MuiLinearProgress-bar': {
+                      borderRadius: { xs: 3, sm: 4 },
+                      bgcolor: watchTime >= minimumWatchTime ? 'success.main' : 'primary.main'
+                    }
+                  }}
                 />
               </Box>
-              <Typography variant="body2" color="text.secondary">
-                {watchTime}/{minimumWatchTime}s
-              </Typography>
+              {watchTime >= minimumWatchTime && (
+                <Box 
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: { xs: 32, sm: 40 },
+                    height: { xs: 32, sm: 40 },
+                    borderRadius: '50%',
+                    bgcolor: 'success.main',
+                    color: 'white'
+                  }}
+                >
+                  <CheckCircle sx={{ fontSize: { xs: 18, sm: 22 } }} />
+                </Box>
+              )}
             </Box>
+            
             {isCompleted && (
-              <Alert severity="info" sx={{ mt: 2 }}>
-                You've already earned points for this video. You can watch it again, but no additional points will be awarded.
+              <Alert 
+                severity="info" 
+                sx={{ 
+                  borderRadius: { xs: 1.5, sm: 2 },
+                  fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                  '& .MuiAlert-message': {
+                    padding: { xs: '4px 0', sm: '8px 0' }
+                  }
+                }}
+              >
+                {isMobile 
+                  ? "Already earned points for this video." 
+                  : "You've already earned points for this video. You can watch it again, but no additional points will be awarded."
+                }
               </Alert>
             )}
-          </>
+          </Box>
         )}
       </DialogContent>
     </Dialog>

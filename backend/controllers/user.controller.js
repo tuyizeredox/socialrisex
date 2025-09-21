@@ -14,6 +14,10 @@ import WatchedVideo from '../models/WatchedVideo.js'; // Add this import
 
 import Transaction from '../models/Transaction.js';
 
+import Photo from '../models/Photo.js';
+
+import PhotoShare from '../models/PhotoShare.js';
+
 import { calculateMultilevelReferralEarnings, getUserReferralStructure } from '../utils/referralCalculations.js';
 
 // Get user profile
@@ -55,11 +59,19 @@ export const getUserStats = async (req, res, next) => {
   try {
     const userId = req.user._id;
     
+    // Get user's current points and earnings from database (includes photo earnings)
+    const user = await User.findById(userId);
+    
     const watchedVideos = await WatchedVideo.find({ user: userId })
       .populate('video', 'pointsReward');
     
     const videoPoints = watchedVideos.reduce((total, watch) => 
       total + (watch.pointsEarned || 0), 0);
+    
+    // Get photo shares count and earnings
+    const photoShares = await PhotoShare.find({ user: userId });
+    const photoPoints = photoShares.reduce((total, share) => total + (share.rwfEarned || 0), 0);
+    const photoSharesCount = photoShares.length;
     
     const referralCount = await User.countDocuments({ referredBy: userId });
     const activeReferrals = await User.countDocuments({ 
@@ -71,15 +83,20 @@ export const getUserStats = async (req, res, next) => {
     const multilevelData = await calculateMultilevelReferralEarnings(userId);
 
     const welcomeBonus = 3000;
-    const totalPoints = videoPoints + welcomeBonus;
+    
+    // Use actual user points from database (includes all earnings: video + photo + bonuses)
+    const totalPoints = user.points || 0;
+    const totalEarnings = (user.earnings || 0) + multilevelData.totalEarnings;
 
     res.status(200).json({
       success: true,
       data: {
         points: totalPoints,
         videoPoints,
+        photoPoints,
+        photoShares: photoSharesCount,
         welcomeBonus,
-        earnings: multilevelData.totalEarnings,
+        earnings: totalEarnings,
         referrals: referralCount,
         activeReferrals,
         level1Count: multilevelData.level1Count,
@@ -423,6 +440,65 @@ export const getWithdrawalsSummary = async (req, res, next) => {
   try {
     const withdrawals = await Withdrawal.find({ user: req.user._id });
     res.status(200).json(withdrawals);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Photo sharing endpoints
+
+// Share photo and earn RWF
+export const sharePhoto = async (req, res, next) => {
+  try {
+    const { photoId, platform } = req.body;
+    const userId = req.user._id;
+
+    // Validate photo exists and is active
+    const photo = await Photo.findOne({ _id: photoId, isActive: true });
+    if (!photo) {
+      return next(new ErrorResponse('Photo not found or inactive', 404));
+    }
+
+    // Create share record
+    const photoShare = await PhotoShare.create({
+      user: userId,
+      photo: photoId,
+      platform: platform || 'whatsapp',
+      rwfEarned: 50
+    });
+
+    // Update photo share count
+    await Photo.findByIdAndUpdate(photoId, {
+      $inc: { shareCount: 1, totalRwfPaid: 50 }
+    });
+
+    // Update user points/earnings
+    await User.findByIdAndUpdate(userId, {
+      $inc: { points: 50, earnings: 50 }
+    });
+
+    res.status(201).json({
+      success: true,
+      data: photoShare,
+      message: 'Photo shared successfully! You earned 50 RWF!'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get user's photo shares
+export const getUserPhotoShares = async (req, res, next) => {
+  try {
+    const shares = await PhotoShare.find({ user: req.user._id })
+      .populate('photo', 'title imageUrl')
+      .sort('-createdAt')
+      .limit(50);
+
+    res.status(200).json({
+      success: true,
+      data: shares
+    });
   } catch (error) {
     next(error);
   }

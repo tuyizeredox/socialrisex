@@ -100,6 +100,9 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // API Routes
 app.use('/api', apiRoutes);
 
