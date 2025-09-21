@@ -369,14 +369,14 @@ export default function Activate() {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: { xs: 2, sm: 4 }, px: { xs: 1, sm: 2 } }}>
       {/* Header Section */}
       <Box
         sx={{
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          borderRadius: 4,
-          p: 4,
-          mb: 4,
+          borderRadius: { xs: 3, sm: 4 },
+          p: { xs: 3, sm: 4 },
+          mb: { xs: 2, sm: 4 },
           color: 'white',
           textAlign: 'center',
           boxShadow: '0 20px 40px rgba(102, 126, 234, 0.3)',
@@ -397,19 +397,31 @@ export default function Activate() {
           <Avatar
             sx={{
               bgcolor: 'rgba(255,255,255,0.2)',
-              width: 80,
-              height: 80,
+              width: { xs: 60, sm: 80 },
+              height: { xs: 60, sm: 80 },
               mx: 'auto',
               mb: 2,
               backdropFilter: 'blur(10px)'
             }}
           >
-            <Lock sx={{ fontSize: 40 }} />
+            <Lock sx={{ fontSize: { xs: 30, sm: 40 } }} />
           </Avatar>
-          <Typography variant="h3" fontWeight={800} gutterBottom>
+          <Typography 
+            variant="h3" 
+            fontWeight={800} 
+            gutterBottom
+            sx={{ fontSize: { xs: '1.8rem', sm: '2.5rem', md: '3rem' } }}
+          >
             🌟 Activate Your Account
           </Typography>
-          <Typography variant="h6" sx={{ opacity: 0.9, mb: 2 }}>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              opacity: 0.9, 
+              mb: 2,
+              fontSize: { xs: '1rem', sm: '1.25rem' }
+            }}
+          >
             Join thousands earning with Worldwide Earn!
           </Typography>
           <Chip
@@ -418,7 +430,7 @@ export default function Activate() {
               bgcolor: 'rgba(255,255,255,0.2)',
               color: 'white',
               fontWeight: 'bold',
-              fontSize: '1.1rem',
+              fontSize: { xs: '0.9rem', sm: '1.1rem' },
               px: 2,
               py: 1
             }}
@@ -426,230 +438,361 @@ export default function Activate() {
         </Box>
       </Box>
 
-      {/* Progress Stepper */}
-      <Paper sx={{ p: 3, mb: 4, borderRadius: 3, boxShadow: 3 }}>
-        <Stepper activeStep={activeStep} alternativeLabel>
-          {steps.map((label) => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
-      </Paper>
+      {/* Mobile-First Step Cards */}
+      <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
+        {/* STEP 1: Payment Instructions - Now prioritized */}
+        <Grid item xs={12}>
+          <Paper 
+            elevation={8}
+            sx={{ 
+              p: { xs: 3, sm: 4 }, 
+              borderRadius: 3, 
+              background: 'linear-gradient(135deg, #FFF8E1 0%, #FFF3C4 100%)',
+              border: '3px solid #FFC107',
+              boxShadow: '0 15px 40px rgba(255, 193, 7, 0.2)'
+            }}
+          >
+            <Box sx={{ textAlign: 'center', mb: 3 }}>
+              <Typography 
+                variant="h2" 
+                sx={{ 
+                  mb: 2, 
+                  fontSize: { xs: '2.5rem', sm: '3rem' } 
+                }}
+              >
+                💛
+              </Typography>
+              <Typography 
+                variant="h4" 
+                fontWeight={800} 
+                gutterBottom 
+                sx={{ 
+                  color: '#FF8F00',
+                  fontSize: { xs: '1.5rem', sm: '2rem' }
+                }}
+              >
+                STEP 1: MTN MoMo Payment
+              </Typography>
+            </Box>
 
-      <Grid container spacing={4}>
-        {/* Payment Methods */}
-        <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 4, borderRadius: 3, boxShadow: 3 }}>
-            <Typography variant="h5" fontWeight={700} gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-              <Payment sx={{ mr: 2, color: 'primary.main' }} />
-              Payment Method - MTN MoMo Only
-            </Typography>
+            {/* Payment Details Card */}
+            <Card
+              elevation={0}
+              sx={{
+                bgcolor: '#E3F2FD',
+                border: '3px solid #2196F3',
+                borderRadius: 3,
+                mb: 3
+              }}
+            >
+              <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+                <Typography 
+                  variant="h6" 
+                  fontWeight={700} 
+                  gutterBottom 
+                  sx={{ color: '#1976D2', textAlign: 'center' }}
+                >
+                  📱 Send Money To:
+                </Typography>
+                <Typography 
+                  variant="h4" 
+                  fontWeight={800} 
+                  sx={{ 
+                    color: '#0D47A1', 
+                    textAlign: 'center',
+                    fontSize: { xs: '1.2rem', sm: '1.5rem' }
+                  }}
+                  gutterBottom
+                >
+                  N AND M SHOP LTD
+                </Typography>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    color: '#666', 
+                    textAlign: 'center',
+                    fontSize: { xs: '0.8rem', sm: '0.9rem' }
+                  }}
+                >
+                  (Use this exact recipient name!)
+                </Typography>
+              </CardContent>
+            </Card>
+
+            {/* USSD Code - Most Prominent */}
+            <Box
+              sx={{
+                bgcolor: '#FFECB3',
+                border: '4px solid #FF8F00',
+                borderRadius: 3,
+                p: { xs: 2, sm: 3 },
+                mb: 3,
+                textAlign: 'center',
+                boxShadow: '0 8px 24px rgba(255, 143, 0, 0.3)'
+              }}
+            >
+              <Typography variant="h6" fontWeight={700} sx={{ color: '#E65100', mb: 2 }}>
+                📞 Dial This Code:
+              </Typography>
+              <Box
+                sx={{
+                  fontFamily: 'monospace',
+                  fontSize: { xs: '1.1rem', sm: '1.4rem', md: '1.6rem' },
+                  fontWeight: 'bold',
+                  color: '#E65100',
+                  letterSpacing: 1,
+                  bgcolor: 'white',
+                  p: { xs: 1.5, sm: 2 },
+                  borderRadius: 2,
+                  border: '2px solid #FF8F00'
+                }}
+              >
+                *182*8*1*000564*8000#
+              </Box>
+            </Box>
             
-            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
-              {paymentMethods.map((method, index) => (
-                <Box key={method.name} sx={{ maxWidth: 400, width: '100%' }}>
-                  <Card
-                    sx={{
-                      border: `3px solid ${method.color}`,
-                      borderRadius: 3,
-                      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                      cursor: 'pointer',
-                      background: 'linear-gradient(135deg, #FFF8E1 0%, #FFF3C4 100%)',
-                      '&:hover': {
-                        transform: 'translateY(-5px)',
-                        boxShadow: `0 15px 40px ${method.color}55`
-                      }
-                    }}
-                    onClick={() => setActiveStep(1)}
-                  >
-                    <CardContent sx={{ textAlign: 'center', p: 4 }}>
-                      <Typography variant="h2" sx={{ mb: 2 }}>{method.icon}</Typography>
-                      <Typography variant="h4" fontWeight={800} gutterBottom sx={{ color: '#FF8F00' }}>
-                        {method.name}
-                      </Typography>
-                      
-                      {/* Recipient Name - Enhanced */}
-                      <Box
-                        sx={{
-                          bgcolor: '#E3F2FD',
-                          border: '2px solid #2196F3',
-                          p: 2,
-                          borderRadius: 2,
-                          mb: 3,
-                          mx: 1
-                        }}
-                      >
-                        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.9rem' }}>
-                          Send Money To:
+            {/* Quick Steps */}
+            <Grid container spacing={2}>
+              {[
+                { step: '1', text: 'Dial the code above', icon: '📞' },
+                { step: '2', text: 'Confirm: N AND M SHOP LTD', icon: '👤' },
+                { step: '3', text: 'Amount: 8000 RWF', icon: '💰' },
+                { step: '4', text: 'Enter your PIN', icon: '🔐' },
+                { step: '5', text: 'Save Transaction ID from SMS', icon: '📱' }
+              ].map((item, index) => (
+                <Grid item xs={12} sm={6} key={index}>
+                  <Card sx={{ height: '100%', bgcolor: '#f8f9fa' }}>
+                    <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Avatar sx={{ bgcolor: '#4CAF50', width: 32, height: 32, mr: 2 }}>
+                          <Typography variant="caption" fontWeight="bold">
+                            {item.step}
+                          </Typography>
+                        </Avatar>
+                        <Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}>
+                          {item.icon} {item.text}
                         </Typography>
-                        <Typography variant="h6" fontWeight={700} sx={{ color: '#1976D2' }}>
-                          {method.recipient}
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: '#666', fontSize: '0.85rem', mt: 1 }}>
-                          (Make sure to send to this exact name)
-                        </Typography>
-                      </Box>
-
-                      {/* Payment Code - Enhanced */}
-                      <Box
-                        sx={{
-                          bgcolor: '#FFECB3',
-                          border: '3px solid #FF8F00',
-                          p: 3,
-                          borderRadius: 2,
-                          fontFamily: 'monospace',
-                          fontSize: '1.3rem',
-                          fontWeight: 'bold',
-                          color: '#E65100',
-                          mt: 2,
-                          letterSpacing: 1,
-                          boxShadow: '0 4px 12px rgba(255, 143, 0, 0.3)'
-                        }}
-                      >
-                        {method.code}
-                      </Box>
-                      
-                      <Typography variant="body1" sx={{ mt: 2, fontWeight: 600, color: '#E65100' }}>
-                        📱 Dial this USSD code to send 8,000 RWF
-                      </Typography>
-                      
-                      {/* Step by step instructions */}
-                      <Box sx={{ mt: 3, textAlign: 'left' }}>
-                        <Typography variant="body2" fontWeight={600} sx={{ mb: 2, color: '#FF8F00', textAlign: 'center' }}>
-                          🔸 Payment Steps:
-                        </Typography>
-                        <Box sx={{ pl: 2 }}>
-                          <Typography variant="body2" sx={{ mb: 1, color: '#666' }}>
-                            1. Dial: <strong>{method.code}</strong>
-                          </Typography>
-                          <Typography variant="body2" sx={{ mb: 1, color: '#666' }}>
-                            2. Confirm recipient: <strong>{method.recipient}</strong>
-                          </Typography>
-                          <Typography variant="body2" sx={{ mb: 1, color: '#666' }}>
-                            3. Enter amount: <strong>8000</strong>
-                          </Typography>
-                          <Typography variant="body2" sx={{ mb: 1, color: '#666' }}>
-                            4. Enter your PIN to complete
-                          </Typography>
-                          <Typography variant="body2" sx={{ color: '#4CAF50', fontWeight: 600 }}>
-                            5. Copy the transaction ID from the SMS
-                          </Typography>
-                        </Box>
                       </Box>
                     </CardContent>
                   </Card>
-                </Box>
+                </Grid>
               ))}
+            </Grid>
+          </Paper>
+        </Grid>
+
+        {/* STEP 2: Transaction ID Input - Now more prominent */}
+        <Grid item xs={12}>
+          <Paper 
+            elevation={12}
+            sx={{ 
+              background: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
+              borderRadius: 3,
+              p: { xs: 3, sm: 4 },
+              color: 'white',
+              textAlign: 'center',
+              boxShadow: '0 20px 50px rgba(76, 175, 80, 0.4)',
+              border: '2px solid rgba(255,255,255,0.2)'
+            }}
+          >
+            <Box sx={{ mb: 3 }}>
+              <AutoAwesome sx={{ fontSize: { xs: 40, sm: 56 }, mb: 2 }} />
+              <Typography 
+                variant="h4" 
+                fontWeight={800} 
+                gutterBottom
+                sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}
+              >
+                STEP 2: Enter Transaction ID
+              </Typography>
+              <Typography 
+                variant="body1" 
+                sx={{ 
+                  mb: 2, 
+                  opacity: 0.9,
+                  fontSize: { xs: '0.9rem', sm: '1rem' }
+                }}
+              >
+                Copy the transaction ID from your MTN MoMo SMS confirmation
+              </Typography>
             </Box>
 
-            {/* Transaction ID Input */}
-            <Box
-              sx={{
-                background: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
-                borderRadius: 3,
-                p: 4,
-                color: 'white',
-                textAlign: 'center'
-              }}
-            >
-              <AutoAwesome sx={{ fontSize: 48, mb: 2 }} />
-              <Typography variant="h5" fontWeight={700} gutterBottom>
-                Submit Transaction ID for Admin Approval
-              </Typography>
-              <Typography variant="body1" sx={{ mb: 2, opacity: 0.9 }}>
-                After making payment to <strong>N AND M SHOP LTD</strong> using code <strong>*182*8*1*000564*8000#</strong>, 
-                enter your MTN MoMo transaction ID below.
-              </Typography>
-              <Typography variant="body1" sx={{ mb: 3, opacity: 0.9, fontStyle: 'italic' }}>
-                💡 Find your transaction ID in the SMS confirmation message you received after payment.
-              </Typography>
+            {/* Enhanced Transaction ID Input */}
+            <Box sx={{ maxWidth: { xs: '100%', sm: 500 }, mx: 'auto' }}>
+              <Card sx={{ mb: 3, bgcolor: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)' }}>
+                <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+                  <Typography variant="h6" fontWeight={700} sx={{ mb: 2, color: '#FFE082' }}>
+                    💡 Transaction ID Examples:
+                  </Typography>
+                  <Box sx={{ textAlign: 'left' }}>
+                    <Typography variant="body2" sx={{ mb: 1, fontFamily: 'monospace', color: '#E8F5E8' }}>
+                      • MP240315.1234.A56789
+                    </Typography>
+                    <Typography variant="body2" sx={{ mb: 1, fontFamily: 'monospace', color: '#E8F5E8' }}>
+                      • MT240315.5678.B12345
+                    </Typography>
+                    <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#E8F5E8' }}>
+                      • MW240315.9012.C67890
+                    </Typography>
+                  </Box>
+                </CardContent>
+              </Card>
               
-              <Box sx={{ maxWidth: 400, mx: 'auto' }}>
-                <TextField
-                  fullWidth
-                  label="Transaction ID"
-                  placeholder="e.g., MP240101.1234.B12345"
-                  value={transactionId}
-                  onChange={(e) => setTransactionId(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Security sx={{ color: 'white' }} />
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{
-                    mb: 3,
-                    '& .MuiOutlinedInput-root': {
-                      bgcolor: 'rgba(255,255,255,0.1)',
-                      backdropFilter: 'blur(10px)',
-                      '& fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
-                      '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.5)' },
-                      '&.Mui-focused fieldset': { borderColor: 'white' }
-                    },
-                    '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.8)' },
-                    '& .MuiInputBase-input': { color: 'white' }
-                  }}
-                />
-                
-                <Button
-                  fullWidth
-                  variant="contained"
-                  size="large"
-                  onClick={handleTransactionSubmit}
-                  disabled={loading}
-                  sx={{
-                    bgcolor: 'rgba(255,255,255,0.2)',
+              <TextField
+                fullWidth
+                label="Enter Transaction ID"
+                placeholder="e.g., MP240101.1234.B12345"
+                value={transactionId}
+                onChange={(e) => setTransactionId(e.target.value)}
+                variant="outlined"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Security sx={{ color: 'rgba(255,255,255,0.8)' }} />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  mb: 3,
+                  '& .MuiOutlinedInput-root': {
+                    bgcolor: 'rgba(255,255,255,0.15)',
                     backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255,255,255,0.3)',
+                    fontSize: { xs: '1rem', sm: '1.1rem' },
+                    fontWeight: 'bold',
+                    height: { xs: 56, sm: 64 },
+                    '& fieldset': { 
+                      borderColor: 'rgba(255,255,255,0.4)',
+                      borderWidth: 2
+                    },
+                    '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.6)' },
+                    '&.Mui-focused fieldset': { 
+                      borderColor: 'white',
+                      borderWidth: 3
+                    }
+                  },
+                  '& .MuiInputLabel-root': { 
+                    color: 'rgba(255,255,255,0.8)',
+                    fontWeight: 600
+                  },
+                  '& .MuiInputBase-input': { 
                     color: 'white',
                     fontWeight: 'bold',
-                    py: 1.5,
-                    borderRadius: 2,
-                    '&:hover': {
-                      bgcolor: 'rgba(255,255,255,0.3)',
+                    '&::placeholder': {
+                      color: 'rgba(255,255,255,0.6)'
                     }
-                  }}
-                >
-                  {loading ? 'Submitting...' : 'Submit for Admin Approval'}
-                </Button>
-              </Box>
+                  }
+                }}
+              />
+              
+              <Button
+                fullWidth
+                variant="contained"
+                size="large"
+                onClick={handleTransactionSubmit}
+                disabled={loading || !transactionId.trim()}
+                sx={{
+                  bgcolor: 'rgba(255,255,255,0.2)',
+                  backdropFilter: 'blur(10px)',
+                  border: '2px solid rgba(255,255,255,0.3)',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  py: { xs: 1.5, sm: 2 },
+                  fontSize: { xs: '1rem', sm: '1.1rem' },
+                  borderRadius: 2,
+                  height: { xs: 50, sm: 56 },
+                  transition: 'all 0.3s ease',
+                  '&:hover:not(:disabled)': {
+                    bgcolor: 'rgba(255,255,255,0.3)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 8px 25px rgba(255,255,255,0.2)'
+                  },
+                  '&:disabled': {
+                    opacity: 0.6
+                  }
+                }}
+              >
+                {loading ? (
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <CircularProgress size={20} sx={{ mr: 1, color: 'white' }} />
+                    Submitting...
+                  </Box>
+                ) : (
+                  <>
+                    <CheckCircle sx={{ mr: 1 }} />
+                    Submit for Instant Activation
+                  </>
+                )}
+              </Button>
+            </Box>
+
+            {/* Benefits Section */}
+            <Box sx={{ mt: 4 }}>
+              <Typography variant="h6" fontWeight={700} sx={{ mb: 2, color: '#E8F5E8' }}>
+                ⚡ After Activation, You'll Get:
+              </Typography>
+              <Grid container spacing={2} justifyContent="center">
+                {[
+                  { icon: <TrendingUp />, text: 'Start Earning Immediately' },
+                  { icon: <AccountBalanceWallet />, text: 'Full Access to Platform' },
+                  { icon: <VerifiedUser />, text: 'Verified Account Status' }
+                ].map((benefit, index) => (
+                  <Grid item xs={12} sm={4} key={index}>
+                    <Box 
+                      sx={{ 
+                        display: 'flex', 
+                        flexDirection: { xs: 'row', sm: 'column' },
+                        alignItems: 'center',
+                        textAlign: { xs: 'left', sm: 'center' },
+                        bgcolor: 'rgba(255,255,255,0.1)',
+                        p: 2,
+                        borderRadius: 2,
+                        height: '100%'
+                      }}
+                    >
+                      <Avatar 
+                        sx={{ 
+                          bgcolor: 'rgba(255,255,255,0.2)', 
+                          width: 40, 
+                          height: 40, 
+                          mr: { xs: 2, sm: 0 },
+                          mb: { xs: 0, sm: 1 }
+                        }}
+                      >
+                        {benefit.icon}
+                      </Avatar>
+                      <Typography 
+                        variant="body2" 
+                        fontWeight={600}
+                        sx={{ fontSize: { xs: '0.85rem', sm: '0.9rem' } }}
+                      >
+                        {benefit.text}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                ))}
+              </Grid>
             </Box>
           </Paper>
         </Grid>
 
-        {/* Benefits Sidebar */}
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3, borderRadius: 3, boxShadow: 3, mb: 3 }}>
-            <Typography variant="h6" fontWeight={700} gutterBottom sx={{ color: 'primary.main' }}>
-              🎯 Why Activate?
-            </Typography>
-            <Box sx={{ mt: 2 }}>
-              {[
-                { icon: <TrendingUp />, text: 'Start earning immediately' },
-                { icon: <AccountBalanceWallet />, text: 'Access to all earning features' },
-                { icon: <VerifiedUser />, text: 'Secure & verified account' },
-                { icon: <AutoAwesome />, text: 'Instant activation' }
-              ].map((benefit, index) => (
-                <Box key={index} sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <Avatar sx={{ bgcolor: 'primary.light', width: 32, height: 32, mr: 2 }}>
-                    {benefit.icon}
-                  </Avatar>
-                  <Typography variant="body2">{benefit.text}</Typography>
-                </Box>
-              ))}
-            </Box>
+        {/* Help Section */}
+        <Grid item xs={12}>
+          <Paper sx={{ p: { xs: 2, sm: 3 }, borderRadius: 3, boxShadow: 3 }}>
+            <Alert severity="info" sx={{ borderRadius: 2 }}>
+              <Typography variant="h6" fontWeight={700} gutterBottom>
+                💬 Need Help?
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                • <strong>Can't find your transaction ID?</strong> Check your SMS messages after payment
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                • <strong>Payment failed?</strong> Make sure you have sufficient MoMo balance
+              </Typography>
+              <Typography variant="body2">
+                • <strong>Still having issues?</strong> Contact our 24/7 support team
+              </Typography>
+            </Alert>
           </Paper>
-
-          <Alert severity="success" sx={{ borderRadius: 2 }}>
-            <Typography variant="body2" fontWeight={600}>
-              🔒 Secure Payment Processing
-            </Typography>
-            <Typography variant="body2" sx={{ mt: 1 }}>
-              Your payment is verified automatically through our secure system. No manual verification needed!
-            </Typography>
-          </Alert>
         </Grid>
       </Grid>
 
