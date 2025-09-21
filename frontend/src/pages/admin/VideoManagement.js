@@ -232,7 +232,7 @@ export default function VideoManagement() {
     >
       <CardMedia
         sx={{
-          height: 200,
+          height: { xs: 160, sm: 180, md: 200 },
           position: 'relative',
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         }}
@@ -282,27 +282,55 @@ export default function VideoManagement() {
         />
       </CardMedia>
 
-      <CardContent sx={{ p: 3 }}>
-        <Typography variant="h6" fontWeight="bold" gutterBottom noWrap>
+      <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+        <Typography 
+          variant="h6" 
+          fontWeight="bold" 
+          gutterBottom 
+          noWrap
+          sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
+        >
           {video.title}
         </Typography>
         
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          mb: 2,
+          flexWrap: { xs: 'wrap', sm: 'nowrap' },
+          gap: { xs: 1, sm: 0 }
+        }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <EmojiEvents sx={{ color: 'gold', fontSize: 18 }} />
-            <Typography variant="body2" fontWeight="bold" color="primary.main">
+            <EmojiEvents sx={{ color: 'gold', fontSize: { xs: 16, sm: 18 } }} />
+            <Typography 
+              variant="body2" 
+              fontWeight="bold" 
+              color="primary.main"
+              sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+            >
               {video.pointsReward} pts
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Schedule sx={{ color: 'text.secondary', fontSize: 18 }} />
-            <Typography variant="body2" color="text.secondary">
+            <Schedule sx={{ color: 'text.secondary', fontSize: { xs: 16, sm: 18 } }} />
+            <Typography 
+              variant="body2" 
+              color="text.secondary"
+              sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+            >
               {video.minimumWatchTime}s min
             </Typography>
           </Box>
         </Box>
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          mb: 2,
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: { xs: 1, sm: 0 }
+        }}>
           <FormControlLabel
             control={
               <Switch
@@ -312,14 +340,23 @@ export default function VideoManagement() {
               />
             }
             label={
-              <Typography variant="body2" fontWeight="medium">
+              <Typography 
+                variant="body2" 
+                fontWeight="medium"
+                sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+              >
                 {video.isActive ? 'Active Quest' : 'Quest Paused'}
               </Typography>
             }
           />
         </Box>
 
-        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+        <Box sx={{ 
+          display: 'flex', 
+          gap: { xs: 0.5, sm: 1 }, 
+          justifyContent: 'center',
+          flexWrap: 'wrap'
+        }}>
           <Tooltip title="Preview Quest">
             <IconButton
               size="small"
@@ -327,10 +364,12 @@ export default function VideoManagement() {
               sx={{
                 bgcolor: 'primary.light',
                 color: 'primary.contrastText',
-                '&:hover': { bgcolor: 'primary.main' }
+                '&:hover': { bgcolor: 'primary.main' },
+                width: { xs: 28, sm: 32 },
+                height: { xs: 28, sm: 32 }
               }}
             >
-              <Visibility fontSize="small" />
+              <Visibility fontSize={isMobile ? 'inherit' : 'small'} />
             </IconButton>
           </Tooltip>
           <Tooltip title="Edit Quest">
@@ -340,10 +379,12 @@ export default function VideoManagement() {
               sx={{
                 bgcolor: 'warning.light',
                 color: 'warning.contrastText',
-                '&:hover': { bgcolor: 'warning.main' }
+                '&:hover': { bgcolor: 'warning.main' },
+                width: { xs: 28, sm: 32 },
+                height: { xs: 28, sm: 32 }
               }}
             >
-              <EditIcon fontSize="small" />
+              <EditIcon fontSize={isMobile ? 'inherit' : 'small'} />
             </IconButton>
           </Tooltip>
           <Tooltip title="Share Quest">
@@ -356,10 +397,12 @@ export default function VideoManagement() {
               sx={{
                 bgcolor: 'info.light',
                 color: 'info.contrastText',
-                '&:hover': { bgcolor: 'info.main' }
+                '&:hover': { bgcolor: 'info.main' },
+                width: { xs: 28, sm: 32 },
+                height: { xs: 28, sm: 32 }
               }}
             >
-              <Share fontSize="small" />
+              <Share fontSize={isMobile ? 'inherit' : 'small'} />
             </IconButton>
           </Tooltip>
           <Tooltip title="Remove Quest">
@@ -369,10 +412,12 @@ export default function VideoManagement() {
               sx={{
                 bgcolor: 'error.light',
                 color: 'error.contrastText',
-                '&:hover': { bgcolor: 'error.main' }
+                '&:hover': { bgcolor: 'error.main' },
+                width: { xs: 28, sm: 32 },
+                height: { xs: 28, sm: 32 }
               }}
             >
-              <DeleteIcon fontSize="small" />
+              <DeleteIcon fontSize={isMobile ? 'inherit' : 'small'} />
             </IconButton>
           </Tooltip>
         </Box>
@@ -381,14 +426,14 @@ export default function VideoManagement() {
   );
 
   return (
-    <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 4 } }}>
+    <Container maxWidth="xl" sx={{ px: { xs: 1, sm: 2, md: 3 }, py: { xs: 1, sm: 2, md: 4 } }}>
       {/* Modern Header */}
       <Box 
         sx={{ 
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          borderRadius: { xs: 3, sm: 4 },
-          p: { xs: 3, sm: 4 },
-          mb: 4,
+          borderRadius: { xs: 2, sm: 3, md: 4 },
+          p: { xs: 2, sm: 3, md: 4 },
+          mb: { xs: 2, sm: 3, md: 4 },
           color: 'white',
           position: 'relative',
           overflow: 'hidden',
@@ -401,15 +446,18 @@ export default function VideoManagement() {
             justifyContent: 'space-between', 
             alignItems: { xs: 'flex-start', sm: 'center' },
             flexDirection: { xs: 'column', sm: 'row' },
-            gap: { xs: 2, sm: 0 },
-            mb: 2
+            gap: { xs: 2, sm: 3 },
+            mb: { xs: 1, sm: 2 }
           }}>
-            <Box>
+            <Box sx={{ width: { xs: '100%', sm: 'auto' } }}>
               <Typography 
                 variant="h3" 
                 fontWeight={800} 
                 gutterBottom
-                sx={{ fontSize: { xs: '1.8rem', sm: '2.5rem', md: '3rem' } }}
+                sx={{ 
+                  fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem', lg: '3rem' },
+                  lineHeight: { xs: 1.2, sm: 1.3 }
+                }}
               >
                 🎬 Quest Library Manager
               </Typography>
@@ -417,7 +465,8 @@ export default function VideoManagement() {
                 variant="h6" 
                 sx={{ 
                   opacity: 0.9,
-                  fontSize: { xs: '1rem', sm: '1.25rem' }
+                  fontSize: { xs: '0.875rem', sm: '1rem', md: '1.25rem' },
+                  lineHeight: { xs: 1.3, sm: 1.4 }
                 }}
               >
                 {videos.length} epic video quests available • {videos.filter(v => v.isActive).length} active adventures
@@ -426,26 +475,32 @@ export default function VideoManagement() {
             
             <Box sx={{ 
               display: 'flex', 
-              gap: 1,
+              gap: { xs: 0.5, sm: 1 },
+              flexDirection: { xs: 'column', sm: 'row' },
+              width: { xs: '100%', sm: 'auto' },
               flexWrap: 'wrap',
-              justifyContent: { xs: 'center', sm: 'flex-end' }
+              justifyContent: { xs: 'stretch', sm: 'flex-end' }
             }}>
               <Button
                 variant="contained"
-                startIcon={<AddIcon />}
+                startIcon={isMobile ? null : <AddIcon />}
                 onClick={() => handleOpenDialog()}
+                size={isMobile ? 'small' : 'medium'}
                 sx={{
                   bgcolor: 'rgba(255,255,255,0.2)',
                   color: 'white',
                   backdropFilter: 'blur(10px)',
                   border: '1px solid rgba(255,255,255,0.3)',
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                  py: { xs: 1, sm: 1.5 },
+                  minWidth: { xs: 'auto', sm: 'fit-content' },
                   '&:hover': { 
                     bgcolor: 'rgba(255,255,255,0.3)',
                     transform: 'translateY(-2px)'
                   }
                 }}
               >
-                Create New Quest
+                {isMobile ? '🎬 Create Quest' : 'Create New Quest'}
               </Button>
             </Box>
           </Box>
@@ -457,32 +512,34 @@ export default function VideoManagement() {
         sx={{
           background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(247,247,247,0.9) 100%)',
           backdropFilter: 'blur(20px)',
-          borderRadius: 4,
-          p: { xs: 2, sm: 3 },
-          mb: 3,
+          borderRadius: { xs: 2, sm: 3, md: 4 },
+          p: { xs: 1.5, sm: 2, md: 3 },
+          mb: { xs: 2, sm: 3 },
           boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
           border: '1px solid rgba(255,255,255,0.2)',
         }}
       >
-        <Grid container spacing={2} alignItems="center">
+        <Grid container spacing={{ xs: 1.5, sm: 2 }} alignItems="center">
           <Grid item xs={12} md={10}>
             <TextField
               fullWidth
               variant="outlined"
-              placeholder="🔍 Search video quests by title or reward points..."
+              placeholder={isMobile ? "🔍 Search quests..." : "🔍 Search video quests by title or reward points..."}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              size={isMobile ? 'small' : 'medium'}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Search sx={{ color: 'primary.main' }} />
+                    <Search sx={{ color: 'primary.main', fontSize: { xs: 18, sm: 20 } }} />
                   </InputAdornment>
                 ),
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  borderRadius: 3,
+                  borderRadius: { xs: 2, sm: 3 },
                   bgcolor: 'rgba(255,255,255,0.8)',
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
                   '&:hover fieldset': { borderColor: 'primary.main' },
                   '&.Mui-focused fieldset': { borderColor: 'primary.main' },
                 },
@@ -490,15 +547,16 @@ export default function VideoManagement() {
             />
           </Grid>
           <Grid item xs={12} md={2}>
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Box sx={{ display: 'flex', justifyContent: { xs: 'center', md: 'center' } }}>
               <IconButton
+                size={isMobile ? 'small' : 'medium'}
                 sx={{
                   bgcolor: 'primary.light',
                   color: 'primary.contrastText',
                   '&:hover': { bgcolor: 'primary.main' }
                 }}
               >
-                <FilterList />
+                <FilterList fontSize={isMobile ? 'small' : 'medium'} />
               </IconButton>
             </Box>
           </Grid>
@@ -511,28 +569,41 @@ export default function VideoManagement() {
           sx={{
             background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(247,247,247,0.9) 100%)',
             backdropFilter: 'blur(20px)',
-            borderRadius: 4,
-            p: 4,
+            borderRadius: { xs: 2, sm: 3, md: 4 },
+            p: { xs: 2, sm: 3, md: 4 },
             textAlign: 'center',
             boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
             border: '1px solid rgba(255,255,255,0.2)',
           }}
         >
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: { xs: 1.5, sm: 2 } }}>
             <Avatar
               sx={{
-                width: 80,
-                height: 80,
+                width: { xs: 60, sm: 80 },
+                height: { xs: 60, sm: 80 },
                 bgcolor: 'primary.light',
-                fontSize: '2rem'
+                fontSize: { xs: '1.5rem', sm: '2rem' }
               }}
             >
               🎬
             </Avatar>
-            <Typography variant="h4" fontWeight="bold" color="text.primary">
+            <Typography 
+              variant="h4" 
+              fontWeight="bold" 
+              color="text.primary"
+              sx={{ fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' } }}
+            >
               {searchTerm ? 'No Matching Quests' : 'Quest Library Empty'}
             </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 400 }}>
+            <Typography 
+              variant="body1" 
+              color="text.secondary" 
+              sx={{ 
+                maxWidth: { xs: 300, sm: 400 },
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                px: { xs: 1, sm: 0 }
+              }}
+            >
               {searchTerm 
                 ? 'No video quests match your search criteria. Try different keywords.'
                 : 'The adventure library is empty! Create your first video quest to get heroes started on their journey.'
@@ -541,19 +612,22 @@ export default function VideoManagement() {
             {!searchTerm && (
               <Button
                 variant="contained"
-                startIcon={<AddIcon />}
-                size="large"
+                startIcon={isMobile ? null : <AddIcon />}
+                size={isMobile ? 'medium' : 'large'}
                 onClick={() => handleOpenDialog()}
                 sx={{
-                  mt: 2,
+                  mt: { xs: 1, sm: 2 },
                   background: 'linear-gradient(45deg, #667eea, #764ba2)',
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                  py: { xs: 1, sm: 1.5 },
+                  px: { xs: 2, sm: 3 },
                   '&:hover': { 
                     background: 'linear-gradient(45deg, #5a6fd8, #6a4190)',
                     transform: 'translateY(-2px)'
                   }
                 }}
               >
-                Create First Quest
+                {isMobile ? '🎬 Create Quest' : 'Create First Quest'}
               </Button>
             )}
           </Box>
@@ -561,11 +635,11 @@ export default function VideoManagement() {
       ) : (
         <Box>
           {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-              <CircularProgress size={60} />
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: { xs: 4, sm: 8 } }}>
+              <CircularProgress size={{ xs: 40, sm: 60 }} />
             </Box>
           ) : (
-            <Grid container spacing={3}>
+            <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
               {filteredVideos.map((video) => (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={video._id}>
                   {renderVideoCard(video)}
@@ -582,12 +656,19 @@ export default function VideoManagement() {
         onClose={handleCloseDialog} 
         maxWidth="md" 
         fullWidth
+        fullScreen={isMobile}
         PaperProps={{
           sx: {
-            borderRadius: 4,
+            borderRadius: isMobile ? 0 : 4,
             background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(247,247,247,0.95) 100%)',
             backdropFilter: 'blur(20px)',
             border: '1px solid rgba(255,255,255,0.3)',
+            maxHeight: isMobile ? '100vh' : 'calc(100vh - 64px)',
+            ...(isMobile && {
+              margin: 0,
+              width: '100vw',
+              height: '100vh'
+            })
           }
         }}
       >
@@ -595,20 +676,36 @@ export default function VideoManagement() {
           sx={{ 
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 
             color: 'white',
-            borderRadius: '16px 16px 0 0',
-            py: 3,
+            borderRadius: isMobile ? 0 : '16px 16px 0 0',
+            py: { xs: 2, sm: 3 },
+            px: { xs: 2, sm: 3 },
             textAlign: 'center'
           }}
         >
-          <Typography variant="h4" fontWeight={800}>
+          <Typography 
+            variant="h4" 
+            fontWeight={800}
+            sx={{ fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' } }}
+          >
             🎬 {editingVideo ? 'Edit Quest Details' : 'Create New Epic Quest'}
           </Typography>
-          <Typography variant="body1" sx={{ opacity: 0.9, mt: 1 }}>
+          <Typography 
+            variant="body1" 
+            sx={{ 
+              opacity: 0.9, 
+              mt: 1,
+              fontSize: { xs: '0.875rem', sm: '1rem' }
+            }}
+          >
             {editingVideo ? 'Modify this video quest' : 'Design an amazing adventure for your heroes'}
           </Typography>
         </DialogTitle>
-        <DialogContent sx={{ p: 4 }}>
-          <Grid container spacing={3}>
+        <DialogContent sx={{ 
+          p: { xs: 2, sm: 3, md: 4 },
+          maxHeight: 'calc(100vh - 200px)',
+          overflowY: 'auto'
+        }}>
+          <Grid container spacing={{ xs: 2, sm: 3 }}>
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -617,10 +714,12 @@ export default function VideoManagement() {
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 required
+                size={isMobile ? 'small' : 'medium'}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: 3,
                     bgcolor: 'rgba(255,255,255,0.8)',
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
                     '&:hover fieldset': { borderColor: 'primary.main' },
                     '&.Mui-focused fieldset': { borderColor: 'primary.main' },
                   },
@@ -632,15 +731,17 @@ export default function VideoManagement() {
               <TextField
                 fullWidth
                 label="📺 YouTube Quest URL"
-                placeholder="https://www.youtube.com/watch?v=..."
+                placeholder={isMobile ? "YouTube URL..." : "https://www.youtube.com/watch?v=..."}
                 value={formData.youtubeUrl}
                 onChange={(e) => setFormData({ ...formData, youtubeUrl: e.target.value })}
                 required
-                helperText="Paste the full YouTube video URL here"
+                size={isMobile ? 'small' : 'medium'}
+                helperText={isMobile ? "Paste YouTube URL here" : "Paste the full YouTube video URL here"}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: 3,
                     bgcolor: 'rgba(255,255,255,0.8)',
+                    fontSize: { xs: '0.875rem', sm: '1rem' },
                     '&:hover fieldset': { borderColor: 'primary.main' },
                     '&.Mui-focused fieldset': { borderColor: 'primary.main' },
                   },
@@ -720,36 +821,43 @@ export default function VideoManagement() {
         
         <DialogActions 
           sx={{ 
-            p: 3, 
-            gap: 2,
+            p: { xs: 2, sm: 3 }, 
+            gap: { xs: 1, sm: 2 },
+            flexDirection: { xs: 'column', sm: 'row' },
             background: 'linear-gradient(135deg, rgba(247,247,247,0.8) 0%, rgba(237,237,237,0.8) 100%)',
-            borderRadius: '0 0 16px 16px'
+            borderRadius: isMobile ? 0 : '0 0 16px 16px'
           }}
         >
           <Button 
             onClick={handleCloseDialog}
             variant="outlined"
-            size="large"
+            size={isMobile ? 'large' : 'large'}
+            fullWidth={isMobile}
             sx={{
               borderRadius: 3,
-              px: 4,
+              px: { xs: 2, sm: 4 },
               borderColor: 'grey.400',
               color: 'grey.600',
+              fontSize: { xs: '0.875rem', sm: '1rem' },
+              order: { xs: 2, sm: 1 },
               '&:hover': {
                 borderColor: 'grey.600',
                 bgcolor: 'grey.50'
               }
             }}
           >
-            Cancel Quest
+            {isMobile ? '❌ Cancel' : 'Cancel Quest'}
           </Button>
           <Button 
             onClick={handleSubmit} 
             variant="contained"
-            size="large"
+            size={isMobile ? 'large' : 'large'}
+            fullWidth={isMobile}
             sx={{
               borderRadius: 3,
-              px: 4,
+              px: { xs: 2, sm: 4 },
+              fontSize: { xs: '0.875rem', sm: '1rem' },
+              order: { xs: 1, sm: 2 },
               background: 'linear-gradient(45deg, #667eea, #764ba2)',
               '&:hover': {
                 background: 'linear-gradient(45deg, #5a6fd8, #6a4190)',
@@ -758,7 +866,10 @@ export default function VideoManagement() {
               }
             }}
           >
-            {editingVideo ? '✏️ Update Quest' : '🚀 Launch Quest'}
+            {editingVideo ? 
+              (isMobile ? '✏️ Update' : '✏️ Update Quest') : 
+              (isMobile ? '🚀 Launch' : '🚀 Launch Quest')
+            }
           </Button>
         </DialogActions>
       </Dialog>

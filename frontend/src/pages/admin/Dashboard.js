@@ -28,6 +28,7 @@ import {
   Settings,
   Receipt
 } from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
 import api from '../../utils/api';
 import PageHeader from '../../components/common/PageHeader';
 import StatCard from '../../components/common/StatCard';
@@ -40,6 +41,8 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
 
   useEffect(() => {
     fetchStats();
@@ -80,14 +83,18 @@ export default function AdminDashboard() {
       {/* Modern Header Section */}
       <Box 
         sx={{ 
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          background: isDark 
+            ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+            : 'linear-gradient(135deg, #5e35b1 0%, #7b1fa2 100%)',
           borderRadius: { xs: 3, sm: 4 },
           p: { xs: 3, sm: 4 },
           mb: 4,
           color: 'white',
           position: 'relative',
           overflow: 'hidden',
-          boxShadow: '0 20px 40px rgba(102, 126, 234, 0.3)',
+          boxShadow: isDark 
+            ? '0 20px 40px rgba(102, 126, 234, 0.3)'
+            : '0 20px 40px rgba(94, 53, 177, 0.4)',
           '&::before': {
             content: '""',
             position: 'absolute',
@@ -230,300 +237,70 @@ export default function AdminDashboard() {
       <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
           <GamificationCard
-            variant="modern"
-            glowing={true}
-            sx={{
-              background: 'linear-gradient(135deg, rgba(33, 150, 243, 0.15) 0%, rgba(33, 203, 243, 0.1) 100%)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(33, 150, 243, 0.3)',
-              textAlign: 'center',
-              color: 'white',
-              position: 'relative',
-              overflow: 'hidden',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: 'linear-gradient(135deg, #2196F3 0%, #21CBF3 100%)',
-                opacity: 0.8,
-                zIndex: -1,
-              }
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-              <People sx={{ fontSize: { xs: 36, sm: 48 }, color: 'white' }} />
-            </Box>
-            
-            <ProgressRing
-              progress={(stats?.activeUsers || 0) / Math.max(stats?.totalUsers || 1, 1) * 100}
-              size={120}
-              strokeWidth={8}
-              color="#ffffff"
-              backgroundColor="rgba(255,255,255,0.2)"
-              showPercentage={false}
-              sx={{ mb: 2 }}
-            >
-              <Typography 
-                variant="h4" 
-                fontWeight="bold"
-                sx={{ 
-                  fontSize: { xs: '1.5rem', sm: '2rem' },
-                  color: 'white'
-                }}
-              >
-                {stats?.totalUsers?.toLocaleString() || 0}
-              </Typography>
-            </ProgressRing>
-
-            <Typography 
-              variant="h6" 
-              fontWeight="bold" 
-              sx={{ 
-                color: 'white',
-                mb: 1,
-                fontSize: { xs: '1rem', sm: '1.25rem' }
-              }}
-            >
-              Community Members
-            </Typography>
-            <Typography 
-              variant="body2" 
-              sx={{ 
-                color: 'rgba(255,255,255,0.9)', 
-                fontSize: { xs: '0.75rem', sm: '0.875rem' }
-              }}
-            >
-              {stats?.activeUsers || 0} active today
-            </Typography>
-          </GamificationCard>
+            title="Community Members"
+            value={stats?.totalUsers?.toLocaleString() || 0}
+            subtitle={`${stats?.activeUsers || 0} active today`}
+            icon={People}
+            gradient={isDark 
+              ? 'linear-gradient(135deg, #2196F3 0%, #21CBF3 100%)'
+              : 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)'
+            }
+            progress={stats?.activeUsers || 0}
+            progressMax={stats?.totalUsers || 1}
+            glowing={false}
+          />
         </Grid>
         
         <Grid item xs={12} sm={6} md={3}>
           <GamificationCard
-            variant="modern"
-            glowing={true}
-            sx={{
-              background: 'linear-gradient(135deg, rgba(0, 188, 212, 0.15) 0%, rgba(0, 151, 167, 0.1) 100%)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(0, 188, 212, 0.3)',
-              textAlign: 'center',
-              color: 'white',
-              position: 'relative',
-              overflow: 'hidden',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: 'linear-gradient(135deg, #00BCD4 0%, #0097A7 100%)',
-                opacity: 0.8,
-                zIndex: -1,
-              }
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-              <VideoLibrary sx={{ fontSize: { xs: 36, sm: 48 }, color: 'white' }} />
-            </Box>
-            
-            <ProgressRing
-              progress={(stats?.activeVideos || 0) / Math.max(stats?.totalVideos || 1, 1) * 100}
-              size={120}
-              strokeWidth={8}
-              color="#ffffff"
-              backgroundColor="rgba(255,255,255,0.2)"
-              showPercentage={false}
-              sx={{ mb: 2 }}
-            >
-              <Typography 
-                variant="h4" 
-                fontWeight="bold"
-                sx={{ 
-                  fontSize: { xs: '1.5rem', sm: '2rem' },
-                  color: 'white'
-                }}
-              >
-                {stats?.totalVideos?.toLocaleString() || 0}
-              </Typography>
-            </ProgressRing>
-
-            <Typography 
-              variant="h6" 
-              fontWeight="bold" 
-              sx={{ 
-                color: 'white',
-                mb: 1,
-                fontSize: { xs: '1rem', sm: '1.25rem' }
-              }}
-            >
-              Video Quests
-            </Typography>
-            <Typography 
-              variant="body2" 
-              sx={{ 
-                color: 'rgba(255,255,255,0.9)', 
-                fontSize: { xs: '0.75rem', sm: '0.875rem' }
-              }}
-            >
-              {stats?.activeVideos || 0} currently active
-            </Typography>
-          </GamificationCard>
+            title="Video Quests"
+            value={stats?.totalVideos?.toLocaleString() || 0}
+            subtitle={`${stats?.activeVideos || 0} currently active`}
+            icon={VideoLibrary}
+            gradient={isDark 
+              ? 'linear-gradient(135deg, #00BCD4 0%, #0097A7 100%)'
+              : 'linear-gradient(135deg, #0277bd 0%, #29b6f6 100%)'
+            }
+            progress={stats?.activeVideos || 0}
+            progressMax={stats?.totalVideos || 1}
+            glowing={false}
+          />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <GamificationCard
-            variant="modern"
-            glowing={true}
-            sx={{
-              background: 'linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(69, 160, 73, 0.1) 100%)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(76, 175, 80, 0.3)',
-              textAlign: 'center',
-              color: 'white',
-              position: 'relative',
-              overflow: 'hidden',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
-                opacity: 0.8,
-                zIndex: -1,
-              }
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-              <MonetizationOn sx={{ fontSize: { xs: 36, sm: 48 }, color: 'white' }} />
-            </Box>
-            
-            <Box sx={{ position: 'relative', mb: 2 }}>
-              <Typography 
-                variant="h4" 
-                fontWeight="bold"
-                sx={{ 
-                  fontSize: { xs: '1.5rem', sm: '2rem' },
-                  color: 'white',
-                  mb: 1
-                }}
-              >
-                {stats?.totalPoints?.toLocaleString() || 0}
-              </Typography>
-              {stats?.pointsGrowthPercentage && (
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
-                  <TrendingUp sx={{ fontSize: 20, mr: 0.5, color: '#81C784' }} />
-                  <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#81C784' }}>
-                    +{stats.pointsGrowthPercentage}% growth
-                  </Typography>
-                </Box>
-              )}
-            </Box>
-
-            <Typography 
-              variant="h6" 
-              fontWeight="bold" 
-              sx={{ 
-                color: 'white',
-                mb: 1,
-                fontSize: { xs: '1rem', sm: '1.25rem' }
-              }}
-            >
-              Reward Tokens
-            </Typography>
-            <Typography 
-              variant="body2" 
-              sx={{ 
-                color: 'rgba(255,255,255,0.9)', 
-                fontSize: { xs: '0.75rem', sm: '0.875rem' }
-              }}
-            >
-              Distributed to players
-            </Typography>
-          </GamificationCard>
+            title="Reward Tokens"
+            value={stats?.totalPoints?.toLocaleString() || 0}
+            subtitle="Distributed to players"
+            icon={MonetizationOn}
+            gradient={isDark 
+              ? 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)'
+              : 'linear-gradient(135deg, #388e3c 0%, #66bb6a 100%)'
+            }
+            badge={stats?.pointsGrowthPercentage ? `+${stats.pointsGrowthPercentage}% growth` : null}
+            glowing={false}
+          />
         </Grid>
         
         <Grid item xs={12} sm={6} md={3}>
           <GamificationCard
-            variant="modern"
-            glowing={true}
-            sx={{
-              background: 'linear-gradient(135deg, rgba(255, 152, 0, 0.15) 0%, rgba(255, 87, 34, 0.1) 100%)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255, 152, 0, 0.3)',
-              textAlign: 'center',
-              color: 'white',
-              position: 'relative',
-              overflow: 'hidden',
+            title="Pending Cashouts"
+            value={stats?.pendingWithdrawals?.toLocaleString() || 0}
+            subtitle={`RWF ${stats?.pendingAmount?.toLocaleString() || 0}`}
+            icon={AccountBalance}
+            gradient={isDark 
+              ? 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)'
+              : 'linear-gradient(135deg, #f57c00 0%, #ff8a65 100%)'
+            }
+            badge={stats?.pendingWithdrawals > 0 ? "Action Required" : "All Clear"}
+            glowing={stats?.pendingWithdrawals > 0}
+            sx={{ 
               cursor: 'pointer',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)',
-                opacity: 0.8,
-                zIndex: -1,
+              '&:hover': {
+                transform: 'translateY(-8px) scale(1.05)',
               }
             }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
-              <AccountBalance sx={{ fontSize: { xs: 36, sm: 48 }, color: 'white' }} />
-            </Box>
-            
-            <Typography 
-              variant="h4" 
-              fontWeight="bold"
-              sx={{ 
-                fontSize: { xs: '1.5rem', sm: '2rem' },
-                color: 'white',
-                mb: 1
-              }}
-            >
-              {stats?.pendingWithdrawals?.toLocaleString() || 0}
-            </Typography>
-
-            <Typography 
-              variant="h6" 
-              fontWeight="bold" 
-              sx={{ 
-                color: 'white',
-                mb: 1,
-                fontSize: { xs: '1rem', sm: '1.25rem' }
-              }}
-            >
-              Pending Cashouts
-            </Typography>
-            <Typography 
-              variant="body2" 
-              sx={{ 
-                color: 'rgba(255,255,255,0.9)', 
-                fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                mb: 1
-              }}
-            >
-              RWF {stats?.pendingAmount?.toLocaleString() || 0}
-            </Typography>
-            <Chip
-              label="⚠️ Action Required"
-              size="small"
-              sx={{
-                bgcolor: 'rgba(255,255,255,0.2)',
-                color: 'white',
-                fontWeight: 'bold',
-                fontSize: '0.75rem',
-                '&:hover': {
-                  bgcolor: 'rgba(255,255,255,0.3)',
-                }
-              }}
-            />
-          </GamificationCard>
+            onClick={() => window.location.href = '/admin/withdrawals'}
+          />
         </Grid>
       </Grid>
 
@@ -532,16 +309,22 @@ export default function AdminDashboard() {
         <Grid item xs={12} sm={6} md={4}>
           <Card
             sx={{
-              background: 'linear-gradient(135deg, #9C27B0 0%, #673AB7 100%)',
+              background: isDark 
+                ? 'linear-gradient(135deg, #9C27B0 0%, #673AB7 100%)'
+                : 'linear-gradient(135deg, #7b1fa2 0%, #5e35b1 100%)',
               borderRadius: { xs: 3, sm: 4 },
               p: { xs: 2, sm: 3 },
               color: 'white',
               textAlign: 'center',
-              boxShadow: '0 8px 32px rgba(156, 39, 176, 0.3)',
+              boxShadow: isDark 
+                ? '0 8px 32px rgba(156, 39, 176, 0.3)'
+                : '0 8px 32px rgba(123, 31, 162, 0.4)',
               transition: 'all 0.3s ease',
               '&:hover': { 
                 transform: 'translateY(-8px) scale(1.02)',
-                boxShadow: '0 16px 40px rgba(156, 39, 176, 0.4)',
+                boxShadow: isDark 
+                  ? '0 16px 40px rgba(156, 39, 176, 0.4)'
+                  : '0 16px 40px rgba(123, 31, 162, 0.5)',
                 cursor: 'pointer'
               }
             }}
@@ -586,7 +369,9 @@ export default function AdminDashboard() {
           >
             <Box
               sx={{
-                background: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
+                background: isDark 
+                  ? 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)'
+                  : 'linear-gradient(135deg, #388e3c 0%, #66bb6a 100%)',
                 color: 'white',
                 p: 3
               }}
@@ -667,7 +452,9 @@ export default function AdminDashboard() {
           >
             <Box
               sx={{
-                background: 'linear-gradient(135deg, #2196F3 0%, #21CBF3 100%)',
+                background: isDark 
+                  ? 'linear-gradient(135deg, #2196F3 0%, #21CBF3 100%)'
+                  : 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)',
                 color: 'white',
                 p: 3
               }}
@@ -761,7 +548,9 @@ export default function AdminDashboard() {
           >
             <Box
               sx={{
-                background: 'linear-gradient(135deg, #9C27B0 0%, #673AB7 100%)',
+                background: isDark 
+                  ? 'linear-gradient(135deg, #9C27B0 0%, #673AB7 100%)'
+                  : 'linear-gradient(135deg, #7b1fa2 0%, #5e35b1 100%)',
                 color: 'white',
                 p: 3
               }}

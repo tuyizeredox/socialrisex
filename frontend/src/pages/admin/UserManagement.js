@@ -391,22 +391,33 @@ export default function UserManagement() {
         }
       }}
     >
-      <CardContent sx={{ p: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
+      <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: { xs: 1.5, sm: 2 }, mb: 2 }}>
           <Avatar
             sx={{
-              width: 60,
-              height: 60,
+              width: { xs: 50, sm: 60 },
+              height: { xs: 50, sm: 60 },
               bgcolor: user.isActive ? 'primary.main' : 'grey.400',
-              fontSize: '1.5rem',
+              fontSize: { xs: '1.25rem', sm: '1.5rem' },
               fontWeight: 'bold'
             }}
           >
             {user.fullName?.charAt(0) || 'U'}
           </Avatar>
           <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <Typography variant="h6" fontWeight="bold" noWrap>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 1, 
+              mb: 1,
+              flexWrap: { xs: 'wrap', sm: 'nowrap' }
+            }}>
+              <Typography 
+                variant="h6" 
+                fontWeight="bold" 
+                noWrap
+                sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
+              >
                 {user.fullName}
               </Typography>
               {user.role === 'admin' && (
@@ -417,19 +428,33 @@ export default function UserManagement() {
                     background: 'linear-gradient(45deg, #FF6B6B, #4ECDC4)',
                     color: 'white',
                     fontWeight: 700,
-                    fontSize: '0.7rem'
+                    fontSize: { xs: '0.625rem', sm: '0.7rem' }
                   }}
                 />
               )}
             </Box>
-            <Typography variant="body2" color="text.secondary" noWrap>
+            <Typography 
+              variant="body2" 
+              color="text.secondary" 
+              noWrap
+              sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+            >
               {user.email}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography 
+              variant="body2" 
+              color="text.secondary"
+              sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+            >
               {user.mobileNumber}
             </Typography>
           </Box>
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            gap: { xs: 0.5, sm: 1 }
+          }}>
             <Chip
               label={user.isActive ? "🟢 Active" : "🔴 Inactive"}
               size="small"
@@ -437,7 +462,7 @@ export default function UserManagement() {
                 bgcolor: user.isActive ? 'success.light' : 'error.light',
                 color: user.isActive ? 'success.contrastText' : 'error.contrastText',
                 fontWeight: 'bold',
-                fontSize: '0.75rem'
+                fontSize: { xs: '0.6rem', sm: '0.75rem' }
               }}
             />
             <Chip
@@ -447,50 +472,91 @@ export default function UserManagement() {
                 bgcolor: user.isVerified ? 'info.light' : 'warning.light',
                 color: user.isVerified ? 'info.contrastText' : 'warning.contrastText',
                 fontWeight: 'bold',
-                fontSize: '0.75rem'
+                fontSize: { xs: '0.6rem', sm: '0.75rem' }
               }}
             />
           </Box>
         </Box>
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-          <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="h6" fontWeight="bold" color="primary.main">
-              {user.points?.toLocaleString() || 0}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              Points Earned
-            </Typography>
-          </Box>
-          <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="h6" fontWeight="bold" color="success.main">
-              RWF {user.earnings?.toLocaleString() || 0}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              Total Earnings
-            </Typography>
-          </Box>
-          <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="h6" fontWeight="bold" color="info.main">
-              {user.referralCount || 0}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              Referrals
-            </Typography>
-          </Box>
-        </Box>
+        <Grid container spacing={1} sx={{ mb: 2 }}>
+          <Grid item xs={4}>
+            <Box sx={{ textAlign: 'center' }}>
+              <Typography 
+                variant="h6" 
+                fontWeight="bold" 
+                color="primary.main"
+                sx={{ fontSize: { xs: '0.9rem', sm: '1.25rem' } }}
+              >
+                {user.points?.toLocaleString() || 0}
+              </Typography>
+              <Typography 
+                variant="caption" 
+                color="text.secondary"
+                sx={{ fontSize: { xs: '0.6rem', sm: '0.75rem' } }}
+              >
+                Points Earned
+              </Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={4}>
+            <Box sx={{ textAlign: 'center' }}>
+              <Typography 
+                variant="h6" 
+                fontWeight="bold" 
+                color="success.main"
+                sx={{ fontSize: { xs: '0.8rem', sm: '1.1rem' } }}
+              >
+                RWF {user.earnings?.toLocaleString() || 0}
+              </Typography>
+              <Typography 
+                variant="caption" 
+                color="text.secondary"
+                sx={{ fontSize: { xs: '0.6rem', sm: '0.75rem' } }}
+              >
+                Total Earnings
+              </Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={4}>
+            <Box sx={{ textAlign: 'center' }}>
+              <Typography 
+                variant="h6" 
+                fontWeight="bold" 
+                color="info.main"
+                sx={{ fontSize: { xs: '0.9rem', sm: '1.25rem' } }}
+              >
+                {user.referralCount || 0}
+              </Typography>
+              <Typography 
+                variant="caption" 
+                color="text.secondary"
+                sx={{ fontSize: { xs: '0.6rem', sm: '0.75rem' } }}
+              >
+                Referrals
+              </Typography>
+            </Box>
+          </Grid>
+        </Grid>
 
-        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mt: 2 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          gap: { xs: 0.5, sm: 1 }, 
+          mt: 2,
+          flexWrap: 'wrap'
+        }}>
           <Tooltip title="View Details">
             <IconButton
               size="small"
               sx={{
                 bgcolor: 'primary.light',
                 color: 'primary.contrastText',
-                '&:hover': { bgcolor: 'primary.main' }
+                '&:hover': { bgcolor: 'primary.main' },
+                width: { xs: 32, sm: 36 },
+                height: { xs: 32, sm: 36 }
               }}
             >
-              <Visibility fontSize="small" />
+              <Visibility fontSize={isMobile ? 'small' : 'small'} />
             </IconButton>
           </Tooltip>
           <Tooltip title="Edit User">
@@ -500,10 +566,12 @@ export default function UserManagement() {
               sx={{
                 bgcolor: 'warning.light',
                 color: 'warning.contrastText',
-                '&:hover': { bgcolor: 'warning.main' }
+                '&:hover': { bgcolor: 'warning.main' },
+                width: { xs: 32, sm: 36 },
+                height: { xs: 32, sm: 36 }
               }}
             >
-              <Edit fontSize="small" />
+              <Edit fontSize={isMobile ? 'small' : 'small'} />
             </IconButton>
           </Tooltip>
           <Tooltip title="Delete User">
@@ -513,17 +581,32 @@ export default function UserManagement() {
               sx={{
                 bgcolor: 'error.light',
                 color: 'error.contrastText',
-                '&:hover': { bgcolor: 'error.main' }
+                '&:hover': { bgcolor: 'error.main' },
+                width: { xs: 32, sm: 36 },
+                height: { xs: 32, sm: 36 }
               }}
             >
-              <Delete fontSize="small" />
+              <Delete fontSize={isMobile ? 'small' : 'small'} />
             </IconButton>
           </Tooltip>
         </Box>
 
         {user.referralCode && (
-          <Box sx={{ mt: 2, p: 1, bgcolor: 'grey.100', borderRadius: 1 }}>
-            <Typography variant="caption" color="text.secondary">
+          <Box sx={{ 
+            mt: 2, 
+            p: { xs: 0.75, sm: 1 }, 
+            bgcolor: 'grey.100', 
+            borderRadius: 1,
+            display: 'flex',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 1
+          }}>
+            <Typography 
+              variant="caption" 
+              color="text.secondary"
+              sx={{ fontSize: { xs: '0.65rem', sm: '0.75rem' } }}
+            >
               Referral Code:
             </Typography>
             <Chip
@@ -535,10 +618,13 @@ export default function UserManagement() {
                 showNotification('Referral code copied!', 'success');
               }}
               sx={{
-                ml: 1,
                 cursor: 'pointer',
-                fontSize: '0.7rem',
-                '&:hover': { bgcolor: 'primary.light', color: 'primary.contrastText' }
+                fontSize: { xs: '0.6rem', sm: '0.7rem' },
+                height: { xs: 20, sm: 24 },
+                '&:hover': { bgcolor: 'primary.light', color: 'primary.contrastText' },
+                '& .MuiChip-label': {
+                  px: { xs: 1, sm: 1.5 }
+                }
               }}
             />
           </Box>
@@ -548,14 +634,14 @@ export default function UserManagement() {
   );
 
   return (
-    <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 4 } }}>
+    <Container maxWidth="xl" sx={{ px: { xs: 1, sm: 2, md: 3 }, py: { xs: 1, sm: 2, md: 4 } }}>
       {/* Modern Header */}
       <Box 
         sx={{ 
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          borderRadius: { xs: 3, sm: 4 },
-          p: { xs: 3, sm: 4 },
-          mb: 4,
+          borderRadius: { xs: 2, sm: 3, md: 4 },
+          p: { xs: 2, sm: 3, md: 4 },
+          mb: { xs: 2, sm: 3, md: 4 },
           color: 'white',
           position: 'relative',
           overflow: 'hidden',
@@ -568,15 +654,18 @@ export default function UserManagement() {
             justifyContent: 'space-between', 
             alignItems: { xs: 'flex-start', sm: 'center' },
             flexDirection: { xs: 'column', sm: 'row' },
-            gap: { xs: 2, sm: 0 },
-            mb: 2
+            gap: { xs: 2, sm: 3 },
+            mb: { xs: 1, sm: 2 }
           }}>
-            <Box>
+            <Box sx={{ width: { xs: '100%', sm: 'auto' } }}>
               <Typography 
                 variant="h3" 
                 fontWeight={800} 
                 gutterBottom
-                sx={{ fontSize: { xs: '1.8rem', sm: '2.5rem', md: '3rem' } }}
+                sx={{ 
+                  fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem', lg: '3rem' },
+                  lineHeight: { xs: 1.2, sm: 1.3 }
+                }}
               >
                 👥 Community Management
               </Typography>
@@ -584,7 +673,8 @@ export default function UserManagement() {
                 variant="h6" 
                 sx={{ 
                   opacity: 0.9,
-                  fontSize: { xs: '1rem', sm: '1.25rem' }
+                  fontSize: { xs: '0.875rem', sm: '1rem', md: '1.25rem' },
+                  lineHeight: { xs: 1.3, sm: 1.4 }
                 }}
               >
                 {users.length} brave adventurers in the quest
@@ -593,18 +683,24 @@ export default function UserManagement() {
             
             <Box sx={{ 
               display: 'flex', 
-              gap: 1,
+              gap: { xs: 0.5, sm: 1 },
+              flexDirection: { xs: 'column', sm: 'row' },
+              width: { xs: '100%', sm: 'auto' },
               flexWrap: 'wrap',
-              justifyContent: { xs: 'center', sm: 'flex-end' }
+              justifyContent: { xs: 'stretch', sm: 'flex-end' }
             }}>
               <Button
                 variant="contained"
-                startIcon={<PersonAdd />}
+                startIcon={isMobile ? null : <PersonAdd />}
+                size={isMobile ? 'small' : 'medium'}
                 sx={{
                   bgcolor: 'rgba(255,255,255,0.2)',
                   color: 'white',
                   backdropFilter: 'blur(10px)',
                   border: '1px solid rgba(255,255,255,0.3)',
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                  py: { xs: 1, sm: 1.5 },
+                  minWidth: { xs: 'auto', sm: 'fit-content' },
                   '&:hover': { 
                     bgcolor: 'rgba(255,255,255,0.3)',
                     transform: 'translateY(-2px)'
@@ -612,21 +708,25 @@ export default function UserManagement() {
                 }}
                 onClick={() => {/* Handle add user */}}
               >
-                Invite New Hero
+                {isMobile ? '👤 Invite Hero' : 'Invite New Hero'}
               </Button>
               <Button
                 variant="outlined"
-                startIcon={<Download />}
+                startIcon={isMobile ? null : <Download />}
+                size={isMobile ? 'small' : 'medium'}
                 sx={{
                   borderColor: 'rgba(255,255,255,0.5)',
                   color: 'white',
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                  py: { xs: 1, sm: 1.5 },
+                  minWidth: { xs: 'auto', sm: 'fit-content' },
                   '&:hover': { 
                     borderColor: 'white',
                     bgcolor: 'rgba(255,255,255,0.1)'
                   }
                 }}
               >
-                Export
+                {isMobile ? '📥 Export' : 'Export'}
               </Button>
             </Box>
           </Box>
@@ -638,32 +738,34 @@ export default function UserManagement() {
         sx={{
           background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(247,247,247,0.9) 100%)',
           backdropFilter: 'blur(20px)',
-          borderRadius: 4,
-          p: { xs: 2, sm: 3 },
-          mb: 3,
+          borderRadius: { xs: 2, sm: 3, md: 4 },
+          p: { xs: 1.5, sm: 2, md: 3 },
+          mb: { xs: 2, sm: 3 },
           boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
           border: '1px solid rgba(255,255,255,0.2)',
         }}
       >
-        <Grid container spacing={2} alignItems="center">
+        <Grid container spacing={{ xs: 1.5, sm: 2 }} alignItems="center">
           <Grid item xs={12} md={8}>
             <TextField
               fullWidth
               variant="outlined"
-              placeholder="🔍 Search heroes by name, email, or referral code..."
+              placeholder={isMobile ? "🔍 Search heroes..." : "🔍 Search heroes by name, email, or referral code..."}
               value={search}
               onChange={(e) => handleSearch(e.target.value)}
+              size={isMobile ? 'small' : 'medium'}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Search sx={{ color: 'primary.main' }} />
+                    <Search sx={{ color: 'primary.main', fontSize: { xs: 18, sm: 20 } }} />
                   </InputAdornment>
                 ),
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  borderRadius: 3,
+                  borderRadius: { xs: 2, sm: 3 },
                   bgcolor: 'rgba(255,255,255,0.8)',
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
                   '&:hover fieldset': { borderColor: 'primary.main' },
                   '&.Mui-focused fieldset': { borderColor: 'primary.main' },
                 },
@@ -671,31 +773,49 @@ export default function UserManagement() {
             />
           </Grid>
           <Grid item xs={12} md={4}>
-            <Box sx={{ display: 'flex', gap: 1, justifyContent: { xs: 'center', md: 'flex-end' } }}>
-              <Button
-                variant={viewMode === 'table' ? 'contained' : 'outlined'}
-                onClick={() => setViewMode('table')}
-                size="small"
-                sx={{ minWidth: 'auto', px: 2 }}
-              >
-                📋 Table
-              </Button>
-              <Button
-                variant={viewMode === 'cards' ? 'contained' : 'outlined'}
-                onClick={() => setViewMode('cards')}
-                size="small"
-                sx={{ minWidth: 'auto', px: 2 }}
-              >
-                🎴 Cards
-              </Button>
+            <Box sx={{ 
+              display: 'flex', 
+              gap: { xs: 0.5, sm: 1 }, 
+              justifyContent: { xs: 'center', md: 'flex-end' },
+              flexWrap: 'wrap'
+            }}>
+              {!isMobile && (
+                <>
+                  <Button
+                    variant={viewMode === 'table' ? 'contained' : 'outlined'}
+                    onClick={() => setViewMode('table')}
+                    size="small"
+                    sx={{ 
+                      minWidth: 'auto', 
+                      px: { xs: 1.5, sm: 2 },
+                      fontSize: '0.75rem'
+                    }}
+                  >
+                    📋 Table
+                  </Button>
+                  <Button
+                    variant={viewMode === 'cards' ? 'contained' : 'outlined'}
+                    onClick={() => setViewMode('cards')}
+                    size="small"
+                    sx={{ 
+                      minWidth: 'auto', 
+                      px: { xs: 1.5, sm: 2 },
+                      fontSize: '0.75rem'
+                    }}
+                  >
+                    🎴 Cards
+                  </Button>
+                </>
+              )}
               <IconButton
+                size={isMobile ? 'small' : 'medium'}
                 sx={{
                   bgcolor: 'primary.light',
                   color: 'primary.contrastText',
                   '&:hover': { bgcolor: 'primary.main' }
                 }}
               >
-                <FilterList />
+                <FilterList fontSize={isMobile ? 'small' : 'medium'} />
               </IconButton>
             </Box>
           </Grid>
@@ -765,9 +885,9 @@ export default function UserManagement() {
             <>
               {/* Cards View for Mobile or when selected */}
               {(isMobile || viewMode === 'cards') && (
-                <Grid container spacing={3}>
+                <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
                   {users.map((user) => (
-                    <Grid item xs={12} sm={6} lg={4} key={user._id}>
+                    <Grid item xs={12} sm={6} md={4} lg={3} key={user._id}>
                       {renderUserCard(user)}
                     </Grid>
                   ))}
@@ -839,14 +959,14 @@ export default function UserManagement() {
                 sx={{
                   background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(247,247,247,0.9) 100%)',
                   backdropFilter: 'blur(20px)',
-                  borderRadius: 4,
-                  mt: 3,
+                  borderRadius: { xs: 2, sm: 3, md: 4 },
+                  mt: { xs: 2, sm: 3 },
                   boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
                   border: '1px solid rgba(255,255,255,0.2)',
                 }}
               >
                 <TablePagination
-                  rowsPerPageOptions={[5, 10, 25, 50]}
+                  rowsPerPageOptions={isMobile ? [5, 10] : [5, 10, 25, 50]}
                   component="div"
                   count={pagination.total}
                   rowsPerPage={rowsPerPage}
@@ -854,10 +974,27 @@ export default function UserManagement() {
                   onPageChange={handlePageChange}
                   onRowsPerPageChange={handleRowsPerPageChange}
                   sx={{ 
-                    '& .MuiTablePagination-toolbar': { px: 3 },
+                    '& .MuiTablePagination-toolbar': { 
+                      px: { xs: 1, sm: 2, md: 3 },
+                      flexDirection: { xs: 'column', sm: 'row' },
+                      gap: { xs: 1, sm: 0 },
+                      minHeight: { xs: 'auto', sm: 52 },
+                      py: { xs: 1, sm: 0 }
+                    },
                     '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
-                      fontSize: '0.9rem',
-                      fontWeight: 500
+                      fontSize: { xs: '0.75rem', sm: '0.875rem', md: '0.9rem' },
+                      fontWeight: 500,
+                      mb: { xs: 0, sm: 0 }
+                    },
+                    '& .MuiTablePagination-select': {
+                      fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                    },
+                    '& .MuiTablePagination-actions': {
+                      ml: { xs: 0, sm: 2 },
+                      mt: { xs: 1, sm: 0 }
+                    },
+                    '& .MuiIconButton-root': {
+                      p: { xs: 0.5, sm: 1 }
                     }
                   }}
                 />
@@ -873,25 +1010,42 @@ export default function UserManagement() {
         onClose={closeEditDialog}
         maxWidth="md"
         fullWidth
+        fullScreen={isMobile}
         PaperProps={{ 
           sx: { 
-            borderRadius: 3,
-            boxShadow: '0 20px 40px rgba(0,0,0,0.1)'
+            borderRadius: isMobile ? 0 : 3,
+            boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+            maxHeight: isMobile ? '100vh' : 'calc(100vh - 64px)',
+            ...(isMobile && {
+              margin: 0,
+              width: '100vw',
+              height: '100vh'
+            })
           } 
         }}
       >
         <DialogTitle sx={{ 
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 
           color: 'white',
-          borderRadius: '12px 12px 0 0',
-          py: 3
+          borderRadius: isMobile ? 0 : '12px 12px 0 0',
+          py: { xs: 2, sm: 3 },
+          px: { xs: 2, sm: 3 }
         }}>
-          <Typography variant="h5" fontWeight={700}>
+          <Typography 
+            variant="h5" 
+            fontWeight={700}
+            sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}
+          >
             ✏️ Edit User - {userToEdit?.fullName}
           </Typography>
         </DialogTitle>
-        <DialogContent sx={{ mt: 3, p: 4 }}>
-          <Grid container spacing={3}>
+        <DialogContent sx={{ 
+          mt: { xs: 1, sm: 2, md: 3 }, 
+          p: { xs: 2, sm: 3, md: 4 },
+          maxHeight: 'calc(100vh - 200px)',
+          overflowY: 'auto'
+        }}>
+          <Grid container spacing={{ xs: 2, sm: 3 }}>
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
@@ -1045,14 +1199,22 @@ export default function UserManagement() {
             )}
           </Grid>
         </DialogContent>
-        <DialogActions sx={{ p: 3, pt: 0 }}>
+        <DialogActions sx={{ 
+          p: { xs: 2, sm: 3 }, 
+          pt: 0,
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: { xs: 1, sm: 0 }
+        }}>
           <Button 
             onClick={closeEditDialog} 
+            fullWidth={isMobile}
+            size={isMobile ? 'large' : 'medium'}
             sx={{ 
               color: 'text.secondary',
               fontWeight: 600,
               borderRadius: 2,
-              px: 3
+              px: { xs: 2, sm: 3 },
+              order: { xs: 2, sm: 1 }
             }}
             disabled={editLoading}
           >
@@ -1060,6 +1222,8 @@ export default function UserManagement() {
           </Button>
           <Button
             onClick={handleUpdateUser}
+            fullWidth={isMobile}
+            size={isMobile ? 'large' : 'medium'}
             variant="contained"
             disabled={editLoading}
             sx={{ 

@@ -16,6 +16,7 @@ export const getStats = async (req, res, next) => {
       pendingWithdrawals,
       pendingTransactions,
       totalPointsArray,
+      pendingAmountArray,
     ] = await Promise.all([
       User.countDocuments(),
       User.countDocuments({ isActive: true }),
@@ -24,6 +25,10 @@ export const getStats = async (req, res, next) => {
       Withdrawal.countDocuments({ status: 'pending' }),
       Transaction.countDocuments({ status: 'pending' }),
       User.aggregate([{ $group: { _id: null, total: { $sum: '$points' } } }]),
+      Withdrawal.aggregate([
+        { $match: { status: 'pending' } },
+        { $group: { _id: null, total: { $sum: '$amount' } } }
+      ]),
     ]);
 
     res.json({
@@ -34,6 +39,7 @@ export const getStats = async (req, res, next) => {
       pendingWithdrawals,
       pendingTransactions,
       totalPoints: totalPointsArray[0]?.total || 0,
+      pendingAmount: pendingAmountArray[0]?.total || 0,
     });
   } catch (error) {
     next(error);
