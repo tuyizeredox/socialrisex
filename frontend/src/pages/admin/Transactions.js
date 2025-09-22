@@ -42,7 +42,9 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Stack
+  Stack,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import {
   CheckCircle,
@@ -66,7 +68,8 @@ import {
   History,
   MonetizationOn,
   TrendingUp,
-  Assessment
+  Assessment,
+  Close
 } from '@mui/icons-material';
 import { format, formatDistanceToNow } from 'date-fns';
 import api from '../../utils/api';
@@ -103,6 +106,8 @@ export default function Transactions() {
 
   const { showNotification } = useNotification();
   const debouncedSearch = useDebounce(search, 500);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const tabFilters = ['all', 'pending', 'approved', 'rejected', 'duplicate'];
   const tabLabels = ['All Transactions', 'Pending Review', 'Approved', 'Rejected', 'Duplicates'];
@@ -475,24 +480,127 @@ export default function Transactions() {
     },
   ], [openTransactionDetails, openProcessDialog]);
 
+  // Mobile Transaction Card Component
+  const MobileTransactionCard = ({ transaction }) => (
+    <Card
+      sx={{
+        mb: 2,
+        borderRadius: 2,
+        border: '1px solid',
+        borderColor: 'divider',
+        '&:hover': {
+          boxShadow: 2,
+          borderColor: 'primary.main',
+        }
+      }}
+    >
+      <CardContent sx={{ p: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography variant="body1" fontWeight={600} gutterBottom>
+              {transaction.user?.fullName || 'N/A'}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              {transaction.user?.email || 'N/A'}
+            </Typography>
+          </Box>
+          <Chip
+            icon={getStatusIcon(transaction.status)}
+            label={transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}
+            color={getStatusColor(transaction.status)}
+            variant={transaction.status === 'pending' ? 'filled' : 'outlined'}
+            size="small"
+          />
+        </Box>
+
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={6}>
+            <Typography variant="caption" color="text.secondary">
+              Amount
+            </Typography>
+            <Typography variant="body1" fontWeight={600} color="primary.main">
+              ${transaction.amount.toFixed(2)}
+            </Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <Typography variant="caption" color="text.secondary">
+              Date
+            </Typography>
+            <Typography variant="body2">
+              {format(new Date(transaction.submittedAt), 'MMM dd, yyyy')}
+            </Typography>
+          </Grid>
+        </Grid>
+
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="caption" color="text.secondary">
+            Description
+          </Typography>
+          <Typography variant="body2">
+            {transaction.description || 'No description'}
+          </Typography>
+        </Box>
+
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Button
+            size="small"
+            variant="outlined"
+            startIcon={<Visibility />}
+            onClick={() => openTransactionDetails(transaction)}
+          >
+            View Details
+          </Button>
+          
+          {transaction.status === 'pending' && (
+            <Stack direction="row" spacing={1}>
+              <IconButton
+                onClick={() => openProcessDialog(transaction, 'approved')}
+                sx={{ color: 'success.main' }}
+                size="small"
+              >
+                <CheckCircle />
+              </IconButton>
+              <IconButton
+                onClick={() => openProcessDialog(transaction, 'rejected')}
+                sx={{ color: 'error.main' }}
+                size="small"
+              >
+                <Cancel />
+              </IconButton>
+            </Stack>
+          )}
+        </Box>
+      </CardContent>
+    </Card>
+  );
+
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
+    <Container maxWidth="xl" sx={{ py: { xs: 2, md: 4 } }}>
       {/* Header */}
-      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <Box sx={{ 
+        mb: 4, 
+        display: 'flex', 
+        flexDirection: { xs: 'column', sm: 'row' },
+        justifyContent: 'space-between', 
+        alignItems: { xs: 'flex-start', sm: 'flex-start' },
+        gap: { xs: 2, sm: 0 }
+      }}>
         <Box>
-          <Typography variant="h4" fontWeight={700} gutterBottom>
+          <Typography variant={isMobile ? "h5" : "h4"} fontWeight={700} gutterBottom>
             💳 Transaction Management
           </Typography>
           <Typography variant="body1" color="text.secondary">
             Comprehensive transaction tracking and approval system
           </Typography>
         </Box>
-        <Stack direction="row" spacing={1}>
+        <Stack direction={isMobile ? "column" : "row"} spacing={1} sx={{ width: isMobile ? '100%' : 'auto' }}>
           <Button
             variant="outlined"
             startIcon={<Refresh />}
             onClick={() => fetchTransactions()}
             disabled={loading}
+            size={isMobile ? "small" : "medium"}
+            fullWidth={isMobile}
           >
             Refresh
           </Button>
@@ -500,6 +608,8 @@ export default function Transactions() {
             variant="outlined"
             startIcon={<Download />}
             onClick={exportTransactions}
+            size={isMobile ? "small" : "medium"}
+            fullWidth={isMobile}
           >
             Export
           </Button>
@@ -586,14 +696,15 @@ export default function Transactions() {
       </Grid>
 
       {/* Filters */}
-      <Paper sx={{ p: 3, mb: 3 }}>
-        <Grid container spacing={3} alignItems="center">
+      <Paper sx={{ p: { xs: 2, md: 3 }, mb: 3 }}>
+        <Grid container spacing={{ xs: 2, md: 3 }} alignItems="center">
           <Grid item xs={12} md={4}>
             <TextField
               fullWidth
               placeholder="Search by Transaction ID, User name, or Email"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              size={isMobile ? "small" : "medium"}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -603,8 +714,8 @@ export default function Transactions() {
               }}
             />
           </Grid>
-          <Grid item xs={12} md={3}>
-            <FormControl fullWidth>
+          <Grid item xs={12} sm={6} md={3}>
+            <FormControl fullWidth size={isMobile ? "small" : "medium"}>
               <InputLabel>Status Filter</InputLabel>
               <Select
                 value={statusFilter}
@@ -619,8 +730,8 @@ export default function Transactions() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} md={3}>
-            <FormControl fullWidth>
+          <Grid item xs={12} sm={6} md={3}>
+            <FormControl fullWidth size={isMobile ? "small" : "medium"}>
               <InputLabel>Date Range</InputLabel>
               <Select
                 value={dateRange}
@@ -640,6 +751,7 @@ export default function Transactions() {
               fullWidth
               variant="outlined"
               startIcon={<FilterList />}
+              size={isMobile ? "small" : "medium"}
               onClick={() => {
                 setSearch('');
                 setStatusFilter('all');
@@ -656,9 +768,24 @@ export default function Transactions() {
       {/* Main Content */}
       <Paper sx={{ borderRadius: 3 }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={activeTab} onChange={handleTabChange}>
+          <Tabs 
+            value={activeTab} 
+            onChange={handleTabChange}
+            variant={isMobile ? "scrollable" : "standard"}
+            scrollButtons={isMobile ? "auto" : false}
+            allowScrollButtonsMobile
+            sx={{
+              '& .MuiTab-root': {
+                minWidth: isMobile ? 'auto' : 160,
+                fontSize: isMobile ? '0.875rem' : '1rem',
+              }
+            }}
+          >
             {tabLabels.map((label, index) => (
-              <Tab key={index} label={label} />
+              <Tab 
+                key={index} 
+                label={isMobile ? label.replace('Transactions', '').replace('Review', '') : label}
+              />
             ))}
           </Tabs>
         </Box>
@@ -680,30 +807,40 @@ export default function Transactions() {
             </Box>
           ) : (
             <>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      {columns.map((column) => (
-                        <TableCell key={column.field} sx={{ fontWeight: 600 }}>
-                          {column.label}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {transactions.map((row) => (
-                      <TableRow key={row._id} hover>
+              {isMobile ? (
+                // Mobile Card View
+                <Box sx={{ p: 2 }}>
+                  {transactions.map((transaction) => (
+                    <MobileTransactionCard key={transaction._id} transaction={transaction} />
+                  ))}
+                </Box>
+              ) : (
+                // Desktop Table View
+                <TableContainer>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
                         {columns.map((column) => (
-                          <TableCell key={column.field}>
-                            {column.render ? column.render(row) : row[column.field]}
+                          <TableCell key={column.field} sx={{ fontWeight: 600 }}>
+                            {column.label}
                           </TableCell>
                         ))}
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                    </TableHead>
+                    <TableBody>
+                      {transactions.map((row) => (
+                        <TableRow key={row._id} hover>
+                          {columns.map((column) => (
+                            <TableCell key={column.field}>
+                              {column.render ? column.render(row) : row[column.field]}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
               <TablePagination
                 component="div"
                 count={pagination.total}
@@ -712,6 +849,11 @@ export default function Transactions() {
                 rowsPerPage={rowsPerPage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
                 rowsPerPageOptions={[5, 10, 25, 50, 100]}
+                sx={{
+                  '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                    fontSize: isMobile ? '0.75rem' : '0.875rem',
+                  }
+                }}
               />
             </>
           )}
@@ -724,6 +866,7 @@ export default function Transactions() {
         onClose={() => setDetailDialogOpen(false)}
         maxWidth="md"
         fullWidth
+        fullScreen={isMobile}
       >
         <DialogTitle>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -889,6 +1032,7 @@ export default function Transactions() {
         onClose={() => setProcessDialogOpen(false)}
         maxWidth="sm"
         fullWidth
+        fullScreen={isMobile}
       >
         <DialogTitle>
           {processingTransaction?.action === 'approved' ? 'Approve Transaction' : 'Reject Transaction'}

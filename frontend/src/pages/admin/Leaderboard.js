@@ -41,7 +41,9 @@ import {
   AccordionSummary,
   AccordionDetails,
   Tab,
-  Tabs
+  Tabs,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import {
   TrendingUp,
@@ -66,7 +68,8 @@ import {
   Award,
   BarChart,
   PieChart,
-  ShowChart
+  ShowChart,
+  Close
 } from '@mui/icons-material';
 import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 import api from '../../utils/api';
@@ -102,6 +105,8 @@ export default function LeaderboardNew() {
 
   const { showNotification } = useNotification();
   const debouncedSearch = useDebounce(search, 500);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const timeRanges = [
     { value: 'all', label: 'All Time', icon: <Timeline /> },
@@ -280,6 +285,103 @@ export default function LeaderboardNew() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  // Mobile Referrer Card component for responsive display
+  const MobileReferrerCard = memo(({ referrer, rank }) => (
+    <Card sx={{ mb: 2, border: rank <= 3 ? '2px solid' : '1px solid', borderColor: rank <= 3 ? (rank === 1 ? '#FFD700' : rank === 2 ? '#C0C0C0' : '#CD7F32') : 'divider' }}>
+      <CardContent sx={{ p: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+            {getRankIcon(rank)}
+            <Typography variant="h6" fontWeight={700} sx={{ ml: 1, mr: 2 }}>
+              #{rank}
+            </Typography>
+            <Avatar sx={{ mr: 2, bgcolor: 'primary.light' }}>
+              <Person />
+            </Avatar>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Typography variant="body1" fontWeight={600} noWrap>
+                {referrer.user.fullName}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" noWrap>
+                {referrer.user.email}
+              </Typography>
+            </Box>
+          </Box>
+          <Stack direction="row" spacing={1}>
+            <Tooltip title="View Details">
+              <IconButton
+                onClick={() => openReferrerDetails(referrer)}
+                color="primary"
+                size="small"
+              >
+                <Visibility />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+        </Box>
+        
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <Typography variant="h6" fontWeight={700} color="success.main">
+              {formatEarnings(referrer.totalEarnings)}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Total Earnings
+            </Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <Typography variant="h6" fontWeight={700} color="primary.main">
+              {referrer.totalReferrals}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Total Referrals
+            </Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <Typography variant="body1" fontWeight={600} color="success.main">
+              {referrer.activeReferrals} active
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Active Referrals
+            </Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <Chip
+              size="small"
+              label={`${referrer.conversionRate}% conv.`}
+              color={referrer.conversionRate > 50 ? 'success' : referrer.conversionRate > 25 ? 'warning' : 'error'}
+              variant="outlined"
+            />
+          </Grid>
+        </Grid>
+        
+        <Box sx={{ mt: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Typography variant="caption" color="text.secondary">
+              Activity Score
+            </Typography>
+            <Typography variant="caption" fontWeight={600}>
+              {referrer.activityScore || 0}%
+            </Typography>
+          </Box>
+          <LinearProgress
+            variant="determinate"
+            value={Math.min(referrer.activityScore || 0, 100)}
+            sx={{
+              height: 6,
+              borderRadius: 3,
+              backgroundColor: 'grey.200',
+              '& .MuiLinearProgress-bar': {
+                backgroundColor: referrer.activityScore > 80 ? 'success.main' : 
+                                referrer.activityScore > 60 ? 'warning.main' : 'error.main'
+              }
+            }}
+          />
+        </Box>
+      </CardContent>
+    </Card>
+  ));
 
   // Memoized TopPerformerCard for better performance
   const TopPerformerCard = memo(({ performer, rank }) => (
@@ -532,21 +634,30 @@ export default function LeaderboardNew() {
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       {/* Header */}
-      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <Box sx={{ 
+        mb: 4, 
+        display: 'flex', 
+        flexDirection: { xs: 'column', md: 'row' },
+        justifyContent: 'space-between', 
+        alignItems: { xs: 'stretch', md: 'flex-start' },
+        gap: { xs: 2, md: 0 }
+      }}>
         <Box>
-          <Typography variant="h4" fontWeight={700} gutterBottom>
+          <Typography variant={{ xs: 'h5', sm: 'h4' }} fontWeight={700} gutterBottom>
             🏆 Referrer Leaderboard & Analytics
           </Typography>
           <Typography variant="body1" color="text.secondary">
             Comprehensive referrer performance tracking and analytics dashboard
           </Typography>
         </Box>
-        <Stack direction="row" spacing={1}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
           <Button
             variant="outlined"
             startIcon={<Refresh />}
             onClick={() => fetchLeaderboard()}
             disabled={loading}
+            size={{ xs: 'small', sm: 'medium' }}
+            fullWidth={{ xs: true, sm: false }}
           >
             Refresh
           </Button>
@@ -554,6 +665,8 @@ export default function LeaderboardNew() {
             variant="outlined"
             startIcon={<Download />}
             onClick={exportLeaderboard}
+            size={{ xs: 'small', sm: 'medium' }}
+            fullWidth={{ xs: true, sm: false }}
           >
             Export
           </Button>
@@ -561,14 +674,20 @@ export default function LeaderboardNew() {
       </Box>
 
       {/* Enhanced Stats Dashboard */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={2.4}>
+      <Grid container spacing={{ xs: 2, md: 3 }} sx={{ mb: 4 }}>
+        <Grid item xs={12} sm={6} lg={2.4}>
           <Card sx={{ bgcolor: 'primary.light', color: 'primary.contrastText', height: '100%' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Group sx={{ fontSize: 40, mr: 2 }} />
+            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                flexDirection: { xs: 'column', sm: 'row' }, 
+                textAlign: { xs: 'center', sm: 'left' },
+                gap: { xs: 1, sm: 0 }
+              }}>
+                <Group sx={{ fontSize: { xs: 32, sm: 40 }, mr: { xs: 0, sm: 2 } }} />
                 <Box>
-                  <Typography variant="h4" fontWeight={700}>
+                  <Typography variant={{ xs: 'h5', sm: 'h4' }} fontWeight={700}>
                     {stats.totalReferrers}
                   </Typography>
                   <Typography variant="body2">Total Referrers</Typography>
@@ -580,13 +699,19 @@ export default function LeaderboardNew() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={2.4}>
+        <Grid item xs={12} sm={6} lg={2.4}>
           <Card sx={{ bgcolor: 'success.light', color: 'success.contrastText', height: '100%' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <TrendingUp sx={{ fontSize: 40, mr: 2 }} />
+            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                flexDirection: { xs: 'column', sm: 'row' }, 
+                textAlign: { xs: 'center', sm: 'left' },
+                gap: { xs: 1, sm: 0 }
+              }}>
+                <TrendingUp sx={{ fontSize: { xs: 32, sm: 40 }, mr: { xs: 0, sm: 2 } }} />
                 <Box>
-                  <Typography variant="h4" fontWeight={700}>
+                  <Typography variant={{ xs: 'h5', sm: 'h4' }} fontWeight={700}>
                     {stats.totalReferrals}
                   </Typography>
                   <Typography variant="body2">Total Referrals</Typography>
@@ -598,13 +723,23 @@ export default function LeaderboardNew() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={2.4}>
+        <Grid item xs={12} sm={6} lg={2.4}>
           <Card sx={{ bgcolor: 'warning.light', color: 'warning.contrastText', height: '100%' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <MonetizationOn sx={{ fontSize: 40, mr: 2 }} />
+            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                flexDirection: { xs: 'column', sm: 'row' }, 
+                textAlign: { xs: 'center', sm: 'left' },
+                gap: { xs: 1, sm: 0 }
+              }}>
+                <MonetizationOn sx={{ fontSize: { xs: 32, sm: 40 }, mr: { xs: 0, sm: 2 } }} />
                 <Box>
-                  <Typography variant="h4" fontWeight={700}>
+                  <Typography 
+                    variant={{ xs: 'h6', sm: 'h4' }} 
+                    fontWeight={700} 
+                    sx={{ wordBreak: 'break-word' }}
+                  >
                     {formatEarnings(stats.totalEarnings)}
                   </Typography>
                   <Typography variant="body2">Total Earnings</Typography>
@@ -616,13 +751,19 @@ export default function LeaderboardNew() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={2.4}>
+        <Grid item xs={12} sm={6} lg={2.4}>
           <Card sx={{ bgcolor: 'info.light', color: 'info.contrastText', height: '100%' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <AssessmentRounded sx={{ fontSize: 40, mr: 2 }} />
+            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                flexDirection: { xs: 'column', sm: 'row' }, 
+                textAlign: { xs: 'center', sm: 'left' },
+                gap: { xs: 1, sm: 0 }
+              }}>
+                <AssessmentRounded sx={{ fontSize: { xs: 32, sm: 40 }, mr: { xs: 0, sm: 2 } }} />
                 <Box>
-                  <Typography variant="h4" fontWeight={700}>
+                  <Typography variant={{ xs: 'h5', sm: 'h4' }} fontWeight={700}>
                     {stats.activeReferrers}
                   </Typography>
                   <Typography variant="body2">Active This Month</Typography>
@@ -634,13 +775,19 @@ export default function LeaderboardNew() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={2.4}>
+        <Grid item xs={12} sm={6} lg={2.4}>
           <Card sx={{ bgcolor: 'secondary.light', color: 'secondary.contrastText', height: '100%' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <TrendingUp sx={{ fontSize: 40, mr: 2 }} />
+            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                flexDirection: { xs: 'column', sm: 'row' }, 
+                textAlign: { xs: 'center', sm: 'left' },
+                gap: { xs: 1, sm: 0 }
+              }}>
+                <TrendingUp sx={{ fontSize: { xs: 32, sm: 40 }, mr: { xs: 0, sm: 2 } }} />
                 <Box>
-                  <Typography variant="h4" fontWeight={700}>
+                  <Typography variant={{ xs: 'h5', sm: 'h4' }} fontWeight={700}>
                     {stats.avgConversionRate.toFixed(1)}%
                   </Typography>
                   <Typography variant="body2">Avg Conversion</Typography>
@@ -655,14 +802,15 @@ export default function LeaderboardNew() {
       </Grid>
 
       {/* Filters */}
-      <Paper sx={{ p: 3, mb: 3 }}>
-        <Grid container spacing={3} alignItems="center">
+      <Paper sx={{ p: { xs: 2, sm: 3 }, mb: 3 }}>
+        <Grid container spacing={{ xs: 2, md: 3 }} alignItems="center">
           <Grid item xs={12} md={4}>
             <TextField
               fullWidth
               placeholder="Search by referrer name or email"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              size={{ xs: 'small', sm: 'medium' }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -672,13 +820,14 @@ export default function LeaderboardNew() {
               }}
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} sm={6} md={3}>
             <FormControl fullWidth>
               <InputLabel>Time Range</InputLabel>
               <Select
                 value={timeRange}
                 label="Time Range"
                 onChange={(e) => setTimeRange(e.target.value)}
+                size={{ xs: 'small', sm: 'medium' }}
               >
                 {timeRanges.map(option => (
                   <MenuItem key={option.value} value={option.value}>
@@ -691,13 +840,14 @@ export default function LeaderboardNew() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} sm={6} md={3}>
             <FormControl fullWidth>
               <InputLabel>Sort By</InputLabel>
               <Select
                 value={sortBy}
                 label="Sort By"
                 onChange={(e) => setSortBy(e.target.value)}
+                size={{ xs: 'small', sm: 'medium' }}
               >
                 {sortOptions.map(option => (
                   <MenuItem key={option.value} value={option.value}>
@@ -715,6 +865,7 @@ export default function LeaderboardNew() {
               fullWidth
               variant="outlined"
               startIcon={<FilterList />}
+              size={{ xs: 'small', sm: 'medium' }}
               onClick={() => {
                 setSearch('');
                 setTimeRange('all');
@@ -747,9 +898,25 @@ export default function LeaderboardNew() {
       {/* Main Content */}
       <Paper sx={{ borderRadius: 3 }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={activeTab} onChange={handleTabChange}>
+          <Tabs 
+            value={activeTab} 
+            onChange={handleTabChange}
+            variant={isMobile ? 'scrollable' : 'standard'}
+            scrollButtons={isMobile ? 'auto' : false}
+            allowScrollButtonsMobile
+            sx={{
+              '& .MuiTab-root': {
+                fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                minWidth: { xs: 'auto', sm: 160 },
+                px: { xs: 1, sm: 3 }
+              }
+            }}
+          >
             {tabLabels.map((label, index) => (
-              <Tab key={index} label={label} />
+              <Tab 
+                key={index} 
+                label={isMobile ? label.replace(/[🏆📊📈🎯]/g, '').trim() : label}
+              />
             ))}
           </Tabs>
         </Box>
@@ -777,39 +944,51 @@ export default function LeaderboardNew() {
             </Box>
           ) : (
             <>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      {columns.map((column) => (
-                        <TableCell key={column.field} sx={{ fontWeight: 700, fontSize: '0.95rem' }}>
-                          {column.label}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {referrers.map((row, index) => (
-                      <TableRow 
-                        key={row.userId} 
-                        hover 
-                        sx={{ 
-                          '&:hover': { 
-                            backgroundColor: 'action.hover',
-                            cursor: 'pointer'
-                          } 
-                        }}
-                      >
+              {isMobile ? (
+                <Box sx={{ p: { xs: 2, sm: 3 } }}>
+                  {referrers.map((referrer, index) => (
+                    <MobileReferrerCard 
+                      key={referrer.userId} 
+                      referrer={referrer} 
+                      rank={page * rowsPerPage + index + 1}
+                    />
+                  ))}
+                </Box>
+              ) : (
+                <TableContainer>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
                         {columns.map((column) => (
-                          <TableCell key={column.field}>
-                            {column.render ? column.render(row, index) : row[column.field]}
+                          <TableCell key={column.field} sx={{ fontWeight: 700, fontSize: '0.95rem' }}>
+                            {column.label}
                           </TableCell>
                         ))}
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                    </TableHead>
+                    <TableBody>
+                      {referrers.map((row, index) => (
+                        <TableRow 
+                          key={row.userId} 
+                          hover 
+                          sx={{ 
+                            '&:hover': { 
+                              backgroundColor: 'action.hover',
+                              cursor: 'pointer'
+                            } 
+                          }}
+                        >
+                          {columns.map((column) => (
+                            <TableCell key={column.field}>
+                              {column.render ? column.render(row, index) : row[column.field]}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
               <TablePagination
                 component="div"
                 count={pagination.total}
@@ -818,7 +997,12 @@ export default function LeaderboardNew() {
                 rowsPerPage={rowsPerPage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
                 rowsPerPageOptions={[5, 10, 25, 50]}
-                labelRowsPerPage="Referrers per page:"
+                labelRowsPerPage={isMobile ? "Per page:" : "Referrers per page:"}
+                sx={{
+                  '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                  }
+                }}
               />
             </>
           )}
@@ -831,6 +1015,13 @@ export default function LeaderboardNew() {
         onClose={() => setDetailDialogOpen(false)}
         maxWidth="lg"
         fullWidth
+        fullScreen={isMobile}
+        PaperProps={{
+          sx: {
+            m: { xs: 0, sm: 2 },
+            maxHeight: { xs: '100%', sm: '90vh' }
+          }
+        }}
       >
         <DialogTitle>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -848,7 +1039,7 @@ export default function LeaderboardNew() {
               </Box>
             </Box>
             <IconButton onClick={() => setDetailDialogOpen(false)}>
-              <ExpandMore />
+              <Close />
             </IconButton>
           </Box>
         </DialogTitle>
