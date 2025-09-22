@@ -617,77 +617,106 @@ export default function Transactions() {
       </Box>
 
       {/* Enhanced Stats Cards */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={2.4}>
+      <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }} sx={{ mb: 4 }}>
+        <Grid item xs={12} md={2.4}>
           <Card sx={{ bgcolor: 'info.light', color: 'info.contrastText', height: '100%' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Receipt sx={{ fontSize: 40, mr: 2 }} />
-                <Box>
-                  <Typography variant="h5" fontWeight={700}>
+            <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center',
+                flexDirection: { xs: 'row', sm: 'row' },
+                gap: { xs: 1.5, sm: 0 }
+              }}>
+                <Receipt sx={{ fontSize: { xs: 28, sm: 32, md: 40 }, mr: { xs: 1.5, sm: 2 } }} />
+                <Box sx={{ minWidth: 0, flex: 1 }}>
+                  <Typography variant={isMobile ? 'h6' : 'h5'} fontWeight={700} sx={{ lineHeight: 1.2 }}>
                     {stats.total}
                   </Typography>
-                  <Typography variant="body2">Total Transactions</Typography>
+                  <Typography variant={isMobile ? 'caption' : 'body2'}>Total Transactions</Typography>
                 </Box>
               </Box>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={2.4}>
+        <Grid item xs={12} md={2.4}>
           <Card sx={{ bgcolor: 'warning.light', color: 'warning.contrastText', height: '100%' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Schedule sx={{ fontSize: 40, mr: 2 }} />
-                <Box>
-                  <Typography variant="h5" fontWeight={700}>
+            <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center',
+                flexDirection: { xs: 'row', sm: 'row' },
+                gap: { xs: 1.5, sm: 0 }
+              }}>
+                <Schedule sx={{ fontSize: { xs: 28, sm: 32, md: 40 }, mr: { xs: 1.5, sm: 2 } }} />
+                <Box sx={{ minWidth: 0, flex: 1 }}>
+                  <Typography variant={isMobile ? 'h6' : 'h5'} fontWeight={700} sx={{ lineHeight: 1.2 }}>
                     {stats.pending}
                   </Typography>
-                  <Typography variant="body2">Pending Review</Typography>
+                  <Typography variant={isMobile ? 'caption' : 'body2'}>Pending Review</Typography>
                 </Box>
               </Box>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={2.4}>
+        <Grid item xs={12} md={2.4}>
           <Card sx={{ bgcolor: 'success.light', color: 'success.contrastText', height: '100%' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <CheckCircle sx={{ fontSize: 40, mr: 2 }} />
-                <Box>
-                  <Typography variant="h5" fontWeight={700}>
+            <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center',
+                flexDirection: { xs: 'row', sm: 'row' },
+                gap: { xs: 1.5, sm: 0 }
+              }}>
+                <CheckCircle sx={{ fontSize: { xs: 28, sm: 32, md: 40 }, mr: { xs: 1.5, sm: 2 } }} />
+                <Box sx={{ minWidth: 0, flex: 1 }}>
+                  <Typography variant={isMobile ? 'h6' : 'h5'} fontWeight={700} sx={{ lineHeight: 1.2 }}>
                     {stats.approved}
                   </Typography>
-                  <Typography variant="body2">Approved</Typography>
+                  <Typography variant={isMobile ? 'caption' : 'body2'}>Approved</Typography>
                 </Box>
               </Box>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={2.4}>
+        <Grid item xs={12} md={2.4}>
           <Card sx={{ bgcolor: 'error.light', color: 'error.contrastText', height: '100%' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Cancel sx={{ fontSize: 40, mr: 2 }} />
-                <Box>
-                  <Typography variant="h5" fontWeight={700}>
+            <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center',
+                flexDirection: { xs: 'row', sm: 'row' },
+                gap: { xs: 1.5, sm: 0 }
+              }}>
+                <Cancel sx={{ fontSize: { xs: 28, sm: 32, md: 40 }, mr: { xs: 1.5, sm: 2 } }} />
+                <Box sx={{ minWidth: 0, flex: 1 }}>
+                  <Typography variant={isMobile ? 'h6' : 'h5'} fontWeight={700} sx={{ lineHeight: 1.2 }}>
                     {stats.rejected}
                   </Typography>
-                  <Typography variant="body2">Rejected</Typography>
+                  <Typography variant={isMobile ? 'caption' : 'body2'}>Rejected</Typography>
                 </Box>
               </Box>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={2.4}>
+        <Grid item xs={12} md={2.4}>
           <Card sx={{ bgcolor: 'primary.light', color: 'primary.contrastText', height: '100%' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <MonetizationOn sx={{ fontSize: 40, mr: 2 }} />
-                <Box>
-                  <Typography variant="h6" fontWeight={700}>
+            <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center',
+                flexDirection: { xs: 'row', sm: 'row' },
+                gap: { xs: 1.5, sm: 0 }
+              }}>
+                <MonetizationOn sx={{ fontSize: { xs: 28, sm: 32, md: 40 }, mr: { xs: 1.5, sm: 2 } }} />
+                <Box sx={{ minWidth: 0, flex: 1 }}>
+                  <Typography 
+                    variant={isMobile ? 'body1' : 'h6'} 
+                    fontWeight={700} 
+                    sx={{ lineHeight: 1.2, wordBreak: 'break-word' }}
+                  >
                     {stats.totalAmount.toLocaleString()} RWF
                   </Typography>
-                  <Typography variant="body2">Total Amount</Typography>
+                  <Typography variant={isMobile ? 'caption' : 'body2'}>Total Amount</Typography>
                 </Box>
               </Box>
             </CardContent>
@@ -696,9 +725,9 @@ export default function Transactions() {
       </Grid>
 
       {/* Filters */}
-      <Paper sx={{ p: { xs: 2, md: 3 }, mb: 3 }}>
-        <Grid container spacing={{ xs: 2, md: 3 }} alignItems="center">
-          <Grid item xs={12} md={4}>
+      <Paper sx={{ p: { xs: 1.5, sm: 2, md: 3 }, mb: 3 }}>
+        <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }} alignItems="end">
+          <Grid item xs={12}>
             <TextField
               fullWidth
               placeholder="Search by Transaction ID, User name, or Email"
@@ -714,7 +743,7 @@ export default function Transactions() {
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6}>
             <FormControl fullWidth size={isMobile ? "small" : "medium"}>
               <InputLabel>Status Filter</InputLabel>
               <Select
@@ -730,7 +759,7 @@ export default function Transactions() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6}>
             <FormControl fullWidth size={isMobile ? "small" : "medium"}>
               <InputLabel>Date Range</InputLabel>
               <Select
@@ -746,7 +775,7 @@ export default function Transactions() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} md={2}>
+          <Grid item xs={12}>
             <Button
               fullWidth
               variant="outlined"

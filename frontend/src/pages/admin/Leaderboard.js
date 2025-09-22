@@ -643,7 +643,7 @@ export default function LeaderboardNew() {
         gap: { xs: 2, md: 0 }
       }}>
         <Box>
-          <Typography variant={{ xs: 'h5', sm: 'h4' }} fontWeight={700} gutterBottom>
+          <Typography variant={isMobile ? 'h5' : 'h4'} fontWeight={700} gutterBottom>
             🏆 Referrer Leaderboard & Analytics
           </Typography>
           <Typography variant="body1" color="text.secondary">
@@ -656,8 +656,8 @@ export default function LeaderboardNew() {
             startIcon={<Refresh />}
             onClick={() => fetchLeaderboard()}
             disabled={loading}
-            size={{ xs: 'small', sm: 'medium' }}
-            fullWidth={{ xs: true, sm: false }}
+            size={isMobile ? 'small' : 'medium'}
+            fullWidth={isMobile}
           >
             Refresh
           </Button>
@@ -665,8 +665,8 @@ export default function LeaderboardNew() {
             variant="outlined"
             startIcon={<Download />}
             onClick={exportLeaderboard}
-            size={{ xs: 'small', sm: 'medium' }}
-            fullWidth={{ xs: true, sm: false }}
+            size={isMobile ? 'small' : 'medium'}
+            fullWidth={isMobile}
           >
             Export
           </Button>
@@ -674,24 +674,24 @@ export default function LeaderboardNew() {
       </Box>
 
       {/* Enhanced Stats Dashboard */}
-      <Grid container spacing={{ xs: 2, md: 3 }} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} lg={2.4}>
+      <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }} sx={{ mb: 4 }}>
+        <Grid item xs={12} md={2.4}>
           <Card sx={{ bgcolor: 'primary.light', color: 'primary.contrastText', height: '100%' }}>
-            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+            <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
               <Box sx={{ 
                 display: 'flex', 
                 alignItems: 'center', 
-                flexDirection: { xs: 'column', sm: 'row' }, 
-                textAlign: { xs: 'center', sm: 'left' },
-                gap: { xs: 1, sm: 0 }
+                flexDirection: { xs: 'row', sm: 'row' }, 
+                textAlign: { xs: 'left', sm: 'left' },
+                gap: { xs: 1.5, sm: 0 }
               }}>
-                <Group sx={{ fontSize: { xs: 32, sm: 40 }, mr: { xs: 0, sm: 2 } }} />
-                <Box>
-                  <Typography variant={{ xs: 'h5', sm: 'h4' }} fontWeight={700}>
+                <Group sx={{ fontSize: { xs: 28, sm: 32, md: 40 }, mr: { xs: 1.5, sm: 2 } }} />
+                <Box sx={{ minWidth: 0, flex: 1 }}>
+                  <Typography variant={isMobile ? 'h6' : 'h5'} fontWeight={700} sx={{ lineHeight: 1.2 }}>
                     {stats.totalReferrers}
                   </Typography>
-                  <Typography variant="body2">Total Referrers</Typography>
-                  <Typography variant="caption">
+                  <Typography variant={isMobile ? 'caption' : 'body2'}>Total Referrers</Typography>
+                  <Typography variant="caption" sx={{ display: 'block', opacity: 0.8 }}>
                     +{stats.recentGrowth}% this month
                   </Typography>
                 </Box>
@@ -699,23 +699,23 @@ export default function LeaderboardNew() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} lg={2.4}>
+        <Grid item xs={12} md={2.4}>
           <Card sx={{ bgcolor: 'success.light', color: 'success.contrastText', height: '100%' }}>
-            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+            <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
               <Box sx={{ 
                 display: 'flex', 
                 alignItems: 'center', 
-                flexDirection: { xs: 'column', sm: 'row' }, 
-                textAlign: { xs: 'center', sm: 'left' },
-                gap: { xs: 1, sm: 0 }
+                flexDirection: { xs: 'row', sm: 'row' }, 
+                textAlign: { xs: 'left', sm: 'left' },
+                gap: { xs: 1.5, sm: 0 }
               }}>
-                <TrendingUp sx={{ fontSize: { xs: 32, sm: 40 }, mr: { xs: 0, sm: 2 } }} />
-                <Box>
-                  <Typography variant={{ xs: 'h5', sm: 'h4' }} fontWeight={700}>
+                <TrendingUp sx={{ fontSize: { xs: 28, sm: 32, md: 40 }, mr: { xs: 1.5, sm: 2 } }} />
+                <Box sx={{ minWidth: 0, flex: 1 }}>
+                  <Typography variant={isMobile ? 'h6' : 'h5'} fontWeight={700} sx={{ lineHeight: 1.2 }}>
                     {stats.totalReferrals}
                   </Typography>
-                  <Typography variant="body2">Total Referrals</Typography>
-                  <Typography variant="caption">
+                  <Typography variant={isMobile ? 'caption' : 'body2'}>Total Referrals</Typography>
+                  <Typography variant="caption" sx={{ display: 'block', opacity: 0.8 }}>
                     Avg: {Math.round(stats.totalReferrals / Math.max(stats.totalReferrers, 1))} per referrer
                   </Typography>
                 </Box>
@@ -723,27 +723,27 @@ export default function LeaderboardNew() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} lg={2.4}>
+        <Grid item xs={12} md={2.4}>
           <Card sx={{ bgcolor: 'warning.light', color: 'warning.contrastText', height: '100%' }}>
-            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+            <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
               <Box sx={{ 
                 display: 'flex', 
                 alignItems: 'center', 
-                flexDirection: { xs: 'column', sm: 'row' }, 
-                textAlign: { xs: 'center', sm: 'left' },
-                gap: { xs: 1, sm: 0 }
+                flexDirection: { xs: 'row', sm: 'row' }, 
+                textAlign: { xs: 'left', sm: 'left' },
+                gap: { xs: 1.5, sm: 0 }
               }}>
-                <MonetizationOn sx={{ fontSize: { xs: 32, sm: 40 }, mr: { xs: 0, sm: 2 } }} />
-                <Box>
+                <MonetizationOn sx={{ fontSize: { xs: 28, sm: 32, md: 40 }, mr: { xs: 1.5, sm: 2 } }} />
+                <Box sx={{ minWidth: 0, flex: 1 }}>
                   <Typography 
-                    variant={{ xs: 'h6', sm: 'h4' }} 
+                    variant={isMobile ? 'body1' : 'h6'} 
                     fontWeight={700} 
-                    sx={{ wordBreak: 'break-word' }}
+                    sx={{ wordBreak: 'break-word', lineHeight: 1.2 }}
                   >
                     {formatEarnings(stats.totalEarnings)}
                   </Typography>
-                  <Typography variant="body2">Total Earnings</Typography>
-                  <Typography variant="caption">
+                  <Typography variant={isMobile ? 'caption' : 'body2'}>Total Earnings</Typography>
+                  <Typography variant="caption" sx={{ display: 'block', opacity: 0.8 }}>
                     Distributed to referrers
                   </Typography>
                 </Box>
@@ -751,23 +751,23 @@ export default function LeaderboardNew() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} lg={2.4}>
+        <Grid item xs={12} md={2.4}>
           <Card sx={{ bgcolor: 'info.light', color: 'info.contrastText', height: '100%' }}>
-            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+            <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
               <Box sx={{ 
                 display: 'flex', 
                 alignItems: 'center', 
-                flexDirection: { xs: 'column', sm: 'row' }, 
-                textAlign: { xs: 'center', sm: 'left' },
-                gap: { xs: 1, sm: 0 }
+                flexDirection: { xs: 'row', sm: 'row' }, 
+                textAlign: { xs: 'left', sm: 'left' },
+                gap: { xs: 1.5, sm: 0 }
               }}>
-                <AssessmentRounded sx={{ fontSize: { xs: 32, sm: 40 }, mr: { xs: 0, sm: 2 } }} />
-                <Box>
-                  <Typography variant={{ xs: 'h5', sm: 'h4' }} fontWeight={700}>
+                <AssessmentRounded sx={{ fontSize: { xs: 28, sm: 32, md: 40 }, mr: { xs: 1.5, sm: 2 } }} />
+                <Box sx={{ minWidth: 0, flex: 1 }}>
+                  <Typography variant={isMobile ? 'h6' : 'h5'} fontWeight={700} sx={{ lineHeight: 1.2 }}>
                     {stats.activeReferrers}
                   </Typography>
-                  <Typography variant="body2">Active This Month</Typography>
-                  <Typography variant="caption">
+                  <Typography variant={isMobile ? 'caption' : 'body2'}>Active This Month</Typography>
+                  <Typography variant="caption" sx={{ display: 'block', opacity: 0.8 }}>
                     {((stats.activeReferrers / Math.max(stats.totalReferrers, 1)) * 100).toFixed(1)}% activity rate
                   </Typography>
                 </Box>
@@ -775,23 +775,23 @@ export default function LeaderboardNew() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} lg={2.4}>
+        <Grid item xs={12} md={2.4}>
           <Card sx={{ bgcolor: 'secondary.light', color: 'secondary.contrastText', height: '100%' }}>
-            <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+            <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
               <Box sx={{ 
                 display: 'flex', 
                 alignItems: 'center', 
-                flexDirection: { xs: 'column', sm: 'row' }, 
-                textAlign: { xs: 'center', sm: 'left' },
-                gap: { xs: 1, sm: 0 }
+                flexDirection: { xs: 'row', sm: 'row' }, 
+                textAlign: { xs: 'left', sm: 'left' },
+                gap: { xs: 1.5, sm: 0 }
               }}>
-                <TrendingUp sx={{ fontSize: { xs: 32, sm: 40 }, mr: { xs: 0, sm: 2 } }} />
-                <Box>
-                  <Typography variant={{ xs: 'h5', sm: 'h4' }} fontWeight={700}>
+                <TrendingUp sx={{ fontSize: { xs: 28, sm: 32, md: 40 }, mr: { xs: 1.5, sm: 2 } }} />
+                <Box sx={{ minWidth: 0, flex: 1 }}>
+                  <Typography variant={isMobile ? 'h6' : 'h5'} fontWeight={700} sx={{ lineHeight: 1.2 }}>
                     {stats.avgConversionRate.toFixed(1)}%
                   </Typography>
-                  <Typography variant="body2">Avg Conversion</Typography>
-                  <Typography variant="caption">
+                  <Typography variant={isMobile ? 'caption' : 'body2'}>Avg Conversion</Typography>
+                  <Typography variant="caption" sx={{ display: 'block', opacity: 0.8 }}>
                     Platform-wide average
                   </Typography>
                 </Box>
@@ -802,15 +802,15 @@ export default function LeaderboardNew() {
       </Grid>
 
       {/* Filters */}
-      <Paper sx={{ p: { xs: 2, sm: 3 }, mb: 3 }}>
-        <Grid container spacing={{ xs: 2, md: 3 }} alignItems="center">
-          <Grid item xs={12} md={4}>
+      <Paper sx={{ p: { xs: 1.5, sm: 2, md: 3 }, mb: 3 }}>
+        <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }} alignItems="end">
+          <Grid item xs={12}>
             <TextField
               fullWidth
               placeholder="Search by referrer name or email"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              size={{ xs: 'small', sm: 'medium' }}
+              size={isMobile ? 'small' : 'medium'}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -820,14 +820,14 @@ export default function LeaderboardNew() {
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6}>
             <FormControl fullWidth>
               <InputLabel>Time Range</InputLabel>
               <Select
                 value={timeRange}
                 label="Time Range"
                 onChange={(e) => setTimeRange(e.target.value)}
-                size={{ xs: 'small', sm: 'medium' }}
+                size={isMobile ? 'small' : 'medium'}
               >
                 {timeRanges.map(option => (
                   <MenuItem key={option.value} value={option.value}>
@@ -840,14 +840,14 @@ export default function LeaderboardNew() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6}>
             <FormControl fullWidth>
               <InputLabel>Sort By</InputLabel>
               <Select
                 value={sortBy}
                 label="Sort By"
                 onChange={(e) => setSortBy(e.target.value)}
-                size={{ xs: 'small', sm: 'medium' }}
+                size={isMobile ? 'small' : 'medium'}
               >
                 {sortOptions.map(option => (
                   <MenuItem key={option.value} value={option.value}>
@@ -860,12 +860,12 @@ export default function LeaderboardNew() {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} md={2}>
+          <Grid item xs={12}>
             <Button
               fullWidth
               variant="outlined"
               startIcon={<FilterList />}
-              size={{ xs: 'small', sm: 'medium' }}
+              size={isMobile ? 'small' : 'medium'}
               onClick={() => {
                 setSearch('');
                 setTimeRange('all');
