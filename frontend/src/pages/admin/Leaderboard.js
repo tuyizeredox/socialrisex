@@ -301,10 +301,10 @@ export default function LeaderboardNew() {
             </Avatar>
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <Typography variant="body1" fontWeight={600} noWrap>
-                {referrer.user.fullName}
+                {referrer.user?.fullName || 'N/A'}
               </Typography>
               <Typography variant="caption" color="text.secondary" noWrap>
-                {referrer.user.email}
+                {referrer.user?.email || 'N/A'}
               </Typography>
             </Box>
           </Box>
@@ -420,11 +420,11 @@ export default function LeaderboardNew() {
         </Avatar>
         
         <Typography variant="h6" fontWeight={700} gutterBottom>
-          {performer.user.fullName}
+          {performer.user?.fullName || 'N/A'}
         </Typography>
         
         <Typography variant="body2" color="text.secondary" gutterBottom>
-          {performer.user.email}
+          {performer.user?.email || 'N/A'}
         </Typography>
         
         <Divider sx={{ my: 2 }} />
@@ -520,13 +520,13 @@ export default function LeaderboardNew() {
           </Avatar>
           <Box>
             <Typography variant="body1" fontWeight={600}>
-              {row.user.fullName}
+              {row.user?.fullName || 'N/A'}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {row.user.email}
+              {row.user?.email || 'N/A'}
             </Typography>
             <Typography variant="caption" display="block" color="text.secondary">
-              Joined: {format(new Date(row.user.createdAt), 'MMM yyyy')}
+              Joined: {row.user?.createdAt ? format(new Date(row.user.createdAt), 'MMM yyyy') : 'N/A'}
             </Typography>
           </Box>
         </Box>
@@ -1055,26 +1055,26 @@ export default function LeaderboardNew() {
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="body2" color="text.secondary">Full Name</Typography>
                       <Typography variant="body1" fontWeight={600}>
-                        {referrerDetails.referrer.fullName}
+                        {referrerDetails?.referrer?.fullName || 'N/A'}
                       </Typography>
                     </Box>
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="body2" color="text.secondary">Email</Typography>
                       <Typography variant="body1">
-                        {referrerDetails.referrer.email}
+                        {referrerDetails?.referrer?.email || 'N/A'}
                       </Typography>
                     </Box>
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="body2" color="text.secondary">Join Date</Typography>
                       <Typography variant="body1">
-                        {format(new Date(referrerDetails.referrer.createdAt), 'PPP')}
+                        {referrerDetails?.referrer?.createdAt ? format(new Date(referrerDetails.referrer.createdAt), 'PPP') : 'N/A'}
                       </Typography>
                     </Box>
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="body2" color="text.secondary">Account Status</Typography>
                       <Chip
-                        label={referrerDetails.referrer.isActive ? 'Active' : 'Inactive'}
-                        color={referrerDetails.referrer.isActive ? 'success' : 'warning'}
+                        label={referrerDetails?.referrer?.isActive ? 'Active' : 'Inactive'}
+                        color={referrerDetails?.referrer?.isActive ? 'success' : 'warning'}
                         size="small"
                       />
                     </Box>
@@ -1091,7 +1091,7 @@ export default function LeaderboardNew() {
                     <Grid container spacing={2}>
                       <Grid item xs={6}>
                         <Typography variant="h4" color="primary.main" fontWeight={700}>
-                          {referrerDetails.stats.totalReferrals}
+                          {referrerDetails?.stats?.totalReferrals || 0}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                           Total Referrals
@@ -1099,7 +1099,7 @@ export default function LeaderboardNew() {
                       </Grid>
                       <Grid item xs={6}>
                         <Typography variant="h4" color="success.main" fontWeight={700}>
-                          {referrerDetails.stats.activeReferrals}
+                          {referrerDetails?.stats?.activeReferrals || 0}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                           Active Referrals
@@ -1107,7 +1107,7 @@ export default function LeaderboardNew() {
                       </Grid>
                       <Grid item xs={12}>
                         <Typography variant="h5" color="warning.main" fontWeight={700}>
-                          {formatEarnings(referrerDetails.stats.totalEarnings)}
+                          {formatEarnings(referrerDetails?.stats?.totalEarnings || 0)}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                           Total Earnings
@@ -1115,14 +1115,14 @@ export default function LeaderboardNew() {
                       </Grid>
                       <Grid item xs={12}>
                         <Typography variant="h6" fontWeight={600}>
-                          {referrerDetails.stats.conversionRate}%
+                          {referrerDetails?.stats?.conversionRate || 0}%
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                           Conversion Rate
                         </Typography>
                         <LinearProgress
                           variant="determinate"
-                          value={parseFloat(referrerDetails.stats.conversionRate)}
+                          value={parseFloat(referrerDetails?.stats?.conversionRate || 0)}
                           sx={{ mt: 1, height: 8, borderRadius: 4 }}
                         />
                       </Grid>
@@ -1138,7 +1138,7 @@ export default function LeaderboardNew() {
                       📅 Recent Activity
                     </Typography>
                     <List dense>
-                      {referrerDetails.recentReferrals.slice(0, 5).map((referral, index) => (
+                      {(referrerDetails?.recentReferrals || []).slice(0, 5).map((referral, index) => (
                         <ListItem key={index} disablePadding>
                           <ListItemAvatar>
                             <Avatar sx={{ bgcolor: referral.isActive ? 'success.light' : 'grey.300' }}>
@@ -1146,8 +1146,8 @@ export default function LeaderboardNew() {
                             </Avatar>
                           </ListItemAvatar>
                           <ListItemText
-                            primary={referral.fullName}
-                            secondary={`${format(new Date(referral.createdAt), 'MMM dd')} • ${referral.isActive ? 'Active' : 'Inactive'}`}
+                            primary={referral?.fullName || 'N/A'}
+                            secondary={`${referral?.createdAt ? format(new Date(referral.createdAt), 'MMM dd') : 'N/A'} • ${referral?.isActive ? 'Active' : 'Inactive'}`}
                           />
                         </ListItem>
                       ))}
