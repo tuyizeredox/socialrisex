@@ -519,7 +519,7 @@ export default function Transactions() {
               Amount
             </Typography>
             <Typography variant="body1" fontWeight={600} color="primary.main">
-              ${transaction.amount.toFixed(2)}
+              {transaction.amount.toLocaleString()} RWF
             </Typography>
           </Grid>
           <Grid item xs={6}>
@@ -531,6 +531,23 @@ export default function Transactions() {
             </Typography>
           </Grid>
         </Grid>
+
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="caption" color="text.secondary">
+            Transaction ID
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2" fontFamily="monospace" sx={{ fontSize: '0.75rem', wordBreak: 'break-all' }}>
+              {transaction.transactionId}
+            </Typography>
+            <IconButton
+              size="small"
+              onClick={() => copyToClipboard(transaction.transactionId)}
+            >
+              <ContentCopy fontSize="small" />
+            </IconButton>
+          </Box>
+        </Box>
 
         <Box sx={{ mb: 2 }}>
           <Typography variant="caption" color="text.secondary">
@@ -575,7 +592,13 @@ export default function Transactions() {
   );
 
   return (
-    <Container maxWidth="xl" sx={{ py: { xs: 2, md: 4 } }}>
+    <Box sx={{ 
+      width: '100%',
+      overflowX: 'auto',
+      minWidth: 0,
+      px: { xs: 1, sm: 2, md: 3 },
+      py: { xs: 1, sm: 2, md: 3 }
+    }}>
       {/* Header */}
       <Box sx={{ 
         mb: 4, 
@@ -845,8 +868,8 @@ export default function Transactions() {
                 </Box>
               ) : (
                 // Desktop Table View
-                <TableContainer>
-                  <Table>
+                <TableContainer sx={{ overflowX: 'auto', maxWidth: '100%' }}>
+                  <Table sx={{ minWidth: 800 }}>
                     <TableHead>
                       <TableRow>
                         {columns.map((column) => (
@@ -1111,6 +1134,6 @@ export default function Transactions() {
           </Button>
         </DialogActions>
       </Dialog>
-    </Container>
+    </Box>
   );
 }

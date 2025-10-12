@@ -140,7 +140,7 @@ export default function Referrals() {
             value={referralData?.stats.level2Count || 0}
             icon={People}
             color="warning"
-            subtitle="2,000 RWF per active member"
+            subtitle="1,500 RWF per active member"
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
@@ -149,7 +149,7 @@ export default function Referrals() {
             value={referralData?.stats.level3Count || 0}
             icon={People}
             color="info"
-            subtitle="500 RWF per active member"
+            subtitle="900 RWF per active member"
           />
         </Grid>
       </Grid>
@@ -284,7 +284,7 @@ export default function Referrals() {
                   color="warning.main"
                   sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}
                 >
-                  2,000 RWF
+                  1,500 RWF
                 </Typography>
                 <Typography 
                   variant="body2" 
@@ -326,7 +326,7 @@ export default function Referrals() {
                   color="info.main"
                   sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}
                 >
-                  500 RWF
+                  900 RWF
                 </Typography>
                 <Typography 
                   variant="body2" 

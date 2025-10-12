@@ -401,12 +401,26 @@ export default function Dashboard() {
           <GamificationCard
             title="Total Earnings"
             value={`RWF ${(stats.videoPoints + stats.photoPoints + stats.referralEarnings + stats.welcomeBonus).toLocaleString()}`}
-            subtitle={`Videos + Photos + Referrals + Welcome bonus`}
+            subtitle={`Videos + Photos + Team + Welcome bonus`}
             icon={MonetizationOn}
-            gradient="linear-gradient(135deg, #FFD700 0%, #FF8F00 100%)"
+            gradient="linear-gradient(135deg, #FF6B6B 0%, #FF8E53 30%, #FF6B9D 70%, #C44569 100%)"
             glowing={stats.points >= 10000}
             level={userLevel}
             achievements={stats.points >= 10000 ? ['High Roller'] : []}
+          />
+        </Grid>
+        
+        <Grid item xs={12} sm={6} lg={3}>
+          <GamificationCard
+            title="Network Income"
+            value={`RWF ${stats.referralEarnings.toLocaleString()}`}
+            subtitle={`From your network activities`}
+            progress={stats.referrals}
+            progressMax={100}
+            icon={TrendingUp}
+            gradient="linear-gradient(135deg, #667eea 0%, #764ba2 30%, #f093fb 70%, #f5576c 100%)"
+            glowing={stats.referralEarnings >= 50000}
+            achievements={stats.referralEarnings >= 50000 ? ['Network Master'] : stats.referralEarnings >= 10000 ? ['Network Builder'] : []}
           />
         </Grid>
         
@@ -418,7 +432,7 @@ export default function Dashboard() {
             progress={stats.videosWatched}
             progressMax={weeklyProgress.target}
             icon={PlayCircle}
-            gradient="linear-gradient(135deg, #2196F3 0%, #00BCD4 100%)"
+            gradient="linear-gradient(135deg, #4facfe 0%, #00f2fe 30%, #43e97b 70%, #38f9d7 100%)"
             streakCount={stats.videosWatched >= 10 ? 1 : null}
             achievements={stats.videosWatched >= 10 ? ['Speed Demon'] : []}
           />
@@ -432,25 +446,9 @@ export default function Dashboard() {
             progress={stats.photoShares}
             progressMax={50}
             icon={PhotoCamera}
-            gradient="linear-gradient(135deg, #E91E63 0%, #F06292 100%)"
+            gradient="linear-gradient(135deg, #fa709a 0%, #fee140 30%, #fa709a 70%, #ff6b6b 100%)"
             badge={stats.photoShares >= 10 ? "Photo Master" : stats.photoShares >= 1 ? "Sharer" : null}
             achievements={stats.photoShares >= 10 ? ['Photo Master'] : stats.photoShares >= 1 ? ['Sharer'] : []}
-          />
-        </Grid>
-        
-
-        
-        <Grid item xs={12} sm={6} lg={3}>
-          <GamificationCard
-            title="Team Size"
-            value={stats.referrals}
-            subtitle={`${stats.activeReferrals} active members`}
-            progress={stats.referrals}
-            progressMax={100}
-            icon={People}
-            gradient="linear-gradient(135deg, #9C27B0 0%, #E91E63 100%)"
-            glowing={stats.referrals >= 50}
-            achievements={stats.referrals >= 50 ? ['Master Recruiter'] : []}
           />
         </Grid>
       </Grid>
@@ -546,8 +544,8 @@ export default function Dashboard() {
           {/* Earnings breakdown chips */}
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mb: 3, flexWrap: 'wrap' }}>
             <Chip label="L1: 4,000 RWF" sx={{ bgcolor: '#FFD700', color: '#000', fontWeight: 'bold' }} />
-            <Chip label="L2: 2,000 RWF" sx={{ bgcolor: '#C0C0C0', color: '#000', fontWeight: 'bold' }} />
-            <Chip label="L3: 500 RWF" sx={{ bgcolor: '#CD7F32', color: '#fff', fontWeight: 'bold' }} />
+            <Chip label="L2: 1,500 RWF" sx={{ bgcolor: '#C0C0C0', color: '#000', fontWeight: 'bold' }} />
+            <Chip label="L3: 900 RWF" sx={{ bgcolor: '#CD7F32', color: '#fff', fontWeight: 'bold' }} />
           </Box>
           
           <Button 

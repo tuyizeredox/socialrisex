@@ -8,7 +8,15 @@ import {
   DialogActions,
   Typography,
   Box,
-  Chip
+  Chip,
+  Card,
+  CardContent,
+  CardActions,
+  Grid,
+  useMediaQuery,
+  useTheme,
+  Stack,
+  Divider
 } from '@mui/material';
 import {
   Payment,
@@ -34,6 +42,9 @@ export default function WithdrawalManagement() {
   const [processing, setProcessing] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState({ open: false });
   const { showNotification } = useNotification();
+  
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   useEffect(() => {
     fetchWithdrawals();
@@ -172,8 +183,108 @@ export default function WithdrawalManagement() {
     }
   ];
 
+  const renderWithdrawalCard = (withdrawal) => {
+    const statusConfig = {
+      pending: { icon: PendingActions, color: 'warning', label: 'Pending' },
+      approved: { icon: CheckCircle, color: 'success', label: 'Approved' },
+      rejected: { icon: Cancel, color: 'error', label: 'Rejected' }
+    };
+    const config = statusConfig[withdrawal.status] || statusConfig.pending;
+    const Icon = config.icon;
+
+    return (
+      <Card key={withdrawal._id} sx={{ mb: 2 }}>
+        <CardContent>
+          <Stack spacing={2}>
+            <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+              <Box>
+                <Typography variant="h6" component="div">
+                  {withdrawal.user?.name || 'N/A'}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {withdrawal.user?.email || 'N/A'}
+                </Typography>
+              </Box>
+              <Chip
+                icon={<Icon />}
+                label={config.label}
+                color={config.color}
+                size="small"
+              />
+            </Box>
+            
+            <Divider />
+            
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <Typography variant="body2" color="text.secondary">
+                  Amount
+                </Typography>
+                <Typography variant="h6" color="primary">
+                  {formatCurrency(withdrawal.amount || 0)}
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2" color="text.secondary">
+                  Payment Method
+                </Typography>
+                <Chip
+                  label={withdrawal.paymentMethod === 'momo' ? 'Mobile Money' : 'Bank Transfer'}
+                  color="primary"
+                  size="small"
+                />
+              </Grid>
+            </Grid>
+
+            {withdrawal.accountDetails && (
+              <>
+                <Divider />
+                <Box>
+                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                    Account Details
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Name:</strong> {withdrawal.accountDetails.accountName || 'N/A'}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Number:</strong> {withdrawal.accountDetails.accountNumber || 'N/A'}
+                  </Typography>
+                </Box>
+              </>
+            )}
+
+            <Divider />
+            
+            <Typography variant="body2" color="text.secondary">
+              Requested: {new Date(withdrawal.createdAt).toLocaleString()}
+            </Typography>
+          </Stack>
+        </CardContent>
+        
+        {withdrawal.status === 'pending' && (
+          <CardActions sx={{ justifyContent: 'flex-end', px: 2, pb: 2 }}>
+            <Button
+              variant="contained"
+              onClick={() => handleOpenDialog(withdrawal)}
+              fullWidth={isMobile}
+            >
+              Process Request
+            </Button>
+          </CardActions>
+        )}
+      </Card>
+    );
+  };
+
   return (
-    <Container maxWidth="lg">
+    <Box sx={{ 
+      width: '100%',
+      overflowX: 'auto',
+      minWidth: 0,
+      px: { xs: 1, sm: 2, md: 3 },
+      py: { xs: 1, sm: 2, md: 3 },
+      minHeight: 'calc(100vh - 120px)'
+    }}>
       <PageHeader
         title="Withdrawal Requests"
         subtitle="Manage pending withdrawal requests"
@@ -187,60 +298,134 @@ export default function WithdrawalManagement() {
           description="There are no pending withdrawal requests at this time."
         />
       ) : (
-        <DataTable
-          columns={columns}
-          data={withdrawals}
-          loading={loading}
-          initialSort={{ field: 'createdAt', direction: 'desc' }}
-        />
+        <>
+          {isMobile ? (
+            <Box sx={{ 
+              px: { xs: 0, sm: 1 },
+              '& > *': { mb: 2 }
+            }}>
+              {withdrawals.map(renderWithdrawalCard)}
+            </Box>
+          ) : (
+            <DataTable
+              columns={columns}
+              data={withdrawals}
+              loading={loading}
+              initialSort={{ field: 'createdAt', direction: 'desc' }}
+            />
+          )}
+        </>
       )}
 
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        <DialogTitle>Process Withdrawal Request</DialogTitle>
-        <DialogContent>
+      <Dialog 
+        open={openDialog} 
+        onClose={handleCloseDialog} 
+        maxWidth="sm" 
+        fullWidth
+        fullScreen={isMobile}
+        sx={{
+          '& .MuiDialog-paper': {
+            m: isMobile ? 0 : 2,
+            height: isMobile ? '100vh' : 'auto',
+            maxHeight: isMobile ? '100vh' : '90vh'
+          }
+        }}
+      >
+        <DialogTitle sx={{ pb: 1 }}>
+          Process Withdrawal Request
+        </DialogTitle>
+        <DialogContent sx={{ px: isMobile ? 2 : 3 }}>
           {selectedWithdrawal && (
-            <Box sx={{ mt: 2 }}>
+            <Box sx={{ mt: 1 }}>
               <Typography variant="subtitle1" gutterBottom>
                 Withdrawal Details
               </Typography>
-              <Typography variant="body2" gutterBottom>
-                <strong>User:</strong> {selectedWithdrawal.user?.name || 'N/A'}
-              </Typography>
-              <Typography variant="body2" gutterBottom>
-                <strong>Amount:</strong> {formatCurrency(selectedWithdrawal.amount || 0)}
-              </Typography>
-              <Typography variant="body2" gutterBottom>
-                <strong>Payment Method:</strong>{' '}
-                {selectedWithdrawal.paymentMethod === 'momo' ? 'Mobile Money' : 'Bank Transfer'}
-              </Typography>
-              <Typography variant="body2" gutterBottom>
-                <strong>Account Name:</strong> {selectedWithdrawal.accountDetails?.accountName || 'N/A'}
-              </Typography>
-              <Typography variant="body2" gutterBottom>
-                <strong>Account Number:</strong> {selectedWithdrawal.accountDetails?.accountNumber || 'N/A'}
-              </Typography>
-              <Typography variant="body2" gutterBottom>
-                <strong>Requested:</strong>{' '}
-                {new Date(selectedWithdrawal.createdAt).toLocaleString()}
-              </Typography>
+              <Stack spacing={1.5}>
+                <Box>
+                  <Typography variant="body2" color="text.secondary">
+                    User
+                  </Typography>
+                  <Typography variant="body1">
+                    {selectedWithdrawal.user?.name || 'N/A'}
+                  </Typography>
+                </Box>
+                
+                <Box>
+                  <Typography variant="body2" color="text.secondary">
+                    Amount
+                  </Typography>
+                  <Typography variant="h6" color="primary">
+                    {formatCurrency(selectedWithdrawal.amount || 0)}
+                  </Typography>
+                </Box>
+                
+                <Box>
+                  <Typography variant="body2" color="text.secondary">
+                    Payment Method
+                  </Typography>
+                  <Typography variant="body1">
+                    {selectedWithdrawal.paymentMethod === 'momo' ? 'Mobile Money' : 'Bank Transfer'}
+                  </Typography>
+                </Box>
+                
+                <Box>
+                  <Typography variant="body2" color="text.secondary">
+                    Account Name
+                  </Typography>
+                  <Typography variant="body1">
+                    {selectedWithdrawal.accountDetails?.accountName || 'N/A'}
+                  </Typography>
+                </Box>
+                
+                <Box>
+                  <Typography variant="body2" color="text.secondary">
+                    Account Number
+                  </Typography>
+                  <Typography variant="body1">
+                    {selectedWithdrawal.accountDetails?.accountNumber || 'N/A'}
+                  </Typography>
+                </Box>
+                
+                <Box>
+                  <Typography variant="body2" color="text.secondary">
+                    Requested
+                  </Typography>
+                  <Typography variant="body1">
+                    {new Date(selectedWithdrawal.createdAt).toLocaleString()}
+                  </Typography>
+                </Box>
 
-              <FormField
-                label="Processing Notes"
-                multiline
-                rows={4}
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                sx={{ mt: 2 }}
-              />
+                <FormField
+                  label="Processing Notes"
+                  multiline
+                  rows={4}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  sx={{ mt: 2 }}
+                />
+              </Stack>
             </Box>
           )}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
+        <DialogActions sx={{ 
+          px: isMobile ? 2 : 3, 
+          pb: isMobile ? 2 : 3,
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: isMobile ? 1 : 0
+        }}>
+          <Button 
+            onClick={handleCloseDialog}
+            fullWidth={isMobile}
+            variant={isMobile ? "outlined" : "text"}
+          >
+            Cancel
+          </Button>
           <Button
             onClick={() => handleProcessWithdrawal('rejected')}
             color="error"
             variant="contained"
+            fullWidth={isMobile}
+            disabled={processing}
           >
             Reject
           </Button>
@@ -248,6 +433,8 @@ export default function WithdrawalManagement() {
             onClick={() => handleProcessWithdrawal('approved')}
             color="success"
             variant="contained"
+            fullWidth={isMobile}
+            disabled={processing}
           >
             Approve
           </Button>
@@ -261,6 +448,6 @@ export default function WithdrawalManagement() {
         onConfirm={confirmDialog.onConfirm}
         onClose={() => setConfirmDialog({ ...confirmDialog, open: false })}
       />
-    </Container>
+    </Box>
   );
 }

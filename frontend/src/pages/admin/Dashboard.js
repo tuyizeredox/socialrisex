@@ -283,6 +283,23 @@ export default function AdminDashboard() {
         
         <Grid item xs={12} sm={6} md={3}>
           <GamificationCard
+            title="Total Platform Earnings"
+            value={`RWF ${((stats?.activeUsers || 0) * 8000).toLocaleString()}`}
+            subtitle={`From ${stats?.activeUsers || 0} active users`}
+            icon={TrendingUp}
+            gradient={isDark 
+              ? 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 30%, #FF6B9D 70%, #C44569 100%)'
+              : 'linear-gradient(135deg, #FF6B6B 0%, #FF8E53 30%, #FF6B9D 70%, #C44569 100%)'
+            }
+            badge={stats?.activeUsers > 0 ? "Active Platform" : "No Activity"}
+            glowing={stats?.activeUsers > 0}
+            progress={stats?.activeUsers || 0}
+            progressMax={stats?.totalUsers || 1}
+          />
+        </Grid>
+        
+        <Grid item xs={12} sm={6} md={3}>
+          <GamificationCard
             title="Pending Cashouts"
             value={stats?.pendingWithdrawals?.toLocaleString() || 0}
             subtitle={`RWF ${stats?.pendingAmount?.toLocaleString() || 0}`}

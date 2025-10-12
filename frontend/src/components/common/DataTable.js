@@ -35,15 +35,15 @@ const DataTable = ({
 
   return (
     <Paper>
-      <TableContainer>
-        <Table>
+      <TableContainer sx={{ overflowX: 'auto', maxWidth: '100%' }}>
+        <Table sx={{ minWidth: 650 }}>
           <TableHead>
             <TableRow>
               {columns.map((column) => (
                 <TableCell
                   key={column.field}
                   align={column.align || 'left'}
-                  style={{ fontWeight: 'bold' }}
+                  style={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}
                 >
                   {column.label}
                 </TableCell>
@@ -54,7 +54,7 @@ const DataTable = ({
             {data.map((row, index) => (
               <TableRow key={row._id || index}>
                 {columns.map((column) => (
-                  <TableCell key={column.field} align={column.align || 'left'}>
+                  <TableCell key={column.field} align={column.align || 'left'} sx={{ whiteSpace: 'nowrap' }}>
                     {column.render ? column.render(row) : row[column.field]}
                   </TableCell>
                 ))}

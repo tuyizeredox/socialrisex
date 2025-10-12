@@ -8,7 +8,8 @@ import {
   Divider,
   IconButton,
   Typography,
-  useTheme
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import { 
   Dashboard, 
@@ -26,11 +27,12 @@ import { useState } from 'react';
 
 const drawerWidth = 240;
 
-export default function Sidebar({ isAdmin }) {
+export default function Sidebar({ isAdmin, mobileOpen, onClose }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(true);
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -64,16 +66,16 @@ export default function Sidebar({ isAdmin }) {
         <Menu />
       </IconButton>
       <Drawer
-        variant={open ? "permanent" : "temporary"}
-        open={open}
-        onClose={toggleDrawer}
+        variant={isMobile ? "temporary" : "permanent"}
+        open={isMobile ? mobileOpen : open}
+        onClose={isMobile ? onClose : toggleDrawer}
         sx={{
-          width: open ? drawerWidth : 0,
+          width: isMobile ? drawerWidth : (open ? drawerWidth : 0),
           flexShrink: 0,
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             boxSizing: 'border-box',
-            mt: 8,
+            mt: { xs: 6, sm: 7, md: 8 },
             background: isAdmin 
               ? theme.palette.mode === 'dark'
                 ? 'linear-gradient(180deg, #1e293b 0%, #0f172a 50%, #1e293b 100%)'

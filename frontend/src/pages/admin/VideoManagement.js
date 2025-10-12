@@ -232,7 +232,7 @@ export default function VideoManagement() {
     >
       <CardMedia
         sx={{
-          height: { xs: 160, sm: 180, md: 200 },
+          height: { xs: 120, sm: 140, md: 160 },
           position: 'relative',
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         }}
@@ -282,13 +282,13 @@ export default function VideoManagement() {
         />
       </CardMedia>
 
-      <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+      <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
         <Typography 
           variant="h6" 
           fontWeight="bold" 
           gutterBottom 
           noWrap
-          sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
+          sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}
         >
           {video.title}
         </Typography>
@@ -306,17 +306,17 @@ export default function VideoManagement() {
               variant="body2" 
               fontWeight="bold" 
               color="primary.main"
-              sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+              sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}
             >
               {video.pointsReward} pts
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Schedule sx={{ color: 'text.secondary', fontSize: { xs: 16, sm: 18 } }} />
+            <Schedule sx={{ color: 'text.secondary', fontSize: { xs: 14, sm: 16 } }} />
             <Typography 
               variant="body2" 
               color="text.secondary"
-              sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+              sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}
             >
               {video.minimumWatchTime}s min
             </Typography>
@@ -343,7 +343,7 @@ export default function VideoManagement() {
               <Typography 
                 variant="body2" 
                 fontWeight="medium"
-                sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+                sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}
               >
                 {video.isActive ? 'Active Quest' : 'Quest Paused'}
               </Typography>
@@ -361,12 +361,12 @@ export default function VideoManagement() {
             <IconButton
               size="small"
               onClick={() => window.open(video.youtubeUrl, '_blank')}
-              sx={{
+                sx={{
                 bgcolor: 'primary.light',
                 color: 'primary.contrastText',
                 '&:hover': { bgcolor: 'primary.main' },
-                width: { xs: 28, sm: 32 },
-                height: { xs: 28, sm: 32 }
+                width: { xs: 24, sm: 28 },
+                height: { xs: 24, sm: 28 }
               }}
             >
               <Visibility fontSize={isMobile ? 'inherit' : 'small'} />
@@ -380,8 +380,8 @@ export default function VideoManagement() {
                 bgcolor: 'warning.light',
                 color: 'warning.contrastText',
                 '&:hover': { bgcolor: 'warning.main' },
-                width: { xs: 28, sm: 32 },
-                height: { xs: 28, sm: 32 }
+                width: { xs: 24, sm: 28 },
+                height: { xs: 24, sm: 28 }
               }}
             >
               <EditIcon fontSize={isMobile ? 'inherit' : 'small'} />
@@ -398,8 +398,8 @@ export default function VideoManagement() {
                 bgcolor: 'info.light',
                 color: 'info.contrastText',
                 '&:hover': { bgcolor: 'info.main' },
-                width: { xs: 28, sm: 32 },
-                height: { xs: 28, sm: 32 }
+                width: { xs: 24, sm: 28 },
+                height: { xs: 24, sm: 28 }
               }}
             >
               <Share fontSize={isMobile ? 'inherit' : 'small'} />
@@ -413,8 +413,8 @@ export default function VideoManagement() {
                 bgcolor: 'error.light',
                 color: 'error.contrastText',
                 '&:hover': { bgcolor: 'error.main' },
-                width: { xs: 28, sm: 32 },
-                height: { xs: 28, sm: 32 }
+                width: { xs: 24, sm: 28 },
+                height: { xs: 24, sm: 28 }
               }}
             >
               <DeleteIcon fontSize={isMobile ? 'inherit' : 'small'} />
@@ -426,20 +426,27 @@ export default function VideoManagement() {
   );
 
   return (
-    <Container maxWidth="xl" sx={{ px: { xs: 1, sm: 2, md: 3 }, py: { xs: 1, sm: 2, md: 4 } }}>
-      {/* Modern Header */}
-      <Box 
-        sx={{ 
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          borderRadius: { xs: 2, sm: 3, md: 4 },
-          p: { xs: 2, sm: 3, md: 4 },
-          mb: { xs: 2, sm: 3, md: 4 },
-          color: 'white',
-          position: 'relative',
-          overflow: 'hidden',
-          boxShadow: '0 20px 40px rgba(102, 126, 234, 0.3)',
-        }}
-      >
+    <Box sx={{ 
+      width: '100%',
+      overflowX: 'auto',
+      minWidth: 0,
+      px: { xs: 1, sm: 2, md: 3 },
+      py: { xs: 1, sm: 2, md: 3 }
+    }}>
+        {/* Modern Header */}
+        <Box 
+          sx={{ 
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            borderRadius: { xs: 1, sm: 2, md: 3 },
+            p: { xs: 1.5, sm: 2, md: 3 },
+            mb: { xs: 1.5, sm: 2, md: 3 },
+            color: 'white',
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: '0 10px 20px rgba(102, 126, 234, 0.3)',
+            width: '100%'
+          }}
+        >
         <Box sx={{ position: 'relative', zIndex: 1 }}>
           <Box sx={{ 
             display: 'flex', 
@@ -455,7 +462,7 @@ export default function VideoManagement() {
                 fontWeight={800} 
                 gutterBottom
                 sx={{ 
-                  fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem', lg: '3rem' },
+                  fontSize: { xs: '1.25rem', sm: '1.5rem', md: '2rem', lg: '2.5rem' },
                   lineHeight: { xs: 1.2, sm: 1.3 }
                 }}
               >
@@ -465,7 +472,7 @@ export default function VideoManagement() {
                 variant="h6" 
                 sx={{ 
                   opacity: 0.9,
-                  fontSize: { xs: '0.875rem', sm: '1rem', md: '1.25rem' },
+                  fontSize: { xs: '0.75rem', sm: '0.875rem', md: '1rem' },
                   lineHeight: { xs: 1.3, sm: 1.4 }
                 }}
               >
@@ -491,8 +498,8 @@ export default function VideoManagement() {
                   color: 'white',
                   backdropFilter: 'blur(10px)',
                   border: '1px solid rgba(255,255,255,0.3)',
-                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                  py: { xs: 1, sm: 1.5 },
+                  fontSize: { xs: '0.7rem', sm: '0.8rem' },
+                  py: { xs: 0.8, sm: 1.2 },
                   minWidth: { xs: 'auto', sm: 'fit-content' },
                   '&:hover': { 
                     bgcolor: 'rgba(255,255,255,0.3)',
@@ -505,20 +512,21 @@ export default function VideoManagement() {
             </Box>
           </Box>
         </Box>
-      </Box>
+        </Box>
 
-      {/* Search and Controls */}
-      <Paper
-        sx={{
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(247,247,247,0.9) 100%)',
-          backdropFilter: 'blur(20px)',
-          borderRadius: { xs: 2, sm: 3, md: 4 },
-          p: { xs: 1.5, sm: 2, md: 3 },
-          mb: { xs: 2, sm: 3 },
-          boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-          border: '1px solid rgba(255,255,255,0.2)',
-        }}
-      >
+        {/* Search and Controls */}
+        <Paper
+          sx={{
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(247,247,247,0.9) 100%)',
+            backdropFilter: 'blur(20px)',
+            borderRadius: { xs: 1, sm: 2, md: 3 },
+            p: { xs: 1, sm: 1.5, md: 2 },
+            mb: { xs: 1.5, sm: 2 },
+            boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+            border: '1px solid rgba(255,255,255,0.2)',
+            width: '100%'
+          }}
+        >
         <Grid container spacing={{ xs: 1.5, sm: 2 }} alignItems="center">
           <Grid item xs={12} md={10}>
             <TextField
@@ -537,9 +545,9 @@ export default function VideoManagement() {
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  borderRadius: { xs: 2, sm: 3 },
+                  borderRadius: { xs: 1, sm: 2 },
                   bgcolor: 'rgba(255,255,255,0.8)',
-                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                  fontSize: { xs: '0.8rem', sm: '0.9rem' },
                   '&:hover fieldset': { borderColor: 'primary.main' },
                   '&.Mui-focused fieldset': { borderColor: 'primary.main' },
                 },
@@ -561,21 +569,22 @@ export default function VideoManagement() {
             </Box>
           </Grid>
         </Grid>
-      </Paper>
+        </Paper>
 
-      {/* Content Area */}
-      {filteredVideos.length === 0 && !loading ? (
-        <Paper
-          sx={{
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(247,247,247,0.9) 100%)',
-            backdropFilter: 'blur(20px)',
-            borderRadius: { xs: 2, sm: 3, md: 4 },
-            p: { xs: 2, sm: 3, md: 4 },
-            textAlign: 'center',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-            border: '1px solid rgba(255,255,255,0.2)',
-          }}
-        >
+        {/* Content Area */}
+        <Box sx={{ width: '100%' }}>
+          {filteredVideos.length === 0 && !loading ? (
+            <Paper
+              sx={{
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(247,247,247,0.9) 100%)',
+                backdropFilter: 'blur(20px)',
+                borderRadius: { xs: 2, sm: 3, md: 4 },
+                p: { xs: 2, sm: 3, md: 4 },
+                textAlign: 'center',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+                border: '1px solid rgba(255,255,255,0.2)',
+              }}
+            >
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: { xs: 1.5, sm: 2 } }}>
             <Avatar
               sx={{
@@ -630,25 +639,26 @@ export default function VideoManagement() {
                 {isMobile ? '🎬 Create Quest' : 'Create First Quest'}
               </Button>
             )}
-          </Box>
-        </Paper>
-      ) : (
-        <Box>
-          {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: { xs: 4, sm: 8 } }}>
-              <CircularProgress size={{ xs: 40, sm: 60 }} />
             </Box>
+            </Paper>
           ) : (
-            <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }}>
-              {filteredVideos.map((video) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={video._id}>
-                  {renderVideoCard(video)}
+            <Box>
+              {loading ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: { xs: 4, sm: 8 } }}>
+                  <CircularProgress size={{ xs: 40, sm: 60 }} />
+                </Box>
+              ) : (
+                <Grid container spacing={{ xs: 1, sm: 1.5, md: 2 }}>
+                  {filteredVideos.map((video) => (
+                    <Grid item xs={12} sm={6} md={4} lg={3} key={video._id}>
+                      {renderVideoCard(video)}
+                    </Grid>
+                  ))}
                 </Grid>
-              ))}
-            </Grid>
+              )}
+            </Box>
           )}
         </Box>
-      )}
 
       {/* Modern Quest Creation/Edit Dialog */}
       <Dialog 
@@ -873,6 +883,6 @@ export default function VideoManagement() {
           </Button>
         </DialogActions>
       </Dialog>
-    </Container>
+    </Box>
   );
 } 
