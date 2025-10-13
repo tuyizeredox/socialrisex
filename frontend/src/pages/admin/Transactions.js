@@ -549,31 +549,25 @@ export default function Transactions() {
           </Box>
         </Box>
 
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="caption" color="text.secondary">
-            Description
-          </Typography>
-          <Typography variant="body2">
-            {transaction.description || 'No description'}
-          </Typography>
-        </Box>
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
           <Button
             size="small"
             variant="outlined"
             startIcon={<Visibility />}
             onClick={() => openTransactionDetails(transaction)}
+            sx={{ flex: 1, minWidth: '120px' }}
           >
             View Details
           </Button>
           
           {transaction.status === 'pending' && (
-            <Stack direction="row" spacing={1}>
+            <Stack direction="row" spacing={1} sx={{ flex: 1, justifyContent: 'flex-end' }}>
               <IconButton
                 onClick={() => openProcessDialog(transaction, 'approved')}
                 sx={{ color: 'success.main' }}
                 size="small"
+                title="Approve"
               >
                 <CheckCircle />
               </IconButton>
@@ -581,6 +575,7 @@ export default function Transactions() {
                 onClick={() => openProcessDialog(transaction, 'rejected')}
                 sx={{ color: 'error.main' }}
                 size="small"
+                title="Reject"
               >
                 <Cancel />
               </IconButton>

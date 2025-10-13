@@ -126,7 +126,13 @@ export default function Dashboard() {
       
       if (statsRes.data?.data) {
         const data = statsRes.data.data;
-        const referralEarnings = data.earnings || 0;
+        
+        // Calculate referral earnings from breakdown (level1 + level2 + level3)
+        const referralBreakdown = data.referralBreakdown || { level1: 0, level2: 0, level3: 0 };
+        const referralEarnings = (referralBreakdown.level1 || 0) + 
+                                 (referralBreakdown.level2 || 0) + 
+                                 (referralBreakdown.level3 || 0);
+        
         const totalPoints = (data.points || 0) + referralEarnings;
         const currentLevel = calculateLevel(totalPoints);
         const nextLevelThreshold = calculateNextLevelXP(currentLevel);
@@ -138,7 +144,7 @@ export default function Dashboard() {
           photoShares: data.photoShares || 0,
           welcomeBonus: data.welcomeBonus || 3000,
           earnings: data.earnings || 0,
-          referralEarnings: referralEarnings || 0,
+          referralEarnings: referralEarnings,
           activeReferrals: data.activeReferrals || 0,
           referrals: data.referrals || 0,
           videosWatched: data.videosWatched || 0,
@@ -147,7 +153,7 @@ export default function Dashboard() {
           level1Count: data.level1Count || 0,
           level2Count: data.level2Count || 0,
           level3Count: data.level3Count || 0,
-          referralBreakdown: data.referralBreakdown || { level1: 0, level2: 0, level3: 0 }
+          referralBreakdown: referralBreakdown
         });
 
         // Update gamification states
@@ -236,16 +242,35 @@ export default function Dashboard() {
         
         <Box sx={{ position: 'relative', zIndex: 1 }}>
           {/* Level and Streak Info */}
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2, mb: 2 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            gap: 2, 
+            mb: 2,
+            animation: 'bounceIn 0.8s ease-out',
+            '@keyframes bounceIn': {
+              '0%': { opacity: 0, transform: 'scale(0.3)' },
+              '50%': { opacity: 1, transform: 'scale(1.05)' },
+              '70%': { transform: 'scale(0.9)' },
+              '100%': { transform: 'scale(1)' }
+            }
+          }}>
             <Chip
               icon={<Rocket />}
               label={`Level ${userLevel}`}
               sx={{
-                bgcolor: '#FFD700',
+                background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
                 color: '#000',
                 fontWeight: 'bold',
                 fontSize: '0.9rem',
                 px: 1,
+                boxShadow: '0 4px 15px rgba(255, 215, 0, 0.4)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'scale(1.1) rotate(-5deg)',
+                  boxShadow: '0 6px 20px rgba(255, 215, 0, 0.6)',
+                },
                 '& .MuiChip-icon': { color: '#000' }
               }}
             />
@@ -254,11 +279,21 @@ export default function Dashboard() {
                 icon={<LocalFireDepartment />}
                 label={`${dailyStreak} Day Streak`}
                 sx={{
-                  bgcolor: '#FF6F00',
+                  background: 'linear-gradient(135deg, #FF6F00 0%, #FF3D00 100%)',
                   color: 'white',
                   fontWeight: 'bold',
                   fontSize: '0.9rem',
                   px: 1,
+                  boxShadow: '0 4px 15px rgba(255, 111, 0, 0.4)',
+                  animation: 'pulse 2s infinite',
+                  '@keyframes pulse': {
+                    '0%, 100%': { transform: 'scale(1)' },
+                    '50%': { transform: 'scale(1.05)' }
+                  },
+                  '&:hover': {
+                    transform: 'scale(1.1)',
+                    boxShadow: '0 6px 20px rgba(255, 111, 0, 0.6)',
+                  }
                 }}
               />
             )}
@@ -274,6 +309,16 @@ export default function Dashboard() {
               mb: 2,
               border: '4px solid #FFD700',
               boxShadow: '0 10px 30px rgba(255, 215, 0, 0.3)',
+              animation: 'float 3s ease-in-out infinite',
+              '@keyframes float': {
+                '0%, 100%': { transform: 'translateY(0px)' },
+                '50%': { transform: 'translateY(-10px)' }
+              },
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: 'scale(1.1) rotate(5deg)',
+                boxShadow: '0 15px 40px rgba(255, 215, 0, 0.5)',
+              }
             }}
           />
           
@@ -294,11 +339,41 @@ export default function Dashboard() {
           </Typography>
 
           {/* XP Progress */}
-          <Box sx={{ mt: 3, mb: 3 }}>
-            <Typography variant="body2" color="text.secondary" gutterBottom>
+          <Box sx={{ 
+            mt: 3, 
+            mb: 3,
+            animation: 'fadeIn 1s ease-out',
+            '@keyframes fadeIn': {
+              from: { opacity: 0 },
+              to: { opacity: 1 }
+            }
+          }}>
+            <Typography 
+              variant="body2" 
+              color="text.secondary" 
+              gutterBottom
+              sx={{ fontWeight: 600 }}
+            >
               Experience Points: {experiencePoints.toLocaleString()} / {nextLevelXP.toLocaleString()}
             </Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              mb: 2,
+              position: 'relative',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+                background: 'radial-gradient(circle, rgba(76, 175, 80, 0.1) 0%, transparent 70%)',
+                animation: 'glow 2s ease-in-out infinite',
+              },
+              '@keyframes glow': {
+                '0%, 100%': { opacity: 0.5 },
+                '50%': { opacity: 1 }
+              }
+            }}>
               <ProgressRing
                 progress={experiencePoints}
                 max={nextLevelXP}
@@ -332,16 +407,18 @@ export default function Dashboard() {
               size="large"
               startIcon={<PlayCircle />}
               sx={{
-                background: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
+                background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
                 borderRadius: 3,
                 px: 3,
                 py: 1.5,
                 fontWeight: 'bold',
                 fontSize: { xs: '0.9rem', sm: '1rem' },
-                boxShadow: '0 8px 20px rgba(76, 175, 80, 0.3)',
+                boxShadow: '0 8px 20px rgba(79, 172, 254, 0.4)',
+                transition: 'all 0.3s ease',
                 '&:hover': { 
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 12px 24px rgba(76, 175, 80, 0.4)',
+                  transform: 'translateY(-2px) scale(1.02)',
+                  boxShadow: '0 12px 28px rgba(79, 172, 254, 0.5)',
+                  background: 'linear-gradient(135deg, #00f2fe 0%, #4facfe 100%)',
                 }
               }}
               onClick={() => navigate('/app/videos')}
@@ -353,16 +430,18 @@ export default function Dashboard() {
               size="large"
               startIcon={<People />}
               sx={{
-                background: 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 borderRadius: 3,
                 px: 3,
                 py: 1.5,
                 fontWeight: 'bold',
                 fontSize: { xs: '0.9rem', sm: '1rem' },
-                boxShadow: '0 8px 20px rgba(33, 150, 243, 0.3)',
+                boxShadow: '0 8px 20px rgba(102, 126, 234, 0.4)',
+                transition: 'all 0.3s ease',
                 '&:hover': { 
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 12px 24px rgba(33, 150, 243, 0.4)',
+                  transform: 'translateY(-2px) scale(1.02)',
+                  boxShadow: '0 12px 28px rgba(102, 126, 234, 0.5)',
+                  background: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
                 }
               }}
               onClick={() => navigate('/app/referrals')}
@@ -378,17 +457,40 @@ export default function Dashboard() {
         severity="success" 
         sx={{ 
           mb: 3, 
-          background: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
           color: 'white', 
           fontWeight: 'bold',
           borderRadius: 3,
           fontSize: { xs: '0.85rem', sm: '0.875rem' },
           backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255,255,255,0.2)',
-          boxShadow: '0 8px 32px rgba(76, 175, 80, 0.2)',
+          border: '1px solid rgba(255,255,255,0.3)',
+          boxShadow: '0 8px 32px rgba(102, 126, 234, 0.3)',
+          position: 'relative',
+          overflow: 'hidden',
+          animation: 'slideInDown 0.5s ease-out',
+          '@keyframes slideInDown': {
+            from: { opacity: 0, transform: 'translateY(-20px)' },
+            to: { opacity: 1, transform: 'translateY(0)' }
+          },
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: '-100%',
+            width: '100%',
+            height: '100%',
+            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+            animation: 'shimmer 3s infinite',
+          },
+          '@keyframes shimmer': {
+            '0%': { left: '-100%' },
+            '100%': { left: '100%' }
+          },
           '& .MuiAlert-icon': { color: 'white' },
           '& .MuiAlert-message': {
-            padding: { xs: '8px 0', sm: '12px 0' }
+            padding: { xs: '8px 0', sm: '12px 0' },
+            position: 'relative',
+            zIndex: 1
           }
         }}
       >
@@ -398,58 +500,98 @@ export default function Dashboard() {
       {/* Modern Gamified Stats Cards */}
       <Grid container spacing={{ xs: 2, sm: 3 }}>
         <Grid item xs={12} sm={6} lg={3}>
-          <GamificationCard
-            title="Total Earnings"
-            value={`RWF ${(stats.videoPoints + stats.photoPoints + stats.referralEarnings + stats.welcomeBonus).toLocaleString()}`}
-            subtitle={`Videos + Photos + Team + Welcome bonus`}
-            icon={MonetizationOn}
-            gradient="linear-gradient(135deg, #FF6B6B 0%, #FF8E53 30%, #FF6B9D 70%, #C44569 100%)"
-            glowing={stats.points >= 10000}
-            level={userLevel}
-            achievements={stats.points >= 10000 ? ['High Roller'] : []}
-          />
+          <Box
+            sx={{
+              animation: 'fadeInUp 0.6s ease-out',
+              '@keyframes fadeInUp': {
+                from: { opacity: 0, transform: 'translateY(20px)' },
+                to: { opacity: 1, transform: 'translateY(0)' }
+              }
+            }}
+          >
+            <GamificationCard
+              title="Total Earnings"
+              value={`RWF ${(stats.videoPoints + stats.photoPoints + stats.referralEarnings + stats.welcomeBonus).toLocaleString()}`}
+              subtitle={`Videos + Photos + Team + Welcome bonus`}
+              icon={MonetizationOn}
+              gradient="linear-gradient(135deg, #FF6B6B 0%, #FF8E53 30%, #FF6B9D 70%, #C44569 100%)"
+              glowing={stats.points >= 10000}
+              level={userLevel}
+              achievements={stats.points >= 10000 ? ['High Roller'] : []}
+            />
+          </Box>
         </Grid>
         
         <Grid item xs={12} sm={6} lg={3}>
-          <GamificationCard
-            title="Network Income"
-            value={`RWF ${stats.referralEarnings.toLocaleString()}`}
-            subtitle={`From your network activities`}
-            progress={stats.referrals}
-            progressMax={100}
-            icon={TrendingUp}
-            gradient="linear-gradient(135deg, #667eea 0%, #764ba2 30%, #f093fb 70%, #f5576c 100%)"
-            glowing={stats.referralEarnings >= 50000}
-            achievements={stats.referralEarnings >= 50000 ? ['Network Master'] : stats.referralEarnings >= 10000 ? ['Network Builder'] : []}
-          />
+          <Box
+            sx={{
+              animation: 'fadeInUp 0.6s ease-out 0.1s backwards',
+              '@keyframes fadeInUp': {
+                from: { opacity: 0, transform: 'translateY(20px)' },
+                to: { opacity: 1, transform: 'translateY(0)' }
+              }
+            }}
+          >
+            <GamificationCard
+              title="Network Income"
+              value={`RWF ${stats.referralEarnings.toLocaleString()}`}
+              subtitle={`From ${stats.level1Count + stats.level2Count + stats.level3Count} team members`}
+              progress={stats.referrals}
+              progressMax={100}
+              icon={TrendingUp}
+              gradient="linear-gradient(135deg, #667eea 0%, #764ba2 30%, #f093fb 70%, #f5576c 100%)"
+              glowing={stats.referralEarnings >= 50000}
+              achievements={stats.referralEarnings >= 50000 ? ['Network Master'] : stats.referralEarnings >= 10000 ? ['Network Builder'] : []}
+            />
+          </Box>
         </Grid>
         
         <Grid item xs={12} sm={6} lg={3}>
-          <GamificationCard
-            title="Video Earnings"
-            value={`RWF ${stats.videoPoints.toLocaleString()}`}
-            subtitle={`From ${stats.videosWatched} videos`}
-            progress={stats.videosWatched}
-            progressMax={weeklyProgress.target}
-            icon={PlayCircle}
-            gradient="linear-gradient(135deg, #4facfe 0%, #00f2fe 30%, #43e97b 70%, #38f9d7 100%)"
-            streakCount={stats.videosWatched >= 10 ? 1 : null}
-            achievements={stats.videosWatched >= 10 ? ['Speed Demon'] : []}
-          />
+          <Box
+            sx={{
+              animation: 'fadeInUp 0.6s ease-out 0.2s backwards',
+              '@keyframes fadeInUp': {
+                from: { opacity: 0, transform: 'translateY(20px)' },
+                to: { opacity: 1, transform: 'translateY(0)' }
+              }
+            }}
+          >
+            <GamificationCard
+              title="Video Earnings"
+              value={`RWF ${stats.videoPoints.toLocaleString()}`}
+              subtitle={`From ${stats.videosWatched} videos`}
+              progress={stats.videosWatched}
+              progressMax={weeklyProgress.target}
+              icon={PlayCircle}
+              gradient="linear-gradient(135deg, #4facfe 0%, #00f2fe 30%, #43e97b 70%, #38f9d7 100%)"
+              streakCount={stats.videosWatched >= 10 ? 1 : null}
+              achievements={stats.videosWatched >= 10 ? ['Speed Demon'] : []}
+            />
+          </Box>
         </Grid>
         
         <Grid item xs={12} sm={6} lg={3}>
-          <GamificationCard
-            title="Photo Earnings"
-            value={`RWF ${stats.photoPoints.toLocaleString()}`}
-            subtitle={`From ${stats.photoShares} photo shares`}
-            progress={stats.photoShares}
-            progressMax={50}
-            icon={PhotoCamera}
-            gradient="linear-gradient(135deg, #fa709a 0%, #fee140 30%, #fa709a 70%, #ff6b6b 100%)"
-            badge={stats.photoShares >= 10 ? "Photo Master" : stats.photoShares >= 1 ? "Sharer" : null}
-            achievements={stats.photoShares >= 10 ? ['Photo Master'] : stats.photoShares >= 1 ? ['Sharer'] : []}
-          />
+          <Box
+            sx={{
+              animation: 'fadeInUp 0.6s ease-out 0.3s backwards',
+              '@keyframes fadeInUp': {
+                from: { opacity: 0, transform: 'translateY(20px)' },
+                to: { opacity: 1, transform: 'translateY(0)' }
+              }
+            }}
+          >
+            <GamificationCard
+              title="Photo Earnings"
+              value={`RWF ${stats.photoPoints.toLocaleString()}`}
+              subtitle={`From ${stats.photoShares} photo shares`}
+              progress={stats.photoShares}
+              progressMax={50}
+              icon={PhotoCamera}
+              gradient="linear-gradient(135deg, #fa709a 0%, #fee140 30%, #fa709a 70%, #ff6b6b 100%)"
+              badge={stats.photoShares >= 10 ? "Photo Master" : stats.photoShares >= 1 ? "Sharer" : null}
+              achievements={stats.photoShares >= 10 ? ['Photo Master'] : stats.photoShares >= 1 ? ['Sharer'] : []}
+            />
+          </Box>
         </Grid>
       </Grid>
 
@@ -459,15 +601,67 @@ export default function Dashboard() {
           mt: 4, 
           p: { xs: 2, sm: 3 }, 
           borderRadius: 3,
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.8) 100%)',
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(240,240,255,0.9) 100%)',
           backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255,255,255,0.2)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+          border: '1px solid rgba(255,255,255,0.3)',
+          boxShadow: '0 8px 32px rgba(102, 126, 234, 0.15)',
+          animation: 'fadeInUp 0.8s ease-out 0.4s backwards',
+          '@keyframes fadeInUp': {
+            from: { opacity: 0, transform: 'translateY(20px)' },
+            to: { opacity: 1, transform: 'translateY(0)' }
+          },
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '4px',
+            background: 'linear-gradient(90deg, #667eea, #764ba2, #f093fb, #667eea)',
+            backgroundSize: '200% 100%',
+            animation: 'gradientMove 3s linear infinite',
+          },
+          '@keyframes gradientMove': {
+            '0%': { backgroundPosition: '0% 0%' },
+            '100%': { backgroundPosition: '200% 0%' }
+          }
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          <EmojiEvents sx={{ color: '#FFD700', fontSize: 32, mr: 1 }} />
-          <Typography variant="h5" fontWeight="bold" color="text.primary">
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          mb: 2,
+          animation: 'slideInLeft 0.6s ease-out',
+          '@keyframes slideInLeft': {
+            from: { opacity: 0, transform: 'translateX(-20px)' },
+            to: { opacity: 1, transform: 'translateX(0)' }
+          }
+        }}>
+          <EmojiEvents 
+            sx={{ 
+              color: '#FFD700', 
+              fontSize: 32, 
+              mr: 1,
+              animation: 'rotate 3s ease-in-out infinite',
+              '@keyframes rotate': {
+                '0%, 100%': { transform: 'rotate(0deg)' },
+                '25%': { transform: 'rotate(-10deg)' },
+                '75%': { transform: 'rotate(10deg)' }
+              }
+            }} 
+          />
+          <Typography 
+            variant="h5" 
+            fontWeight="bold" 
+            sx={{
+              background: 'linear-gradient(45deg, #667eea, #764ba2)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
             Your Achievements
           </Typography>
         </Box>
@@ -494,10 +688,15 @@ export default function Dashboard() {
           textAlign: 'center',
           position: 'relative',
           overflow: 'hidden',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
           borderRadius: 4,
-          boxShadow: '0 20px 40px rgba(102, 126, 234, 0.3)',
-          border: '1px solid rgba(255,255,255,0.1)',
+          boxShadow: '0 20px 40px rgba(102, 126, 234, 0.4)',
+          border: '1px solid rgba(255,255,255,0.2)',
+          animation: 'fadeInUp 0.8s ease-out 0.5s backwards',
+          '@keyframes fadeInUp': {
+            from: { opacity: 0, transform: 'translateY(20px)' },
+            to: { opacity: 1, transform: 'translateY(0)' }
+          },
         }}
       >
         {/* Animated background effect */}
@@ -517,8 +716,52 @@ export default function Dashboard() {
           }}
         />
         
+        {/* Floating particles effect */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            '&::before, &::after': {
+              content: '""',
+              position: 'absolute',
+              width: '100px',
+              height: '100px',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
+              animation: 'float 6s ease-in-out infinite',
+            },
+            '&::before': {
+              top: '10%',
+              left: '10%',
+            },
+            '&::after': {
+              bottom: '10%',
+              right: '10%',
+              animationDelay: '3s',
+            },
+            '@keyframes float': {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-20px)' }
+            }
+          }}
+        />
+        
         <Box sx={{ position: 'relative', zIndex: 1 }}>
-          <Rocket sx={{ fontSize: 48, color: '#FFD700', mb: 2 }} />
+          <Rocket 
+            sx={{ 
+              fontSize: 48, 
+              color: '#FFD700', 
+              mb: 2,
+              animation: 'bounce 2s ease-in-out infinite',
+              '@keyframes bounce': {
+                '0%, 100%': { transform: 'translateY(0px)' },
+                '50%': { transform: 'translateY(-15px)' }
+              }
+            }} 
+          />
           <Typography 
             variant="h4" 
             fontWeight={800} 
@@ -542,10 +785,60 @@ export default function Dashboard() {
           </Typography>
           
           {/* Earnings breakdown chips */}
-          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mb: 3, flexWrap: 'wrap' }}>
-            <Chip label="L1: 4,000 RWF" sx={{ bgcolor: '#FFD700', color: '#000', fontWeight: 'bold' }} />
-            <Chip label="L2: 1,500 RWF" sx={{ bgcolor: '#C0C0C0', color: '#000', fontWeight: 'bold' }} />
-            <Chip label="L3: 900 RWF" sx={{ bgcolor: '#CD7F32', color: '#fff', fontWeight: 'bold' }} />
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            gap: 1, 
+            mb: 3, 
+            flexWrap: 'wrap',
+            animation: 'fadeIn 1s ease-out 0.6s backwards',
+            '@keyframes fadeIn': {
+              from: { opacity: 0 },
+              to: { opacity: 1 }
+            }
+          }}>
+            <Chip 
+              label="L1: 4,000 RWF" 
+              sx={{ 
+                background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)', 
+                color: '#000', 
+                fontWeight: 'bold',
+                boxShadow: '0 4px 15px rgba(255, 215, 0, 0.4)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'scale(1.1)',
+                  boxShadow: '0 6px 20px rgba(255, 215, 0, 0.6)',
+                }
+              }} 
+            />
+            <Chip 
+              label="L2: 1,500 RWF" 
+              sx={{ 
+                background: 'linear-gradient(135deg, #E8E8E8 0%, #C0C0C0 100%)', 
+                color: '#000', 
+                fontWeight: 'bold',
+                boxShadow: '0 4px 15px rgba(192, 192, 192, 0.4)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'scale(1.1)',
+                  boxShadow: '0 6px 20px rgba(192, 192, 192, 0.6)',
+                }
+              }} 
+            />
+            <Chip 
+              label="L3: 900 RWF" 
+              sx={{ 
+                background: 'linear-gradient(135deg, #CD7F32 0%, #B87333 100%)', 
+                color: '#fff', 
+                fontWeight: 'bold',
+                boxShadow: '0 4px 15px rgba(205, 127, 50, 0.4)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'scale(1.1)',
+                  boxShadow: '0 6px 20px rgba(205, 127, 50, 0.6)',
+                }
+              }} 
+            />
           </Box>
           
           <Button 
@@ -559,10 +852,18 @@ export default function Dashboard() {
               fontWeight: 'bold',
               borderRadius: 3,
               background: 'linear-gradient(135deg, #FF6F00 0%, #FF8F00 100%)',
-              boxShadow: '0 8px 20px rgba(255, 111, 0, 0.3)',
+              boxShadow: '0 8px 20px rgba(255, 111, 0, 0.4)',
               fontSize: { xs: '0.9rem', sm: '1rem' },
+              transition: 'all 0.3s ease',
+              animation: 'pulse 2s ease-in-out infinite',
+              '@keyframes pulse': {
+                '0%, 100%': { transform: 'scale(1)' },
+                '50%': { transform: 'scale(1.05)' }
+              },
               '&:hover': {
-                boxShadow: '0 12px 24px rgba(255, 111, 0, 0.4)',
+                boxShadow: '0 12px 28px rgba(255, 111, 0, 0.6)',
+                transform: 'translateY(-2px) scale(1.05)',
+                animation: 'none',
                 transform: 'translateY(-2px)'
               },
             }}

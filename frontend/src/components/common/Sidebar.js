@@ -19,8 +19,12 @@ import {
   AdminPanelSettings, 
   Menu,
   Receipt,
-  PhotoCamera,
   CloudUpload
+} from '@mui/icons-material';
+import { 
+  WhatsApp, 
+  Facebook, 
+  Instagram 
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
@@ -42,7 +46,9 @@ export default function Sidebar({ isAdmin, mobileOpen, onClose }) {
     { text: 'Dashboard', icon: <Dashboard />, path: '/app/dashboard' },
     { text: 'Videos', icon: <VideoLibrary />, path: '/app/videos' },
     { text: 'Team', icon: <People />, path: '/app/referrals' },
-    { text: 'Photo Share', icon: <PhotoCamera />, path: '/app/photo-share' },
+    { text: 'WhatsApp Share', icon: <WhatsApp />, path: '/app/whatsapp-share' },
+    { text: 'Facebook Share', icon: <Facebook />, path: '/app/facebook-share' },
+    { text: 'Instagram Share', icon: <Instagram />, path: '/app/instagram-share' },
     { text: 'Withdraw', icon: <AccountBalance />, path: '/app/withdraw' }
   ];
 

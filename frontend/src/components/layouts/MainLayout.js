@@ -29,10 +29,12 @@ import {
   Star,
   TrendingUp,
   Favorite,
-  PhotoCamera,
   SupportAgent,
   Share,
   ArrowForwardIos,
+  WhatsApp,
+  Facebook,
+  Instagram,
 } from '@mui/icons-material';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
@@ -68,7 +70,9 @@ const MainLayout = () => {
         { text: 'Dashboard', icon: <Dashboard />, path: '/app/dashboard' },
         { text: 'Videos', icon: <VideoLibrary />, path: '/app/videos' },
         { text: 'Team', icon: <People />, path: '/app/referrals' },
-        { text: 'Photo Share', icon: <PhotoCamera />, path: '/app/photo-share' },
+        { text: 'WhatsApp Share', icon: <WhatsApp />, path: '/app/whatsapp-share' },
+        { text: 'Facebook Share', icon: <Facebook />, path: '/app/facebook-share' },
+        { text: 'Instagram Share', icon: <Instagram />, path: '/app/instagram-share' },
         { text: 'Withdraw', icon: <AccountBalance />, path: '/app/withdraw' },
       ]
     : [];

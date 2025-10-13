@@ -16,7 +16,9 @@ import Activate from './pages/user/Activate';
 import Dashboard from './pages/user/Dashboard';
 import Videos from './pages/user/Videos';
 import Referrals from './pages/user/Referrals';
-import PhotoShare from './pages/user/PhotoShare';
+import WhatsAppShare from './pages/user/WhatsAppShare';
+import FacebookShare from './pages/user/FacebookShare';
+import InstagramShare from './pages/user/InstagramShare';
 import Withdraw from './pages/user/Withdraw';
 
 // Admin Pages
@@ -60,7 +62,9 @@ function App() {
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="videos" element={<Videos />} />
         <Route path="referrals" element={<Referrals />} />
-        <Route path="photo-share" element={<PhotoShare />} />
+        <Route path="whatsapp-share" element={<WhatsAppShare />} />
+        <Route path="facebook-share" element={<FacebookShare />} />
+        <Route path="instagram-share" element={<InstagramShare />} />
         <Route path="withdraw" element={<Withdraw />} />
         <Route path="activate" element={<Activate />} />
       </Route>

@@ -62,9 +62,9 @@ export const calculateMultilevelReferralEarnings = async (userId) => {
  */
 export const getUserReferralStructure = async (userId) => {
   try {
-    // Get all direct referrals with basic info
+    // Get all direct referrals with basic info including mobile number
     const directReferrals = await User.find({ referredBy: userId })
-      .select('fullName email isActive createdAt')
+      .select('fullName email mobileNumber isActive createdAt')
       .sort('-createdAt');
 
     const earnings = await calculateMultilevelReferralEarnings(userId);

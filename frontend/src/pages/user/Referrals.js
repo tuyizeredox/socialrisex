@@ -18,14 +18,22 @@ import {
   Alert,
   IconButton,
   Tooltip,
-  useTheme
+  useTheme,
+  Chip,
+  Divider,
+  TextField,
+  InputAdornment
 } from '@mui/material';
 import {
   ContentCopy,
   People,
   PersonAdd,
   MonetizationOn,
-  CheckCircle
+  CheckCircle,
+  WhatsApp,
+  Phone,
+  Search,
+  Clear
 } from '@mui/icons-material';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
@@ -39,6 +47,7 @@ export default function Referrals() {
   const [referralInfo, setReferralInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const { user } = useAuth();
   const { showNotification } = useNotification();
 
@@ -71,6 +80,38 @@ export default function Referrals() {
       navigator.clipboard.writeText(cleanLink);
       showNotification('Referral link copied to clipboard!', 'success');
     }
+  };
+
+  const openWhatsAppChat = (mobileNumber, name) => {
+    if (!mobileNumber) {
+      showNotification('Mobile number not available', 'error');
+      return;
+    }
+    
+    // Remove any non-digit characters from mobile number
+    const cleanPhone = mobileNumber.replace(/\D/g, '');
+    
+    // Create WhatsApp URL with optional pre-filled message
+    const message = encodeURIComponent(`Hi ${name}, I wanted to reach out to you from SocialRise X!`);
+    const whatsappUrl = `https://wa.me/${cleanPhone}?text=${message}`;
+    
+    // Open WhatsApp in a new window
+    window.open(whatsappUrl, '_blank');
+  };
+
+  // Filter referrals based on search query
+  const filteredReferrals = referralData?.referrals.filter((referral) => {
+    if (!searchQuery.trim()) return true;
+    
+    const query = searchQuery.toLowerCase();
+    const name = referral.fullName?.toLowerCase() || '';
+    const mobile = referral.mobileNumber?.toLowerCase() || '';
+    
+    return name.includes(query) || mobile.includes(query);
+  }) || [];
+
+  const clearSearch = () => {
+    setSearchQuery('');
   };
 
   if (loading) {
@@ -392,51 +433,298 @@ export default function Referrals() {
         </CardContent>
       </Card>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell align="center">Status</TableCell>
-              <TableCell align="right">Earnings Generated</TableCell>
-              <TableCell align="right">Joined Date</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {referralData?.referrals.map((referral) => (
-              <TableRow key={referral._id}>
-                <TableCell>{referral.fullName}</TableCell>
-                <TableCell align="center">
-                  {referral.isActive ? (
-                    <Tooltip title="Active - Generating 4,000 RWF (Level 1)">
-                      <CheckCircle color="success" />
-                    </Tooltip>
-                  ) : (
-                    <Typography variant="body2" color="text.secondary">
-                      Pending
-                    </Typography>
-                  )}
-                </TableCell>
-                <TableCell align="right">
-                  RWF {referral.isActive ? '4,000' : '0'}
-                </TableCell>
-                <TableCell align="right">
-                  {new Date(referral.createdAt).toLocaleDateString()}
-                </TableCell>
-              </TableRow>
-            ))}
-            {referralData?.referrals.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={4} align="center">
-                  <Typography variant="body2" color="text.secondary" py={3}>
-                    You haven't referred anyone yet
-                  </Typography>
-                </TableCell>
-              </TableRow>
+      {/* Search Bar */}
+      {referralData?.referrals.length > 0 && (
+        <Card sx={{ mb: 3, borderRadius: 2, boxShadow: 2 }}>
+          <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+            <TextField
+              fullWidth
+              placeholder="Search by name or mobile number..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search color="action" />
+                  </InputAdornment>
+                ),
+                endAdornment: searchQuery && (
+                  <InputAdornment position="end">
+                    <IconButton
+                      size="small"
+                      onClick={clearSearch}
+                      edge="end"
+                    >
+                      <Clear />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  '&:hover fieldset': {
+                    borderColor: 'primary.main',
+                  },
+                },
+              }}
+            />
+            {searchQuery && (
+              <Typography 
+                variant="body2" 
+                color="text.secondary" 
+                sx={{ mt: 1.5, ml: 0.5 }}
+              >
+                Found {filteredReferrals.length} result{filteredReferrals.length !== 1 ? 's' : ''}
+              </Typography>
             )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Referral List - Desktop View */}
+      <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+        <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 2 }}>
+          <Table>
+            <TableHead>
+              <TableRow sx={{ backgroundColor: 'rgba(0, 0, 0, 0.04)' }}>
+                <TableCell sx={{ fontWeight: 'bold', fontSize: '0.95rem' }}>Name & Contact</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '0.95rem' }}>Status</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '0.95rem' }}>Earnings Generated</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '0.95rem' }}>Joined Date</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '0.95rem' }}>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredReferrals.map((referral) => (
+                <TableRow 
+                  key={referral._id}
+                  sx={{ 
+                    '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.02)' },
+                    transition: 'background-color 0.2s'
+                  }}
+                >
+                  <TableCell>
+                    <Box>
+                      <Typography variant="body2" fontWeight={600} gutterBottom>
+                        {referral.fullName}
+                      </Typography>
+                      <Box display="flex" alignItems="center" gap={0.5}>
+                        <Phone sx={{ fontSize: 14, color: 'text.secondary' }} />
+                        <Typography variant="caption" color="text.secondary">
+                          {referral.mobileNumber || 'N/A'}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </TableCell>
+                  <TableCell align="center">
+                    {referral.isActive ? (
+                      <Chip 
+                        label="Active" 
+                        color="success" 
+                        size="small"
+                        icon={<CheckCircle />}
+                        sx={{ fontWeight: 600 }}
+                      />
+                    ) : (
+                      <Chip 
+                        label="Inactive" 
+                        color="default" 
+                        size="small"
+                      />
+                    )}
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography 
+                      variant="body2" 
+                      fontWeight="bold" 
+                      color={referral.isActive ? 'success.main' : 'text.secondary'}
+                    >
+                      RWF {referral.isActive ? '4,000' : '0'}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography variant="body2">
+                      {new Date(referral.createdAt).toLocaleDateString()}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    {referral.mobileNumber ? (
+                      <Tooltip title="Chat on WhatsApp">
+                        <IconButton
+                          size="small"
+                          onClick={() => openWhatsAppChat(referral.mobileNumber, referral.fullName)}
+                          sx={{
+                            color: '#25D366',
+                            backgroundColor: 'rgba(37, 211, 102, 0.1)',
+                            '&:hover': {
+                              backgroundColor: 'rgba(37, 211, 102, 0.2)',
+                              transform: 'scale(1.1)'
+                            },
+                            transition: 'all 0.2s'
+                          }}
+                        >
+                          <WhatsApp />
+                        </IconButton>
+                      </Tooltip>
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">
+                        -
+                      </Typography>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+              {filteredReferrals.length === 0 && searchQuery && (
+                <TableRow>
+                  <TableCell colSpan={5} align="center">
+                    <Box py={6}>
+                      <Search sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
+                      <Typography variant="h6" color="text.secondary" gutterBottom>
+                        No results found
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Try searching with a different name or mobile number
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              )}
+              {referralData?.referrals.length === 0 && !searchQuery && (
+                <TableRow>
+                  <TableCell colSpan={5} align="center">
+                    <Box py={6}>
+                      <People sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
+                      <Typography variant="h6" color="text.secondary" gutterBottom>
+                        No referrals yet
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Share your referral link to start earning!
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+
+      {/* Referral List - Mobile View */}
+      <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+        {filteredReferrals.length === 0 && searchQuery ? (
+          <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 2 }}>
+            <Search sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              No results found
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Try searching with a different name or mobile number
+            </Typography>
+          </Paper>
+        ) : referralData?.referrals.length === 0 ? (
+          <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 2 }}>
+            <People sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              No referrals yet
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Share your referral link to start earning!
+            </Typography>
+          </Paper>
+        ) : (
+          <Grid container spacing={2}>
+            {filteredReferrals.map((referral) => (
+              <Grid item xs={12} key={referral._id}>
+                <Card 
+                  sx={{ 
+                    borderRadius: 2,
+                    boxShadow: 2,
+                    transition: 'all 0.3s',
+                    '&:hover': { 
+                      boxShadow: 4,
+                      transform: 'translateY(-4px)'
+                    }
+                  }}
+                >
+                  <CardContent>
+                    <Box display="flex" justifyContent="space-between" alignItems="start" mb={2}>
+                      <Box flex={1}>
+                        <Typography variant="h6" fontWeight="bold" gutterBottom>
+                          {referral.fullName}
+                        </Typography>
+                        <Box display="flex" alignItems="center" gap={0.5} mb={1}>
+                          <Phone sx={{ fontSize: 16, color: 'text.secondary' }} />
+                          <Typography variant="body2" color="text.secondary">
+                            {referral.mobileNumber || 'N/A'}
+                          </Typography>
+                        </Box>
+                      </Box>
+                      {referral.isActive ? (
+                        <Chip 
+                          label="Active" 
+                          color="success" 
+                          size="small"
+                          icon={<CheckCircle />}
+                          sx={{ fontWeight: 600 }}
+                        />
+                      ) : (
+                        <Chip label="Inactive" color="default" size="small" />
+                      )}
+                    </Box>
+
+                    <Divider sx={{ my: 2 }} />
+
+                    <Grid container spacing={2} sx={{ mb: 2 }}>
+                      <Grid item xs={6}>
+                        <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                          💰 Earnings Generated
+                        </Typography>
+                        <Typography 
+                          variant="h6" 
+                          fontWeight="bold" 
+                          color={referral.isActive ? 'success.main' : 'text.secondary'}
+                        >
+                          RWF {referral.isActive ? '4,000' : '0'}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+                          📅 Joined Date
+                        </Typography>
+                        <Typography variant="body2" fontWeight={600}>
+                          {new Date(referral.createdAt).toLocaleDateString()}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+
+                    {referral.mobileNumber && (
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        startIcon={<WhatsApp />}
+                        onClick={() => openWhatsAppChat(referral.mobileNumber, referral.fullName)}
+                        sx={{
+                          background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
+                          fontWeight: 600,
+                          py: 1.2,
+                          '&:hover': {
+                            background: 'linear-gradient(135deg, #128C7E 0%, #25D366 100%)',
+                            transform: 'scale(1.02)'
+                          },
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        Chat on WhatsApp
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
+      </Box>
     </Container>
   );
 }
