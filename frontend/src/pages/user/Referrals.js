@@ -48,6 +48,7 @@ export default function Referrals() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedLevel, setSelectedLevel] = useState('all'); // 'all', 'level1', 'level2', 'level3'
   const { user } = useAuth();
   const { showNotification } = useNotification();
 
@@ -99,8 +100,15 @@ export default function Referrals() {
     window.open(whatsappUrl, '_blank');
   };
 
-  // Filter referrals based on search query
+  // Filter referrals based on search query and selected level
   const filteredReferrals = referralData?.referrals.filter((referral) => {
+    // Filter by level
+    if (selectedLevel !== 'all') {
+      const levelMap = { level1: 1, level2: 2, level3: 3 };
+      if (referral.level !== levelMap[selectedLevel]) return false;
+    }
+    
+    // Filter by search query
     if (!searchQuery.trim()) return true;
     
     const query = searchQuery.toLowerCase();
@@ -433,7 +441,7 @@ export default function Referrals() {
         </CardContent>
       </Card>
 
-      {/* Search Bar */}
+      {/* Search and Filter Bar */}
       {referralData?.referrals.length > 0 && (
         <Card sx={{ mb: 3, borderRadius: 2, boxShadow: 2 }}>
           <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
@@ -469,13 +477,54 @@ export default function Referrals() {
                 },
               }}
             />
-            {searchQuery && (
+            
+            {/* Level Filter Buttons */}
+            <Box sx={{ mt: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              <Button
+                variant={selectedLevel === 'all' ? 'contained' : 'outlined'}
+                size="small"
+                onClick={() => setSelectedLevel('all')}
+                sx={{ borderRadius: 2 }}
+              >
+                All Levels ({referralData?.referrals.length || 0})
+              </Button>
+              <Button
+                variant={selectedLevel === 'level1' ? 'contained' : 'outlined'}
+                size="small"
+                onClick={() => setSelectedLevel('level1')}
+                color="success"
+                sx={{ borderRadius: 2 }}
+              >
+                Level 1 ({referralData?.level1Referrals?.length || 0})
+              </Button>
+              <Button
+                variant={selectedLevel === 'level2' ? 'contained' : 'outlined'}
+                size="small"
+                onClick={() => setSelectedLevel('level2')}
+                color="warning"
+                sx={{ borderRadius: 2 }}
+              >
+                Level 2 ({referralData?.level2Referrals?.length || 0})
+              </Button>
+              <Button
+                variant={selectedLevel === 'level3' ? 'contained' : 'outlined'}
+                size="small"
+                onClick={() => setSelectedLevel('level3')}
+                color="info"
+                sx={{ borderRadius: 2 }}
+              >
+                Level 3 ({referralData?.level3Referrals?.length || 0})
+              </Button>
+            </Box>
+            
+            {(searchQuery || selectedLevel !== 'all') && (
               <Typography 
                 variant="body2" 
                 color="text.secondary" 
                 sx={{ mt: 1.5, ml: 0.5 }}
               >
                 Found {filteredReferrals.length} result{filteredReferrals.length !== 1 ? 's' : ''}
+                {selectedLevel !== 'all' && ` in Level ${selectedLevel.replace('level', '')}`}
               </Typography>
             )}
           </CardContent>
@@ -489,6 +538,7 @@ export default function Referrals() {
             <TableHead>
               <TableRow sx={{ backgroundColor: 'rgba(0, 0, 0, 0.04)' }}>
                 <TableCell sx={{ fontWeight: 'bold', fontSize: '0.95rem' }}>Name & Contact</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '0.95rem' }}>Level</TableCell>
                 <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '0.95rem' }}>Status</TableCell>
                 <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '0.95rem' }}>Earnings Generated</TableCell>
                 <TableCell align="center" sx={{ fontWeight: 'bold', fontSize: '0.95rem' }}>Joined Date</TableCell>
@@ -518,6 +568,17 @@ export default function Referrals() {
                     </Box>
                   </TableCell>
                   <TableCell align="center">
+                    <Chip 
+                      label={`Level ${referral.level}`}
+                      color={
+                        referral.level === 1 ? 'success' : 
+                        referral.level === 2 ? 'warning' : 'info'
+                      }
+                      size="small"
+                      sx={{ fontWeight: 600 }}
+                    />
+                  </TableCell>
+                  <TableCell align="center">
                     {referral.isActive ? (
                       <Chip 
                         label="Active" 
@@ -540,7 +601,7 @@ export default function Referrals() {
                       fontWeight="bold" 
                       color={referral.isActive ? 'success.main' : 'text.secondary'}
                     >
-                      RWF {referral.isActive ? '4,000' : '0'}
+                      RWF {referral.earnings?.toLocaleString() || '0'}
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
@@ -575,24 +636,27 @@ export default function Referrals() {
                   </TableCell>
                 </TableRow>
               ))}
-              {filteredReferrals.length === 0 && searchQuery && (
+              {filteredReferrals.length === 0 && (searchQuery || selectedLevel !== 'all') && (
                 <TableRow>
-                  <TableCell colSpan={5} align="center">
+                  <TableCell colSpan={6} align="center">
                     <Box py={6}>
                       <Search sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
                       <Typography variant="h6" color="text.secondary" gutterBottom>
                         No results found
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        Try searching with a different name or mobile number
+                        {selectedLevel !== 'all' 
+                          ? `No referrals found in Level ${selectedLevel.replace('level', '')}`
+                          : 'Try searching with a different name or mobile number'
+                        }
                       </Typography>
                     </Box>
                   </TableCell>
                 </TableRow>
               )}
-              {referralData?.referrals.length === 0 && !searchQuery && (
+              {referralData?.referrals.length === 0 && !searchQuery && selectedLevel === 'all' && (
                 <TableRow>
-                  <TableCell colSpan={5} align="center">
+                  <TableCell colSpan={6} align="center">
                     <Box py={6}>
                       <People sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
                       <Typography variant="h6" color="text.secondary" gutterBottom>
@@ -612,17 +676,20 @@ export default function Referrals() {
 
       {/* Referral List - Mobile View */}
       <Box sx={{ display: { xs: 'block', md: 'none' } }}>
-        {filteredReferrals.length === 0 && searchQuery ? (
+        {filteredReferrals.length === 0 && (searchQuery || selectedLevel !== 'all') ? (
           <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 2 }}>
             <Search sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
             <Typography variant="h6" color="text.secondary" gutterBottom>
               No results found
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Try searching with a different name or mobile number
+              {selectedLevel !== 'all' 
+                ? `No referrals found in Level ${selectedLevel.replace('level', '')}`
+                : 'Try searching with a different name or mobile number'
+              }
             </Typography>
           </Paper>
-        ) : referralData?.referrals.length === 0 ? (
+        ) : referralData?.referrals.length === 0 && selectedLevel === 'all' ? (
           <Paper sx={{ p: 4, textAlign: 'center', borderRadius: 2 }}>
             <People sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
             <Typography variant="h6" color="text.secondary" gutterBottom>
@@ -660,17 +727,28 @@ export default function Referrals() {
                           </Typography>
                         </Box>
                       </Box>
-                      {referral.isActive ? (
+                      <Box display="flex" flexDirection="column" gap={1} alignItems="end">
                         <Chip 
-                          label="Active" 
-                          color="success" 
+                          label={`Level ${referral.level}`}
+                          color={
+                            referral.level === 1 ? 'success' : 
+                            referral.level === 2 ? 'warning' : 'info'
+                          }
                           size="small"
-                          icon={<CheckCircle />}
                           sx={{ fontWeight: 600 }}
                         />
-                      ) : (
-                        <Chip label="Inactive" color="default" size="small" />
-                      )}
+                        {referral.isActive ? (
+                          <Chip 
+                            label="Active" 
+                            color="success" 
+                            size="small"
+                            icon={<CheckCircle />}
+                            sx={{ fontWeight: 600 }}
+                          />
+                        ) : (
+                          <Chip label="Inactive" color="default" size="small" />
+                        )}
+                      </Box>
                     </Box>
 
                     <Divider sx={{ my: 2 }} />
@@ -685,7 +763,7 @@ export default function Referrals() {
                           fontWeight="bold" 
                           color={referral.isActive ? 'success.main' : 'text.secondary'}
                         >
-                          RWF {referral.isActive ? '4,000' : '0'}
+                          RWF {referral.earnings?.toLocaleString() || '0'}
                         </Typography>
                       </Grid>
                       <Grid item xs={6}>

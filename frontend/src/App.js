@@ -29,6 +29,7 @@ import PhotoManagement from './pages/admin/PhotoManagement';
 import WithdrawalManagement from './pages/admin/WithdrawalManagement';
 import Transactions from './pages/admin/Transactions';
 import Leaderboard from './pages/admin/Leaderboard';
+import MultilevelEarnings from './pages/admin/MultilevelEarnings';
 
 
 
@@ -80,6 +81,7 @@ function App() {
         <Route path="videos" element={<VideoManagement />} />
         <Route path="photos" element={<PhotoManagement />} />
         <Route path="transactions" element={<Transactions />} />
+        <Route path="multilevel-earnings" element={<MultilevelEarnings />} />
         <Route path="withdrawals" element={<WithdrawalManagement />} />
         <Route path="leaderboard" element={<Leaderboard />} />
       </Route>

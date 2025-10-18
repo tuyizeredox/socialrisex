@@ -82,4 +82,10 @@ router.delete('/admin/photos/:id', photoController.deletePhoto);
 router.patch('/admin/photos/:id/toggle-status', photoController.togglePhotoStatus);
 router.get('/admin/photo-stats', photoController.getPhotoStats);
 
+// Admin multilevel earnings routes
+router.get('/admin/multilevel-earnings', adminController.getMultilevelEarnings);
+router.get('/admin/multilevel-earnings/stats', adminController.getMultilevelEarningsStats);
+router.put('/admin/multilevel-earnings/:userId', adminController.updateUserMultilevelEarnings);
+router.post('/admin/multilevel-earnings/recalculate', adminController.recalculateAllMultilevelEarnings);
+
 export default router;

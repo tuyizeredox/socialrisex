@@ -16,7 +16,11 @@ import {
   exportTransactions,
   getLeaderboard,
   exportLeaderboard,
-  getReferrerDetails
+  getReferrerDetails,
+  getMultilevelEarnings,
+  updateUserMultilevelEarnings,
+  recalculateAllMultilevelEarnings,
+  getMultilevelEarningsStats
 } from '../controllers/admin.controller.js';
 import { protect } from '../middleware/auth.js';
 
@@ -53,5 +57,11 @@ router.put('/transactions/:id', processTransaction);
 router.get('/leaderboard', getLeaderboard);
 router.get('/leaderboard/export', exportLeaderboard);
 router.get('/referrers/:userId', getReferrerDetails);
+
+// Multilevel Earnings Management
+router.get('/multilevel-earnings', getMultilevelEarnings);
+router.get('/multilevel-earnings/stats', getMultilevelEarningsStats);
+router.put('/multilevel-earnings/:userId', updateUserMultilevelEarnings);
+router.post('/multilevel-earnings/recalculate', recalculateAllMultilevelEarnings);
 
 export default router; 

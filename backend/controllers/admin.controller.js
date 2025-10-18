@@ -2,8 +2,13 @@ import User from '../models/User.js';
 import Video from '../models/Video.js';
 import Withdrawal from '../models/Withdrawal.js';
 import Transaction from '../models/Transaction.js';
+import MultilevelEarnings from '../models/MultilevelEarnings.js';
 import ErrorResponse from '../utils/errorResponse.js';
-import { calculateMultilevelReferralEarnings } from '../utils/referralCalculations.js';
+import { 
+  calculateMultilevelReferralEarnings,
+  updateMultilevelEarnings,
+  getAllMultilevelEarnings
+} from '../utils/referralCalculations.js';
 
 // Dashboard Stats
 export const getStats = async (req, res, next) => {
@@ -538,8 +543,19 @@ export const processTransaction = async (req, res, next) => {
           referrer.referralCount += 1;
           await referrer.save();
           
-          // Note: Multilevel earnings are now calculated dynamically in real-time
-          // No need to store static earnings anymore as they depend on the full tree
+          // Update multilevel earnings for the referrer and their upline
+          await updateMultilevelEarnings(user.referredBy);
+          
+          // Also update multilevel earnings for the referrer's referrer (level 2)
+          if (referrer.referredBy) {
+            await updateMultilevelEarnings(referrer.referredBy);
+            
+            // And the referrer's referrer's referrer (level 3)
+            const level2Referrer = await User.findById(referrer.referredBy);
+            if (level2Referrer && level2Referrer.referredBy) {
+              await updateMultilevelEarnings(level2Referrer.referredBy);
+            }
+          }
         }
       }
     }
@@ -1201,6 +1217,199 @@ export const getReferrerDetails = async (req, res, next) => {
     });
 
   } catch (error) {
+    next(error);
+  }
+};
+
+// Multilevel Earnings Management
+export const getMultilevelEarnings = async (req, res, next) => {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      search = '',
+      sortBy = 'totalEarnings',
+      sortOrder = 'desc',
+      minEarnings = 0,
+      maxEarnings = null
+    } = req.query;
+
+    // Check if multilevel earnings data exists
+    const earningsCount = await MultilevelEarnings.countDocuments();
+    
+    if (earningsCount === 0) {
+      // If no multilevel earnings data exists, return empty result with message
+      res.json({
+        success: true,
+        data: [],
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total: 0,
+          pages: 0
+        },
+        message: 'No multilevel earnings data found. Click "Recalculate All" to generate earnings data.'
+      });
+      return;
+    }
+
+    const options = {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      search,
+      sortBy,
+      sortOrder,
+      minEarnings: parseInt(minEarnings),
+      maxEarnings: maxEarnings ? parseInt(maxEarnings) : null
+    };
+
+    const result = await getAllMultilevelEarnings(options);
+
+    res.json({
+      success: true,
+      data: result.earnings,
+      pagination: result.pagination
+    });
+  } catch (error) {
+    console.error('Error fetching multilevel earnings:', error);
+    next(error);
+  }
+};
+
+export const updateUserMultilevelEarnings = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new ErrorResponse('User not found', 404);
+    }
+
+    const updatedEarnings = await updateMultilevelEarnings(userId);
+
+    res.json({
+      success: true,
+      message: 'Multilevel earnings updated successfully',
+      data: updatedEarnings
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const recalculateAllMultilevelEarnings = async (req, res, next) => {
+  try {
+    // Get all users who have referrals
+    const usersWithReferrals = await User.find({
+      referralCount: { $gt: 0 }
+    }).select('_id');
+
+    const results = [];
+    const errors = [];
+
+    // Process in batches to avoid overwhelming the database
+    const batchSize = 10;
+    for (let i = 0; i < usersWithReferrals.length; i += batchSize) {
+      const batch = usersWithReferrals.slice(i, i + batchSize);
+      
+      const batchPromises = batch.map(async (user) => {
+        try {
+          const updatedEarnings = await updateMultilevelEarnings(user._id);
+          return { userId: user._id, success: true, data: updatedEarnings };
+        } catch (error) {
+          console.error(`Error updating earnings for user ${user._id}:`, error);
+          return { userId: user._id, success: false, error: error.message };
+        }
+      });
+
+      const batchResults = await Promise.all(batchPromises);
+      results.push(...batchResults);
+    }
+
+    const successful = results.filter(r => r.success).length;
+    const failed = results.filter(r => !r.success).length;
+
+    res.json({
+      success: true,
+      message: `Multilevel earnings recalculation completed. ${successful} successful, ${failed} failed.`,
+      data: {
+        total: usersWithReferrals.length,
+        successful,
+        failed,
+        results: results.slice(0, 50) // Return first 50 results for preview
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMultilevelEarningsStats = async (req, res, next) => {
+  try {
+    console.log('getMultilevelEarningsStats called');
+    // Check if multilevel earnings data exists
+    const earningsCount = await MultilevelEarnings.countDocuments();
+    
+    let result = {
+      totalUsers: 0,
+      totalLevel1Earnings: 0,
+      totalLevel2Earnings: 0,
+      totalLevel3Earnings: 0,
+      totalEarnings: 0,
+      avgEarnings: 0,
+      maxEarnings: 0,
+      minEarnings: 0,
+      topEarners: []
+    };
+
+    if (earningsCount > 0) {
+      // Get overall multilevel earnings statistics from stored data
+      const pipeline = [
+        {
+          $group: {
+            _id: null,
+            totalUsers: { $sum: 1 },
+            totalLevel1Earnings: { $sum: '$level1.earnings' },
+            totalLevel2Earnings: { $sum: '$level2.earnings' },
+            totalLevel3Earnings: { $sum: '$level3.earnings' },
+            totalEarnings: { $sum: '$totalEarnings' },
+            avgEarnings: { $avg: '$totalEarnings' },
+            maxEarnings: { $max: '$totalEarnings' },
+            minEarnings: { $min: '$totalEarnings' }
+          }
+        }
+      ];
+
+      const stats = await MultilevelEarnings.aggregate(pipeline);
+      result = stats[0] || result;
+
+      // Get top earners
+      const topEarners = await MultilevelEarnings.find({ isActive: true })
+        .populate('user', 'fullName email')
+        .sort({ totalEarnings: -1 })
+        .limit(10)
+        .lean();
+
+      result.topEarners = topEarners;
+    } else {
+      // If no multilevel earnings data exists, calculate basic stats from users
+      const usersWithReferrals = await User.find({ referralCount: { $gt: 0 } })
+        .select('referralCount')
+        .lean();
+
+      result.totalUsers = usersWithReferrals.length;
+      result.totalEarnings = usersWithReferrals.reduce((sum, user) => sum + (user.referralCount * 4000), 0);
+      result.avgEarnings = result.totalUsers > 0 ? result.totalEarnings / result.totalUsers : 0;
+      result.maxEarnings = Math.max(...usersWithReferrals.map(u => u.referralCount * 4000), 0);
+      result.minEarnings = Math.min(...usersWithReferrals.map(u => u.referralCount * 4000), 0);
+    }
+
+    res.json({
+      success: true,
+      data: result
+    });
+  } catch (error) {
+    console.error('Error fetching multilevel earnings stats:', error);
     next(error);
   }
 };

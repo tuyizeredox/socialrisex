@@ -18,7 +18,7 @@ import Photo from '../models/Photo.js';
 
 import PhotoShare from '../models/PhotoShare.js';
 
-import { calculateMultilevelReferralEarnings, getUserReferralStructure } from '../utils/referralCalculations.js';
+import { calculateMultilevelReferralEarnings, getUserReferralStructure, getDetailedMultilevelStructure } from '../utils/referralCalculations.js';
 
 // Get user profile
 export const getProfile = async (req, res, next) => {
@@ -354,8 +354,8 @@ export const getStats = async (req, res, next) => {
 
 export const getReferrals = async (req, res, next) => {
   try {
-    // Get complete multilevel structure for stats
-    const multilevelData = await getUserReferralStructure(req.user._id);
+    // Get complete multilevel structure for stats including level 2 and 3
+    const multilevelData = await getDetailedMultilevelStructure(req.user._id);
     
     const stats = {
       total: multilevelData.stats.total,
@@ -363,13 +363,19 @@ export const getReferrals = async (req, res, next) => {
       level2Count: multilevelData.stats.level2Count,
       level3Count: multilevelData.stats.level3Count,
       active: multilevelData.stats.active,
+      level1Active: multilevelData.stats.level1Active,
+      level2Active: multilevelData.stats.level2Active,
+      level3Active: multilevelData.stats.level3Active,
       earnings: multilevelData.stats.earnings,
       breakdown: multilevelData.stats.breakdown
     };
 
     res.status(200).json({
       stats,
-      referrals: multilevelData.referrals
+      referrals: multilevelData.referrals,
+      level1Referrals: multilevelData.level1Referrals,
+      level2Referrals: multilevelData.level2Referrals,
+      level3Referrals: multilevelData.level3Referrals
     });
 
   } catch (error) {

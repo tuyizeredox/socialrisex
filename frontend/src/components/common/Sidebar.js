@@ -19,7 +19,8 @@ import {
   AdminPanelSettings, 
   Menu,
   Receipt,
-  CloudUpload
+  CloudUpload,
+  TrendingUp
 } from '@mui/icons-material';
 import { 
   WhatsApp, 
@@ -58,6 +59,7 @@ export default function Sidebar({ isAdmin, mobileOpen, onClose }) {
     { text: 'Videos', icon: <VideoLibrary />, path: '/admin/videos' },
     { text: 'Photo Upload', icon: <CloudUpload />, path: '/admin/photos' },
     { text: 'Transaction Approvals', icon: <Receipt />, path: '/admin/transactions' },
+    { text: 'Multilevel Earnings', icon: <TrendingUp />, path: '/admin/multilevel-earnings' },
     { text: 'Withdrawals', icon: <AccountBalance />, path: '/admin/withdrawals' }
   ];
 

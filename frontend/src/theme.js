@@ -125,8 +125,8 @@ export const getTheme = (mode) => createTheme({
           fontSize: '1rem',
           lineHeight: 1.6,
           overflowX: 'hidden',
-          '-webkit-font-smoothing': 'antialiased',
-          '-moz-osx-font-smoothing': 'grayscale',
+          WebkitFontSmoothing: 'antialiased',
+          MozOsxFontSmoothing: 'grayscale',
         },
         '*': {
           boxSizing: 'border-box',
