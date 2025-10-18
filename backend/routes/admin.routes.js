@@ -20,7 +20,12 @@ import {
   getMultilevelEarnings,
   updateUserMultilevelEarnings,
   recalculateAllMultilevelEarnings,
-  getMultilevelEarningsStats
+  getMultilevelEarningsStats,
+  getBonusTransactions,
+  addBonusToUser,
+  getBonusTransaction,
+  updateBonusTransaction,
+  getBonusStats
 } from '../controllers/admin.controller.js';
 import { protect } from '../middleware/auth.js';
 
@@ -63,5 +68,12 @@ router.get('/multilevel-earnings', getMultilevelEarnings);
 router.get('/multilevel-earnings/stats', getMultilevelEarningsStats);
 router.put('/multilevel-earnings/:userId', updateUserMultilevelEarnings);
 router.post('/multilevel-earnings/recalculate', recalculateAllMultilevelEarnings);
+
+// Bonus Management
+router.get('/bonus-transactions', getBonusTransactions);
+router.get('/bonus-transactions/stats', getBonusStats);
+router.post('/bonus-transactions', addBonusToUser);
+router.get('/bonus-transactions/:id', getBonusTransaction);
+router.put('/bonus-transactions/:id', updateBonusTransaction);
 
 export default router; 

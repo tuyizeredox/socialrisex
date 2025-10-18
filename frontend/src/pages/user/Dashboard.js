@@ -511,8 +511,8 @@ export default function Dashboard() {
           >
             <GamificationCard
               title="Total Earnings"
-              value={`RWF ${(stats.videoPoints + stats.photoPoints + stats.referralEarnings + stats.welcomeBonus).toLocaleString()}`}
-              subtitle={`Videos + Photos + Team + Welcome bonus`}
+              value={`RWF ${stats.earnings.toLocaleString()}`}
+              subtitle={`Videos + Photos + Team + Bonus + Welcome bonus`}
               icon={MonetizationOn}
               gradient="linear-gradient(135deg, #FF6B6B 0%, #FF8E53 30%, #FF6B9D 70%, #C44569 100%)"
               glowing={stats.points >= 10000}

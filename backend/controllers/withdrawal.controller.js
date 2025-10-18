@@ -100,19 +100,27 @@ export const getUserWithdrawals = async (req, res, next) => {
     const referralData = await calculateMultilevelReferralEarnings(req.user._id);
     const totalReferralEarnings = referralData.totalEarnings;
     
-    // Calculate available balance
+    // Include bonus earnings in total earnings (but NOT welcome bonus for withdrawal)
+    const welcomeBonus = 3000;
+    const totalEarnings = totalReferralEarnings + (user.bonusEarnings || 0);
+    const totalEarningsWithWelcome = totalEarnings + welcomeBonus; // For display only
+    
+    // Calculate available balance (without welcome bonus)
     const totalWithdrawn = withdrawnAmount[0]?.total || 0;
     const pendingWithdrawals = pendingAmount[0]?.total || 0;
-    const availableBalance = totalReferralEarnings - totalWithdrawn - pendingWithdrawals;
+    const availableBalance = totalEarnings - totalWithdrawn - pendingWithdrawals;
 
     res.status(200).json({
       success: true,
       data: {
         withdrawals,
-        totalReferralEarnings,
+        totalReferralEarnings: totalEarningsWithWelcome, // For display (includes welcome bonus)
         totalWithdrawn,
         pendingWithdrawals,
-        availableBalance
+        availableBalance, // Actual withdrawable amount (without welcome bonus)
+        bonusEarnings: user.bonusEarnings || 0,
+        welcomeBonus: welcomeBonus,
+        withdrawableEarnings: totalEarnings // Actual earnings that can be withdrawn
       }
     });
   } catch (error) {

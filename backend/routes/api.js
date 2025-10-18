@@ -34,6 +34,7 @@ router.get('/users/pending-activation', userController.checkPendingActivation);
 router.post('/users/activate', userController.activateAccount);
 router.post('/users/share-photo', userController.sharePhoto);
 router.get('/users/photo-shares', userController.getUserPhotoShares);
+router.get('/users/bonus-history', userController.getBonusHistory);
 
 // Video routes
 router.get('/videos', videoController.getVideos);
@@ -87,5 +88,12 @@ router.get('/admin/multilevel-earnings', adminController.getMultilevelEarnings);
 router.get('/admin/multilevel-earnings/stats', adminController.getMultilevelEarningsStats);
 router.put('/admin/multilevel-earnings/:userId', adminController.updateUserMultilevelEarnings);
 router.post('/admin/multilevel-earnings/recalculate', adminController.recalculateAllMultilevelEarnings);
+
+// Admin bonus management routes
+router.get('/admin/bonus-transactions', adminController.getBonusTransactions);
+router.get('/admin/bonus-transactions/stats', adminController.getBonusStats);
+router.post('/admin/bonus-transactions', adminController.addBonusToUser);
+router.get('/admin/bonus-transactions/:id', adminController.getBonusTransaction);
+router.put('/admin/bonus-transactions/:id', adminController.updateBonusTransaction);
 
 export default router;

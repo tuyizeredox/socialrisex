@@ -19,6 +19,7 @@ import Photo from '../models/Photo.js';
 import PhotoShare from '../models/PhotoShare.js';
 
 import { calculateMultilevelReferralEarnings, getUserReferralStructure, getDetailedMultilevelStructure } from '../utils/referralCalculations.js';
+import BonusTransaction from '../models/BonusTransaction.js';
 
 // Get user profile
 export const getProfile = async (req, res, next) => {
@@ -86,7 +87,7 @@ export const getUserStats = async (req, res, next) => {
     
     // Use actual user points from database (includes all earnings: video + photo + bonuses)
     const totalPoints = user.points || 0;
-    const totalEarnings = (user.earnings || 0) + multilevelData.totalEarnings;
+    const totalEarnings = (user.earnings || 0) + (user.bonusEarnings || 0) + multilevelData.totalEarnings + welcomeBonus;
 
     res.status(200).json({
       success: true,
@@ -506,6 +507,43 @@ export const getUserPhotoShares = async (req, res, next) => {
       data: shares
     });
   } catch (error) {
+    next(error);
+  }
+};
+
+// Get user bonus history
+export const getBonusHistory = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    
+    // Get bonus transactions for the user
+    const bonusTransactions = await BonusTransaction.find({ user: userId })
+      .populate('addedBy', 'fullName email')
+      .sort('-addedAt')
+      .limit(50);
+
+    // Create notification-style history
+    const bonusHistory = bonusTransactions.map(transaction => ({
+      id: transaction._id,
+      type: 'bonus',
+      title: `Bonus Added: ${transaction.type}`,
+      description: transaction.description || `Admin added RWF ${transaction.amount.toLocaleString()} bonus`,
+      amount: transaction.amount,
+      status: transaction.status,
+      createdAt: transaction.addedAt,
+      addedBy: transaction.addedBy?.fullName || 'Admin'
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: {
+        bonusHistory,
+        totalBonuses: bonusTransactions.length,
+        totalAmount: bonusTransactions.reduce((sum, t) => sum + t.amount, 0)
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching bonus history:', error);
     next(error);
   }
 };

@@ -68,6 +68,7 @@ const menuItems = [
     { text: 'Photo Upload', icon: <CloudUpload />, path: '/admin/photos' },
     { text: 'Transactions', icon: <AccountBalance />, path: '/admin/transactions' },
     { text: 'Multilevel Earnings', icon: <TrendingUp />, path: '/admin/multilevel-earnings' },
+    { text: 'Bonus Management', icon: <Star />, path: '/admin/bonus' },
     { text: 'Withdrawals', icon: <Payment />, path: '/admin/withdrawals' },
     { text: 'Leaderboard', icon: <EmojiEvents />, path: '/admin/leaderboard' }
   ];

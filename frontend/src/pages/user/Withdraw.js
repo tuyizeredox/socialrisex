@@ -45,7 +45,10 @@ export default function Withdraw() {
     totalReferralEarnings: 0,
     totalWithdrawn: 0,
     pendingWithdrawals: 0,
-    availableBalance: 0
+    availableBalance: 0,
+    bonusEarnings: 0,
+    welcomeBonus: 0,
+    withdrawableEarnings: 0
   });
   
   const { user } = useAuth();
@@ -72,7 +75,10 @@ export default function Withdraw() {
         totalReferralEarnings: data.totalReferralEarnings,
         totalWithdrawn: data.totalWithdrawn,
         pendingWithdrawals: data.pendingWithdrawals,
-        availableBalance: data.availableBalance
+        availableBalance: data.availableBalance,
+        bonusEarnings: data.bonusEarnings || 0,
+        welcomeBonus: data.welcomeBonus || 0,
+        withdrawableEarnings: data.withdrawableEarnings || 0
       });
       
       // Check if user has any previous withdrawals
@@ -162,15 +168,34 @@ export default function Withdraw() {
       <PageHeader title="Withdraw Earnings" />
       
       <Grid container spacing={{ xs: 2, sm: 3 }} mb={4}>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6} md={2}>
           <StatCard
-            title="Total Referral Earnings"
+            title="Total Earnings"
             value={`RWF ${balance.totalReferralEarnings.toLocaleString()}`}
             icon={MonetizationOn}
             color="success"
+            subtitle="All earnings (display only)"
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6} md={2}>
+          <StatCard
+            title="Withdrawable Earnings"
+            value={`RWF ${balance.withdrawableEarnings.toLocaleString()}`}
+            icon={MonetizationOn}
+            color="primary"
+            subtitle="Referral + Bonus only"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={2}>
+          <StatCard
+            title="Welcome Bonus"
+            value={`RWF ${balance.welcomeBonus.toLocaleString()}`}
+            icon={MonetizationOn}
+            color="info"
+            subtitle="Not withdrawable"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={2}>
           <StatCard
             title="Total Withdrawn"
             value={`RWF ${balance.totalWithdrawn.toLocaleString()}`}
@@ -178,20 +203,13 @@ export default function Withdraw() {
             color="info"
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Pending Withdrawals"
-            value={`RWF ${balance.pendingWithdrawals.toLocaleString()}`}
-            icon={MonetizationOn}
-            color="warning"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6} md={2}>
           <StatCard
             title="Available Balance"
             value={`RWF ${balance.availableBalance.toLocaleString()}`}
             icon={MonetizationOn}
             color="primary"
+            subtitle="Ready to withdraw"
           />
         </Grid>
       </Grid>
@@ -218,6 +236,20 @@ export default function Withdraw() {
             <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
               Minimum withdrawal: RWF 5,000
             </Typography>
+            
+            {(balance.bonusEarnings > 0 || balance.welcomeBonus > 0) && (
+              <Alert severity="info" sx={{ mt: 2 }}>
+                <Typography variant="body2">
+                  <strong>Earnings Breakdown:</strong>
+                  {balance.bonusEarnings > 0 && (
+                    <> Your withdrawable balance includes RWF {balance.bonusEarnings.toLocaleString()} in admin bonus earnings.</>
+                  )}
+                  {balance.welcomeBonus > 0 && (
+                    <> The welcome bonus of RWF {balance.welcomeBonus.toLocaleString()} is for display only and cannot be withdrawn.</>
+                  )}
+                </Typography>
+              </Alert>
+            )}
 
             {error && (
               <Alert severity="error" sx={{ mt: 2 }}>

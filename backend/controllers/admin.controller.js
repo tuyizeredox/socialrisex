@@ -3,6 +3,7 @@ import Video from '../models/Video.js';
 import Withdrawal from '../models/Withdrawal.js';
 import Transaction from '../models/Transaction.js';
 import MultilevelEarnings from '../models/MultilevelEarnings.js';
+import BonusTransaction from '../models/BonusTransaction.js';
 import ErrorResponse from '../utils/errorResponse.js';
 import { 
   calculateMultilevelReferralEarnings,
@@ -1410,6 +1411,242 @@ export const getMultilevelEarningsStats = async (req, res, next) => {
     });
   } catch (error) {
     console.error('Error fetching multilevel earnings stats:', error);
+    next(error);
+  }
+};
+
+// Bonus Management Functions
+
+// Get all bonus transactions with pagination and filtering
+export const getBonusTransactions = async (req, res, next) => {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      search = '',
+      type = '',
+      status = '',
+      sortBy = 'addedAt',
+      sortOrder = 'desc'
+    } = req.query;
+
+    const skip = (page - 1) * limit;
+    const query = {};
+
+    // Add search filter
+    if (search) {
+      query.$or = [
+        { description: { $regex: search, $options: 'i' } },
+        { notes: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    // Add type filter
+    if (type) {
+      query.type = type;
+    }
+
+    // Add status filter
+    if (status) {
+      query.status = status;
+    }
+
+    // Build sort object
+    const sort = {};
+    sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
+
+    const [bonusTransactions, total] = await Promise.all([
+      BonusTransaction.find(query)
+        .populate('user', 'fullName email mobileNumber')
+        .populate('addedBy', 'fullName email')
+        .sort(sort)
+        .skip(skip)
+        .limit(parseInt(limit)),
+      BonusTransaction.countDocuments(query)
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        bonusTransactions,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total,
+          pages: Math.ceil(total / limit)
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching bonus transactions:', error);
+    next(error);
+  }
+};
+
+// Add bonus to a user
+export const addBonusToUser = async (req, res, next) => {
+  try {
+    const { userId, amount, description, type = 'admin_bonus', notes = '' } = req.body;
+
+    // Validate required fields
+    if (!userId || !amount || !description) {
+      return next(new ErrorResponse('User ID, amount, and description are required', 400));
+    }
+
+    // Validate amount
+    if (amount <= 0) {
+      return next(new ErrorResponse('Amount must be greater than 0', 400));
+    }
+
+    // Check if user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return next(new ErrorResponse('User not found', 404));
+    }
+
+    // Create bonus transaction
+    const bonusTransaction = new BonusTransaction({
+      user: userId,
+      amount: parseInt(amount),
+      type,
+      description,
+      notes,
+      addedBy: req.user._id,
+      status: 'approved'
+    });
+
+    await bonusTransaction.save();
+
+    // Update user's bonus earnings
+    user.bonusEarnings += parseInt(amount);
+    await user.save();
+
+    // Populate the response
+    await bonusTransaction.populate([
+      { path: 'user', select: 'fullName email mobileNumber' },
+      { path: 'addedBy', select: 'fullName email' }
+    ]);
+
+    res.status(201).json({
+      success: true,
+      message: `Successfully added RWF ${amount.toLocaleString()} bonus to ${user.fullName}`,
+      data: bonusTransaction
+    });
+  } catch (error) {
+    console.error('Error adding bonus to user:', error);
+    next(error);
+  }
+};
+
+// Get bonus transaction by ID
+export const getBonusTransaction = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const bonusTransaction = await BonusTransaction.findById(id)
+      .populate('user', 'fullName email mobileNumber')
+      .populate('addedBy', 'fullName email');
+
+    if (!bonusTransaction) {
+      return next(new ErrorResponse('Bonus transaction not found', 404));
+    }
+
+    res.json({
+      success: true,
+      data: bonusTransaction
+    });
+  } catch (error) {
+    console.error('Error fetching bonus transaction:', error);
+    next(error);
+  }
+};
+
+// Update bonus transaction status
+export const updateBonusTransaction = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status, notes } = req.body;
+
+    const bonusTransaction = await BonusTransaction.findById(id);
+    if (!bonusTransaction) {
+      return next(new ErrorResponse('Bonus transaction not found', 404));
+    }
+
+    // If status is being changed to rejected, reverse the bonus
+    if (status === 'rejected' && bonusTransaction.status === 'approved') {
+      const user = await User.findById(bonusTransaction.user);
+      if (user) {
+        user.bonusEarnings = Math.max(0, user.bonusEarnings - bonusTransaction.amount);
+        await user.save();
+      }
+    }
+
+    // If status is being changed to approved, add the bonus
+    if (status === 'approved' && bonusTransaction.status === 'rejected') {
+      const user = await User.findById(bonusTransaction.user);
+      if (user) {
+        user.bonusEarnings += bonusTransaction.amount;
+        await user.save();
+      }
+    }
+
+    bonusTransaction.status = status;
+    if (notes) {
+      bonusTransaction.notes = notes;
+    }
+    bonusTransaction.processedAt = new Date();
+
+    await bonusTransaction.save();
+
+    res.json({
+      success: true,
+      message: 'Bonus transaction updated successfully',
+      data: bonusTransaction
+    });
+  } catch (error) {
+    console.error('Error updating bonus transaction:', error);
+    next(error);
+  }
+};
+
+// Get bonus statistics
+export const getBonusStats = async (req, res, next) => {
+  try {
+    const [
+      totalBonusGiven,
+      totalBonusTransactions,
+      pendingBonusTransactions,
+      bonusByType,
+      recentBonuses
+    ] = await Promise.all([
+      BonusTransaction.aggregate([
+        { $match: { status: 'approved' } },
+        { $group: { _id: null, total: { $sum: '$amount' } } }
+      ]),
+      BonusTransaction.countDocuments(),
+      BonusTransaction.countDocuments({ status: 'pending' }),
+      BonusTransaction.aggregate([
+        { $match: { status: 'approved' } },
+        { $group: { _id: '$type', total: { $sum: '$amount' }, count: { $sum: 1 } } }
+      ]),
+      BonusTransaction.find({ status: 'approved' })
+        .populate('user', 'fullName email')
+        .sort({ addedAt: -1 })
+        .limit(5)
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        totalBonusGiven: totalBonusGiven[0]?.total || 0,
+        totalBonusTransactions,
+        pendingBonusTransactions,
+        bonusByType,
+        recentBonuses
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching bonus stats:', error);
     next(error);
   }
 };

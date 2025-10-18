@@ -20,6 +20,7 @@ import WhatsAppShare from './pages/user/WhatsAppShare';
 import FacebookShare from './pages/user/FacebookShare';
 import InstagramShare from './pages/user/InstagramShare';
 import Withdraw from './pages/user/Withdraw';
+import Notifications from './pages/user/Notifications';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard';
@@ -30,6 +31,7 @@ import WithdrawalManagement from './pages/admin/WithdrawalManagement';
 import Transactions from './pages/admin/Transactions';
 import Leaderboard from './pages/admin/Leaderboard';
 import MultilevelEarnings from './pages/admin/MultilevelEarnings';
+import BonusManagement from './pages/admin/BonusManagement';
 
 
 
@@ -67,6 +69,7 @@ function App() {
         <Route path="facebook-share" element={<FacebookShare />} />
         <Route path="instagram-share" element={<InstagramShare />} />
         <Route path="withdraw" element={<Withdraw />} />
+        <Route path="notifications" element={<Notifications />} />
         <Route path="activate" element={<Activate />} />
       </Route>
 
@@ -82,6 +85,7 @@ function App() {
         <Route path="photos" element={<PhotoManagement />} />
         <Route path="transactions" element={<Transactions />} />
         <Route path="multilevel-earnings" element={<MultilevelEarnings />} />
+        <Route path="bonus" element={<BonusManagement />} />
         <Route path="withdrawals" element={<WithdrawalManagement />} />
         <Route path="leaderboard" element={<Leaderboard />} />
       </Route>
