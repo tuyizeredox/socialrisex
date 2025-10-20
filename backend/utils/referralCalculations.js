@@ -65,6 +65,11 @@ export const updateMultilevelEarnings = async (userId) => {
   try {
     const earningsData = await calculateMultilevelReferralEarnings(userId);
     
+    // Get existing earnings to calculate difference
+    const existingEarnings = await MultilevelEarnings.findOne({ user: userId });
+    const previousTotalEarnings = existingEarnings?.totalEarnings || 0;
+    const earningsDifference = earningsData.totalEarnings - previousTotalEarnings;
+    
     // Update or create multilevel earnings record
     const multilevelEarnings = await MultilevelEarnings.findOneAndUpdate(
       { user: userId },
@@ -87,10 +92,47 @@ export const updateMultilevelEarnings = async (userId) => {
         },
         totalEarnings: earningsData.totalEarnings,
         lastCalculated: new Date(),
-        isActive: true
+        isActive: true,
+        adminEdited: false,
+        editReason: ''
       },
       { upsert: true, new: true }
     );
+
+    // Update user's network income and withdrawal balance
+    if (earningsDifference !== 0) {
+      try {
+        const User = (await import('../models/User.js')).default;
+        const Withdrawal = (await import('../models/Withdrawal.js')).default;
+        
+        // Update user's network income
+        await User.findByIdAndUpdate(
+          userId,
+          {
+            $inc: {
+              networkIncome: earningsDifference,
+              totalEarnings: earningsDifference
+            }
+          }
+        );
+
+        // Update user's withdrawal balance
+        await Withdrawal.findOneAndUpdate(
+          { user: userId },
+          {
+            $inc: {
+              availableBalance: earningsDifference
+            }
+          },
+          { upsert: true }
+        );
+
+        console.log(`Updated user ${userId} network income by ${earningsDifference}`);
+      } catch (updateError) {
+        console.error('Error updating user network income:', updateError);
+        // Don't throw error here, just log it as the main operation succeeded
+      }
+    }
 
     return multilevelEarnings;
   } catch (error) {
@@ -100,7 +142,7 @@ export const updateMultilevelEarnings = async (userId) => {
 };
 
 /**
- * Get all multilevel earnings with pagination and filtering
+ * Get all multilevel earnings with pagination and filtering (optimized)
  * @param {Object} options - Query options
  * @returns {Promise<Object>} Paginated earnings data
  */
@@ -118,17 +160,20 @@ export const getAllMultilevelEarnings = async (options = {}) => {
 
     const skip = (page - 1) * limit;
     
-    // Build match criteria
+    // Build match criteria - include all users, even those with 0 earnings
     const matchCriteria = {
-      isActive: true,
-      totalEarnings: { $gte: minEarnings }
+      isActive: true
     };
 
-    if (maxEarnings !== null) {
-      matchCriteria.totalEarnings.$lte = maxEarnings;
+    // Only apply earnings filters if they're not the default values
+    if (minEarnings > 0 || maxEarnings !== null) {
+      matchCriteria.totalEarnings = { $gte: minEarnings };
+      if (maxEarnings !== null) {
+        matchCriteria.totalEarnings.$lte = maxEarnings;
+      }
     }
 
-    // Build aggregation pipeline
+    // Optimized aggregation pipeline with better performance
     const pipeline = [
       {
         $match: matchCriteria
@@ -138,7 +183,16 @@ export const getAllMultilevelEarnings = async (options = {}) => {
           from: 'users',
           localField: 'user',
           foreignField: '_id',
-          as: 'userInfo'
+          as: 'userInfo',
+          pipeline: [
+            {
+              $project: {
+                fullName: 1,
+                email: 1,
+                mobileNumber: 1
+              }
+            }
+          ]
         }
       },
       {
@@ -146,19 +200,20 @@ export const getAllMultilevelEarnings = async (options = {}) => {
       }
     ];
 
-    // Add search filter if provided
+    // Add search filter if provided (optimized with index)
     if (search) {
       pipeline.push({
         $match: {
           $or: [
             { 'userInfo.fullName': { $regex: search, $options: 'i' } },
-            { 'userInfo.email': { $regex: search, $options: 'i' } }
+            { 'userInfo.email': { $regex: search, $options: 'i' } },
+            { 'userInfo.mobileNumber': { $regex: search, $options: 'i' } }
           ]
         }
       });
     }
 
-    // Add sorting
+    // Add sorting (optimized with compound index)
     const sortCriteria = {};
     sortCriteria[sortBy] = sortOrder === 'desc' ? -1 : 1;
     pipeline.push({ $sort: sortCriteria });
@@ -169,14 +224,17 @@ export const getAllMultilevelEarnings = async (options = {}) => {
       { $limit: limit }
     );
 
-    // Execute aggregation
-    const earnings = await MultilevelEarnings.aggregate(pipeline);
+    // Execute aggregation with parallel execution
+    const [earnings, countResult] = await Promise.all([
+      MultilevelEarnings.aggregate(pipeline),
+      MultilevelEarnings.aggregate([
+        ...pipeline.slice(0, -2), // Remove skip and limit
+        { $count: 'total' }
+      ])
+    ]);
 
-    // Get total count for pagination
-    const countPipeline = pipeline.slice(0, -2); // Remove skip and limit
-    countPipeline.push({ $count: 'total' });
-    const countResult = await MultilevelEarnings.aggregate(countPipeline);
     const total = countResult[0]?.total || 0;
+
 
     return {
       earnings,

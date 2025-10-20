@@ -102,7 +102,7 @@ export default function Withdraw() {
     const amount = Number(formData.amount);
     
     // Skip balance check for first-time withdrawal
-    if (!isFirstWithdrawal && amount > balance.availableBalance) {
+    if (!isFirstWithdrawal && amount > (balance.availableBalance || 0)) {
       setError('Withdrawal amount cannot exceed your available balance');
       return;
     }
@@ -117,8 +117,8 @@ export default function Withdraw() {
 
     try {
       await api.post('/withdrawals', {
-        ...formData,
         amount,
+        paymentMethod: formData.paymentMethod,
         isFirstWithdrawal,
         accountDetails: {
           accountName: formData.accountName,
@@ -171,7 +171,7 @@ export default function Withdraw() {
         <Grid item xs={12} sm={6} md={2}>
           <StatCard
             title="Total Earnings"
-            value={`RWF ${balance.totalReferralEarnings.toLocaleString()}`}
+            value={`RWF ${(balance.totalReferralEarnings || 0).toLocaleString()}`}
             icon={MonetizationOn}
             color="success"
             subtitle="All earnings (display only)"
@@ -180,7 +180,7 @@ export default function Withdraw() {
         <Grid item xs={12} sm={6} md={2}>
           <StatCard
             title="Withdrawable Earnings"
-            value={`RWF ${balance.withdrawableEarnings.toLocaleString()}`}
+            value={`RWF ${(balance.withdrawableEarnings || 0).toLocaleString()}`}
             icon={MonetizationOn}
             color="primary"
             subtitle="Referral + Bonus only"
@@ -189,7 +189,7 @@ export default function Withdraw() {
         <Grid item xs={12} sm={6} md={2}>
           <StatCard
             title="Welcome Bonus"
-            value={`RWF ${balance.welcomeBonus.toLocaleString()}`}
+            value={`RWF ${(balance.welcomeBonus || 0).toLocaleString()}`}
             icon={MonetizationOn}
             color="info"
             subtitle="Not withdrawable"
@@ -198,7 +198,7 @@ export default function Withdraw() {
         <Grid item xs={12} sm={6} md={2}>
           <StatCard
             title="Total Withdrawn"
-            value={`RWF ${balance.totalWithdrawn.toLocaleString()}`}
+            value={`RWF ${(balance.totalWithdrawn || 0).toLocaleString()}`}
             icon={MonetizationOn}
             color="info"
           />
@@ -206,7 +206,7 @@ export default function Withdraw() {
         <Grid item xs={12} sm={6} md={2}>
           <StatCard
             title="Available Balance"
-            value={`RWF ${balance.availableBalance.toLocaleString()}`}
+            value={`RWF ${(balance.availableBalance || 0).toLocaleString()}`}
             icon={MonetizationOn}
             color="primary"
             subtitle="Ready to withdraw"
@@ -230,22 +230,22 @@ export default function Withdraw() {
               gutterBottom
               sx={{ fontSize: { xs: '1.75rem', sm: '2rem' } }}
             >
-              RWF {balance.availableBalance.toLocaleString()}
+              RWF {(balance.availableBalance || 0).toLocaleString()}
             </Typography>
 
             <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
               Minimum withdrawal: RWF 5,000
             </Typography>
             
-            {(balance.bonusEarnings > 0 || balance.welcomeBonus > 0) && (
+            {((balance.bonusEarnings || 0) > 0 || (balance.welcomeBonus || 0) > 0) && (
               <Alert severity="info" sx={{ mt: 2 }}>
                 <Typography variant="body2">
                   <strong>Earnings Breakdown:</strong>
-                  {balance.bonusEarnings > 0 && (
-                    <> Your withdrawable balance includes RWF {balance.bonusEarnings.toLocaleString()} in admin bonus earnings.</>
+                  {(balance.bonusEarnings || 0) > 0 && (
+                    <> Your withdrawable balance includes RWF {(balance.bonusEarnings || 0).toLocaleString()} in admin bonus earnings.</>
                   )}
-                  {balance.welcomeBonus > 0 && (
-                    <> The welcome bonus of RWF {balance.welcomeBonus.toLocaleString()} is for display only and cannot be withdrawn.</>
+                  {(balance.welcomeBonus || 0) > 0 && (
+                    <> The welcome bonus of RWF {(balance.welcomeBonus || 0).toLocaleString()} is for display only and cannot be withdrawn.</>
                   )}
                 </Typography>
               </Alert>
@@ -269,7 +269,7 @@ export default function Withdraw() {
                 sx={{ mb: 2 }}
                 inputProps={{
                   min: 5000,
-                  max: balance.availableBalance
+                  max: balance.availableBalance || 0
                 }}
               />
 
@@ -314,7 +314,7 @@ export default function Withdraw() {
                 type="submit"
                 variant="contained"
                 fullWidth
-                disabled={submitting || balance.availableBalance < 5000}
+                disabled={submitting || (balance.availableBalance || 0) < 5000}
                 startIcon={<MonetizationOn />}
               >
                 {submitting ? 'Processing...' : 'Request Withdrawal'}
@@ -347,7 +347,7 @@ export default function Withdraw() {
                           {new Date(withdrawal.createdAt).toLocaleDateString()}
                         </TableCell>
                         <TableCell align="right">
-                          RWF {withdrawal.amount.toLocaleString()}
+                          RWF {(withdrawal.amount || 0).toLocaleString()}
                         </TableCell>
                         <TableCell>
                           {withdrawal.paymentMethod === 'momo' ? 'Mobile Money' : 'Bank Transfer'}

@@ -1,36 +1,32 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Container,
   Paper,
   Typography,
   Box,
-  Grid,
-  Card,
-  CardContent,
   Button,
-  CircularProgress,
   Alert,
   useMediaQuery,
-  useTheme
+  useTheme,
+  TextField,
+  InputAdornment,
+  Grid
 } from '@mui/material';
 import {
-  TrendingUp,
-  People,
-  MonetizationOn,
   Refresh,
-  Assessment
+  Search
 } from '@mui/icons-material';
 import api from '../../utils/api';
 import { useNotification } from '../../context/NotificationContext';
 import { useDebounce } from '../../hooks/useDebounce';
 import MultilevelEarningsTable from './components/MultilevelEarningsTable';
 import MultilevelEarningsStats from './components/MultilevelEarningsStats';
-import MultilevelEarningsFilters from './components/MultilevelEarningsFilters';
 
 export default function MultilevelEarnings() {
   const [earnings, setEarnings] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [recalculating, setRecalculating] = useState(false);
   const [pagination, setPagination] = useState({ page: 0, limit: 10, total: 0 });
   const [message, setMessage] = useState('');
   const [filters, setFilters] = useState({
@@ -48,12 +44,16 @@ export default function MultilevelEarnings() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
+  // Memoized filter params to prevent unnecessary re-renders
+  const filterParams = useMemo(() => ({
+    ...filters,
+    search: debouncedSearch
+  }), [filters.sortBy, filters.sortOrder, filters.minEarnings, filters.maxEarnings, debouncedSearch]);
+
   const fetchEarnings = useCallback(async (page = pagination.page, limit = pagination.limit, filterParams = filters) => {
-    // Prevent multiple simultaneous requests
-    if (loading) return;
-    
     try {
       setLoading(true);
+      
       const response = await api.get('/admin/multilevel-earnings', {
         params: {
           page: page + 1,
@@ -66,6 +66,9 @@ export default function MultilevelEarnings() {
         setEarnings(response.data.data);
         setPagination(response.data.pagination);
         setMessage(response.data.message || '');
+      } else if (response.data && Array.isArray(response.data)) {
+        setEarnings(response.data);
+        setPagination({ page: 0, limit: 10, total: response.data.length });
       }
     } catch (error) {
       console.error('Error fetching multilevel earnings:', error);
@@ -73,7 +76,7 @@ export default function MultilevelEarnings() {
     } finally {
       setLoading(false);
     }
-  }, [loading]);
+  }, [showNotification]);
 
   const fetchStats = useCallback(async () => {
     try {
@@ -86,127 +89,232 @@ export default function MultilevelEarnings() {
     }
   }, []);
 
-  // Initial load
+  // Initial load - fetch both data and stats in parallel
   useEffect(() => {
-    fetchEarnings();
-    fetchStats();
-  }, []);
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        await Promise.all([
+          fetchEarnings(),
+          fetchStats()
+        ]);
+      } catch (error) {
+        console.error('Error loading initial data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadData();
+  }, []); // Empty dependency array - only run once on mount
 
-  // Refetch when pagination or filters change (with debounced search)
+  // Refetch when filters change
   useEffect(() => {
-    const filtersWithDebouncedSearch = { ...filters, search: debouncedSearch };
-    fetchEarnings(pagination.page, pagination.limit, filtersWithDebouncedSearch);
-  }, [pagination.page, pagination.limit, debouncedSearch, filters.sortBy, filters.sortOrder, filters.minEarnings, filters.maxEarnings, fetchEarnings]);
+    if (debouncedSearch || filters.sortBy !== 'totalEarnings' || filters.sortOrder !== 'desc' ||
+        filters.minEarnings !== 0 || filters.maxEarnings !== null) {
+      fetchEarnings(0, 10, filterParams); // Always start from page 0 when filters change
+    }
+  }, [debouncedSearch, filters.sortBy, filters.sortOrder, filters.minEarnings, filters.maxEarnings, fetchEarnings]);
+
+  const handleEnsureAllUsers = async () => {
+    try {
+      setRecalculating(true);
+      const response = await api.post('/admin/multilevel-earnings/ensure-all-users');
+      
+      if (response.data.success) {
+        showNotification(response.data.message, 'success');
+        // Refresh data after ensuring all users have records
+        await Promise.all([
+          fetchEarnings(),
+          fetchStats()
+        ]);
+      }
+    } catch (error) {
+      console.error('Error ensuring all users have earnings:', error);
+      showNotification('Failed to ensure all users have earnings records', 'error');
+    } finally {
+      setRecalculating(false);
+    }
+  };
 
   const handleRecalculateAll = async () => {
     try {
-      setLoading(true);
-      const response = await api.post('/admin/multilevel-earnings/recalculate');
-      showNotification(response.data.message, 'success');
-      fetchEarnings(pagination.page, pagination.limit, filters);
-      fetchStats();
+      setRecalculating(true);
+      const response = await api.post('/admin/multilevel-earnings/recalculate-all');
+      
+      if (response.data.success) {
+        showNotification(response.data.message, 'success');
+        // Refresh data after recalculation
+        await Promise.all([
+          fetchEarnings(),
+          fetchStats()
+        ]);
+      }
     } catch (error) {
-      showNotification('Failed to recalculate earnings', 'error');
+      console.error('Error recalculating multilevel earnings:', error);
+      showNotification('Failed to recalculate multilevel earnings', 'error');
     } finally {
-      setLoading(false);
+      setRecalculating(false);
     }
   };
 
-  const handleUpdateUserEarnings = async (userId) => {
-    try {
-      await api.put(`/admin/multilevel-earnings/${userId}`);
-      showNotification('User earnings updated successfully', 'success');
-      fetchEarnings(pagination.page, pagination.limit, filters);
-    } catch (error) {
-      showNotification('Failed to update user earnings', 'error');
-    }
-  };
+  const handlePageChange = useCallback((event, newPage) => {
+    setPagination(prev => ({ ...prev, page: newPage }));
+    fetchEarnings(newPage, pagination.limit, filterParams);
+  }, [fetchEarnings, pagination.limit, filterParams]);
+
+  const handleRowsPerPageChange = useCallback((event) => {
+    const newLimit = parseInt(event?.target?.value || 10, 10);
+    setPagination(prev => ({ ...prev, limit: newLimit, page: 0 }));
+    fetchEarnings(0, newLimit, filterParams);
+  }, [fetchEarnings, filterParams]);
 
   const handleFilterChange = useCallback((newFilters) => {
-    setFilters(newFilters);
-    setPagination(prev => ({ ...prev, page: 0 }));
+    setFilters(prev => ({ ...prev, ...newFilters }));
+    setPagination(prev => ({ ...prev, page: 0 })); // Reset to first page when filters change
   }, []);
 
-  const handlePageChange = useCallback((newPage) => {
-    setPagination(prev => ({ ...prev, page: newPage }));
-  }, []);
 
-  const handleRowsPerPageChange = useCallback((newLimit) => {
-    setPagination(prev => ({ ...prev, limit: newLimit, page: 0 }));
-  }, []);
+  const handleUpdateUserEarnings = useCallback(async (userId, earningsData) => {
+    try {
+      const response = await api.put(`/admin/multilevel-earnings/${userId}/edit`, earningsData);
+      
+      if (response.data.success) {
+        showNotification('User earnings updated successfully', 'success');
+        // Refresh the data
+        await fetchEarnings(pagination.page, pagination.limit, filterParams);
+      }
+    } catch (error) {
+      console.error('Error updating user earnings:', error);
+      showNotification('Failed to update user earnings', 'error');
+    }
+  }, [showNotification, fetchEarnings, pagination.page, pagination.limit, filterParams]);
 
   return (
     <Box sx={{ 
       width: '100%',
-      overflowX: 'auto',
-      minWidth: 0,
-      px: { xs: 1, sm: 2, md: 3 },
-      py: { xs: 1, sm: 2, md: 3 }
+      maxWidth: '100vw',
+      overflow: 'hidden',
+      py: { xs: 1, sm: 3, md: 4 },
+      px: { xs: 0, sm: 2, md: 3 }
     }}>
-      {/* Header */}
       <Box sx={{ 
-        mb: 4, 
-        display: 'flex', 
-        flexDirection: { xs: 'column', sm: 'row' },
-        justifyContent: 'space-between', 
-        alignItems: { xs: 'flex-start', sm: 'center' },
-        gap: { xs: 2, sm: 0 }
+        mb: { xs: 2, sm: 3, md: 4 },
+        px: { xs: 2, sm: 0 },
+        width: '100%',
+        maxWidth: '100%'
       }}>
-        <Box>
-          <Typography variant={isMobile ? "h5" : "h4"} fontWeight={700} gutterBottom>
-            💰 Multilevel Earnings
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Track and manage all multilevel referral earnings
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-          <Button
-            variant="outlined"
-            startIcon={<Refresh />}
-            onClick={() => {
-              fetchEarnings(pagination.page, pagination.limit, filters);
-              fetchStats();
-            }}
-            disabled={loading}
-            size={isMobile ? "small" : "medium"}
-          >
-            Refresh
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<Assessment />}
-            onClick={handleRecalculateAll}
-            disabled={loading}
-            size={isMobile ? "small" : "medium"}
-            color="primary"
-          >
-            Recalculate All
-          </Button>
-        </Box>
+        <Typography 
+          variant={isMobile ? "h5" : "h4"} 
+          component="h1" 
+          gutterBottom
+          sx={{ 
+            textAlign: { xs: 'center', sm: 'left' },
+            fontSize: { xs: '1.25rem', sm: '2rem' },
+            wordBreak: 'break-word'
+          }}
+        >
+          Multilevel Earnings Management
+        </Typography>
+        <Typography 
+          variant="body1" 
+          color="text.secondary"
+          sx={{ 
+            textAlign: { xs: 'center', sm: 'left' },
+            fontSize: { xs: '0.8rem', sm: '1rem' },
+            wordBreak: 'break-word'
+          }}
+        >
+          Manage and monitor multilevel referral earnings across all users
+        </Typography>
       </Box>
 
-      {/* Stats Cards */}
-      {stats && <MultilevelEarningsStats stats={stats} isMobile={isMobile} />}
-
-      {/* Filters */}
-      <Paper sx={{ p: 2, mb: 3 }}>
-        <MultilevelEarningsFilters
-          filters={filters}
-          onFilterChange={handleFilterChange}
-          isMobile={isMobile}
-        />
-      </Paper>
-
-      {/* Message */}
       {message && (
         <Alert severity="info" sx={{ mb: 3 }}>
           {message}
         </Alert>
       )}
 
-      {/* Main Content */}
-      <Paper sx={{ borderRadius: 3 }}>
+      {/* Stats Cards */}
+      <MultilevelEarningsStats stats={stats} isMobile={isMobile} />
+
+      {/* Search and Action Buttons */}
+      <Box sx={{ 
+        mb: { xs: 1.5, sm: 3 }, 
+        px: { xs: 2, sm: 0 },
+        width: '100%',
+        maxWidth: '100%'
+      }}>
+        {/* Search Field */}
+        <Box sx={{ mb: 1.5, width: '100%' }}>
+          <TextField
+            fullWidth
+            variant="outlined"
+            placeholder="Search users by name or email..."
+            value={filters.search}
+            onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search color="action" />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              width: '100%',
+              '& .MuiOutlinedInput-root': {
+                borderRadius: { xs: 1, sm: 2 },
+                fontSize: { xs: '0.875rem', sm: '1rem' }
+              },
+              '& .MuiInputBase-input': {
+                padding: { xs: '10px 12px', sm: '16px 14px' }
+              }
+            }}
+          />
+        </Box>
+
+        {/* Action Buttons */}
+        <Box sx={{ 
+          display: 'flex', 
+          gap: { xs: 1, sm: 2 }, 
+          flexWrap: 'wrap',
+          justifyContent: { xs: 'center', sm: 'flex-start' },
+          width: '100%'
+        }}>
+          <Button
+            variant="contained"
+            startIcon={<Refresh />}
+            onClick={handleEnsureAllUsers}
+            disabled={loading || recalculating}
+            color="secondary"
+            size={isMobile ? 'small' : 'medium'}
+            sx={{ 
+              minWidth: { xs: 'auto', sm: 200 },
+              maxWidth: { xs: '100%', sm: 'auto' },
+              fontSize: { xs: '0.65rem', sm: '0.875rem' },
+              px: { xs: 1, sm: 3 },
+              py: { xs: 0.75, sm: 1 },
+              whiteSpace: { xs: 'nowrap', sm: 'normal' }
+            }}
+          >
+            {recalculating ? 'Ensuring...' : 'Ensure All Users Have Records'}
+          </Button>
+        </Box>
+      </Box>
+
+
+      {/* Earnings Table */}
+      <Paper 
+        sx={{ 
+          p: { xs: 1, sm: 1.5, md: 2 },
+          borderRadius: { xs: 1, sm: 2 },
+          boxShadow: { xs: 1, sm: 2, md: 3 },
+          overflow: 'hidden',
+          width: '100%',
+          maxWidth: '100%',
+          mx: { xs: 2, sm: 0 }
+        }}
+      >
         <MultilevelEarningsTable
           earnings={earnings}
           loading={loading}

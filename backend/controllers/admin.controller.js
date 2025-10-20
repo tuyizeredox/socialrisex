@@ -1239,19 +1239,29 @@ export const getMultilevelEarnings = async (req, res, next) => {
     const earningsCount = await MultilevelEarnings.countDocuments();
     
     if (earningsCount === 0) {
-      // If no multilevel earnings data exists, return empty result with message
-      res.json({
-        success: true,
-        data: [],
-        pagination: {
-          page: parseInt(page),
-          limit: parseInt(limit),
-          total: 0,
-          pages: 0
-        },
-        message: 'No multilevel earnings data found. Click "Recalculate All" to generate earnings data.'
-      });
-      return;
+      // If no multilevel earnings data exists, try to generate some automatically
+      console.log('No multilevel earnings data found, attempting to generate...');
+      
+      // Get all active users and generate earnings for them
+      const activeUsers = await User.find({ isActive: true }).select('_id').limit(100);
+      
+      if (activeUsers.length > 0) {
+        // Generate earnings for users in batches
+        const batchSize = 10;
+        for (let i = 0; i < activeUsers.length; i += batchSize) {
+          const batch = activeUsers.slice(i, i + batchSize);
+          const promises = batch.map(async (user) => {
+            try {
+              await updateMultilevelEarnings(user._id);
+            } catch (error) {
+              console.error(`Error generating earnings for user ${user._id}:`, error);
+            }
+          });
+          await Promise.all(promises);
+        }
+        
+        console.log(`Generated multilevel earnings for ${activeUsers.length} users`);
+      }
     }
 
     const options = {
@@ -1266,10 +1276,12 @@ export const getMultilevelEarnings = async (req, res, next) => {
 
     const result = await getAllMultilevelEarnings(options);
 
+
     res.json({
       success: true,
-      data: result.earnings,
-      pagination: result.pagination
+      data: JSON.parse(JSON.stringify(result.earnings)), // Ensure proper serialization
+      pagination: result.pagination,
+      message: result.earnings.length === 0 ? 'No multilevel earnings data found. Click "Recalculate All" to generate earnings data.' : ''
     });
   } catch (error) {
     console.error('Error fetching multilevel earnings:', error);
@@ -1298,20 +1310,179 @@ export const updateUserMultilevelEarnings = async (req, res, next) => {
   }
 };
 
+// New endpoint to ensure all users have multilevel earnings records
+export const ensureAllUsersHaveEarnings = async (req, res, next) => {
+  try {
+    // Get all active users
+    const allUsers = await User.find({ isActive: true }).select('_id fullName email');
+    
+    // Get users who already have multilevel earnings records
+    const existingEarnings = await MultilevelEarnings.find({}).select('user');
+    const existingUserIds = existingEarnings.map(e => e.user.toString());
+    
+    // Find users who don't have earnings records yet
+    const usersWithoutEarnings = allUsers.filter(user => 
+      !existingUserIds.includes(user._id.toString())
+    );
+    
+    const results = [];
+    
+    // Create earnings records for users who don't have them
+    for (const user of usersWithoutEarnings) {
+      try {
+        const earningsRecord = await updateMultilevelEarnings(user._id);
+        results.push({ 
+          userId: user._id, 
+          userName: user.fullName,
+          success: true, 
+          data: earningsRecord 
+        });
+      } catch (error) {
+        console.error(`Error creating earnings for user ${user._id}:`, error);
+        results.push({ 
+          userId: user._id, 
+          userName: user.fullName,
+          success: false, 
+          error: error.message 
+        });
+      }
+    }
+    
+    const successful = results.filter(r => r.success).length;
+    const failed = results.filter(r => !r.success).length;
+    
+    res.json({
+      success: true,
+      message: `Ensured multilevel earnings records for all users. ${successful} successful, ${failed} failed.`,
+      data: {
+        totalUsers: allUsers.length,
+        usersWithoutEarnings: usersWithoutEarnings.length,
+        successful,
+        failed,
+        results: results.slice(0, 50) // Return first 50 results for preview
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// New endpoint for admin to manually edit user earnings
+export const editUserMultilevelEarnings = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const { level1Earnings, level2Earnings, level3Earnings, reason } = req.body;
+    
+    console.log('Edit earnings request for userId:', userId);
+    
+    // First check if the multilevel earnings record exists
+    const existingEarnings = await MultilevelEarnings.findById(userId);
+    if (!existingEarnings) {
+      throw new ErrorResponse('Multilevel earnings record not found', 404);
+    }
+    
+    // Get user info from the existing earnings record
+    const user = await User.findById(existingEarnings.user);
+    if (!user) {
+      throw new ErrorResponse('User not found', 404);
+    }
+
+    // Validate earnings values
+    if (level1Earnings < 0 || level2Earnings < 0 || level3Earnings < 0) {
+      throw new ErrorResponse('Earnings cannot be negative', 400);
+    }
+
+    // Calculate total earnings
+    const totalEarnings = level1Earnings + level2Earnings + level3Earnings;
+
+    // Update the multilevel earnings record
+    const multilevelEarnings = await MultilevelEarnings.findByIdAndUpdate(
+      userId,
+      {
+        user: existingEarnings.user,
+        level1: {
+          count: Math.floor(level1Earnings / 4000), // Estimate count based on earnings
+          earnings: level1Earnings,
+          lastUpdated: new Date()
+        },
+        level2: {
+          count: Math.floor(level2Earnings / 1500), // Estimate count based on earnings
+          earnings: level2Earnings,
+          lastUpdated: new Date()
+        },
+        level3: {
+          count: Math.floor(level3Earnings / 900), // Estimate count based on earnings
+          earnings: level3Earnings,
+          lastUpdated: new Date()
+        },
+        totalEarnings: totalEarnings,
+        lastCalculated: new Date(),
+        isActive: true,
+        adminEdited: true,
+        editReason: reason || 'Admin manual adjustment'
+      },
+      { new: true }
+    ).populate('user', 'fullName email');
+
+    // Update user's network income and withdrawal balance
+    try {
+      // Calculate the difference in total earnings
+      const previousTotalEarnings = existingEarnings.totalEarnings || 0;
+      const earningsDifference = totalEarnings - previousTotalEarnings;
+
+      // Update user's network income
+      await User.findByIdAndUpdate(
+        existingEarnings.user,
+        {
+          $inc: {
+            networkIncome: earningsDifference,
+            totalEarnings: earningsDifference
+          }
+        }
+      );
+
+      // Update user's withdrawal balance if they have a withdrawal record
+      const Withdrawal = (await import('../models/Withdrawal.js')).default;
+      await Withdrawal.findOneAndUpdate(
+        { user: existingEarnings.user },
+        {
+          $inc: {
+            availableBalance: earningsDifference
+          }
+        },
+        { upsert: true }
+      );
+
+      console.log(`Updated user ${existingEarnings.user} network income by ${earningsDifference}`);
+    } catch (updateError) {
+      console.error('Error updating user network income:', updateError);
+      // Don't throw error here, just log it as the main operation succeeded
+    }
+
+    res.json({
+      success: true,
+      message: 'User multilevel earnings updated successfully',
+      data: multilevelEarnings
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const recalculateAllMultilevelEarnings = async (req, res, next) => {
   try {
-    // Get all users who have referrals
-    const usersWithReferrals = await User.find({
-      referralCount: { $gt: 0 }
-    }).select('_id');
+    // Get all active users (not just those with referrals)
+    const allUsers = await User.find({
+      isActive: true
+    }).select('_id fullName email');
 
     const results = [];
     const errors = [];
 
     // Process in batches to avoid overwhelming the database
     const batchSize = 10;
-    for (let i = 0; i < usersWithReferrals.length; i += batchSize) {
-      const batch = usersWithReferrals.slice(i, i + batchSize);
+    for (let i = 0; i < allUsers.length; i += batchSize) {
+      const batch = allUsers.slice(i, i + batchSize);
       
       const batchPromises = batch.map(async (user) => {
         try {
@@ -1334,7 +1505,7 @@ export const recalculateAllMultilevelEarnings = async (req, res, next) => {
       success: true,
       message: `Multilevel earnings recalculation completed. ${successful} successful, ${failed} failed.`,
       data: {
-        total: usersWithReferrals.length,
+        total: allUsers.length,
         successful,
         failed,
         results: results.slice(0, 50) // Return first 50 results for preview

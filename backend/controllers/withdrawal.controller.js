@@ -12,15 +12,79 @@ export const createWithdrawal = async (req, res) => {
     const { amount, paymentMethod, accountDetails, isFirstWithdrawal } = req.body;
     const userId = req.user._id;
 
+    // Debug logging
+    console.log('Create withdrawal request body:', req.body);
+    console.log('Extracted values:', { amount, paymentMethod, accountDetails, isFirstWithdrawal });
+
+    // Validate required fields
+    if (!amount || !paymentMethod || !accountDetails) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required fields: amount, paymentMethod, and accountDetails are required'
+      });
+    }
+
+    if (!accountDetails.accountName || !accountDetails.accountNumber) {
+      return res.status(400).json({
+        success: false,
+        message: 'Account name and account number are required'
+      });
+    }
+
     // Get user's current balance
     const user = await User.findById(userId);
     
     // Skip balance check for first-time withdrawal
-    if (!isFirstWithdrawal && user.balance < amount) {
-      return res.status(400).json({
-        success: false,
-        message: 'Insufficient balance'
-      });
+    if (!isFirstWithdrawal) {
+      // Calculate multilevel referral earnings
+      const referralData = await calculateMultilevelReferralEarnings(userId);
+      const totalReferralEarnings = referralData.totalEarnings;
+      
+      // Include bonus earnings in total earnings (but NOT welcome bonus for withdrawal)
+      const totalEarnings = totalReferralEarnings + (user.bonusEarnings || 0);
+
+      // Get total approved withdrawals
+      const withdrawnAmount = await Withdrawal.aggregate([
+        {
+          $match: {
+            user: userId,
+            status: 'approved'
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            total: { $sum: '$amount' }
+          }
+        }
+      ]);
+
+      // Get pending withdrawals
+      const pendingAmount = await Withdrawal.aggregate([
+        {
+          $match: {
+            user: userId,
+            status: 'pending'
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            total: { $sum: '$amount' }
+          }
+        }
+      ]);
+
+      const totalWithdrawn = withdrawnAmount[0]?.total || 0;
+      const pendingWithdrawals = pendingAmount[0]?.total || 0;
+      const availableBalance = totalEarnings - totalWithdrawn - pendingWithdrawals;
+
+      if (amount > availableBalance) {
+        return res.status(400).json({
+          success: false,
+          message: 'Insufficient balance'
+        });
+      }
     }
 
     // Create new withdrawal
@@ -33,12 +97,6 @@ export const createWithdrawal = async (req, res) => {
     });
 
     await withdrawal.save();
-
-    // Update user's balance
-    if (!isFirstWithdrawal) {
-      user.balance -= amount;
-      await user.save();
-    }
 
     res.status(201).json({
       success: true,
@@ -234,6 +292,9 @@ export const processWithdrawal = async (req, res, next) => {
     const referralData = await calculateMultilevelReferralEarnings(withdrawal.user._id);
     const totalReferralEarnings = referralData.totalEarnings;
 
+    // Include bonus earnings in total earnings (but NOT welcome bonus for withdrawal)
+    const totalEarnings = totalReferralEarnings + (user.bonusEarnings || 0);
+
     // Get total approved withdrawals
     const withdrawnAmount = await Withdrawal.aggregate([
       {
@@ -270,7 +331,19 @@ export const processWithdrawal = async (req, res, next) => {
 
     const totalWithdrawn = withdrawnAmount[0]?.total || 0;
     const pendingWithdrawals = pendingAmount[0]?.total || 0;
-    const availableBalance = totalReferralEarnings - totalWithdrawn - pendingWithdrawals;
+    const availableBalance = totalEarnings - totalWithdrawn - pendingWithdrawals;
+
+    // Debug logging for balance calculation
+    console.log('Withdrawal Balance Debug:', {
+      userId: user._id,
+      withdrawalAmount: withdrawal.amount,
+      totalReferralEarnings,
+      bonusEarnings: user.bonusEarnings || 0,
+      totalEarnings,
+      totalWithdrawn,
+      pendingWithdrawals,
+      availableBalance
+    });
 
     // If approving, check if user has sufficient balance
     if (status === 'approved' && withdrawal.amount > availableBalance) {

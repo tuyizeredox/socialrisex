@@ -19,6 +19,7 @@ import {
   getReferrerDetails,
   getMultilevelEarnings,
   updateUserMultilevelEarnings,
+  editUserMultilevelEarnings,
   recalculateAllMultilevelEarnings,
   getMultilevelEarningsStats,
   getBonusTransactions,
@@ -67,7 +68,8 @@ router.get('/referrers/:userId', getReferrerDetails);
 router.get('/multilevel-earnings', getMultilevelEarnings);
 router.get('/multilevel-earnings/stats', getMultilevelEarningsStats);
 router.put('/multilevel-earnings/:userId', updateUserMultilevelEarnings);
-router.post('/multilevel-earnings/recalculate', recalculateAllMultilevelEarnings);
+router.put('/multilevel-earnings/:userId/edit', editUserMultilevelEarnings);
+router.post('/multilevel-earnings/recalculate-all', recalculateAllMultilevelEarnings);
 
 // Bonus Management
 router.get('/bonus-transactions', getBonusTransactions);

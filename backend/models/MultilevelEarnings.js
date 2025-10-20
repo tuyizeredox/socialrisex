@@ -60,6 +60,14 @@ const multilevelEarningsSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true
+  },
+  adminEdited: {
+    type: Boolean,
+    default: false
+  },
+  editReason: {
+    type: String,
+    default: ''
   }
 }, {
   timestamps: true,
@@ -71,6 +79,8 @@ const multilevelEarningsSchema = new mongoose.Schema({
 multilevelEarningsSchema.index({ user: 1 });
 multilevelEarningsSchema.index({ totalEarnings: -1 });
 multilevelEarningsSchema.index({ lastCalculated: -1 });
+multilevelEarningsSchema.index({ isActive: 1, totalEarnings: -1 }); // Compound index for filtering
+multilevelEarningsSchema.index({ adminEdited: 1 }); // For admin edited records
 
 const MultilevelEarnings = mongoose.model('MultilevelEarnings', multilevelEarningsSchema);
 

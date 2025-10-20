@@ -87,7 +87,9 @@ router.get('/admin/photo-stats', photoController.getPhotoStats);
 router.get('/admin/multilevel-earnings', adminController.getMultilevelEarnings);
 router.get('/admin/multilevel-earnings/stats', adminController.getMultilevelEarningsStats);
 router.put('/admin/multilevel-earnings/:userId', adminController.updateUserMultilevelEarnings);
-router.post('/admin/multilevel-earnings/recalculate', adminController.recalculateAllMultilevelEarnings);
+router.put('/admin/multilevel-earnings/:userId/edit', adminController.editUserMultilevelEarnings);
+router.post('/admin/multilevel-earnings/recalculate-all', adminController.recalculateAllMultilevelEarnings);
+router.post('/admin/multilevel-earnings/ensure-all-users', adminController.ensureAllUsersHaveEarnings);
 
 // Admin bonus management routes
 router.get('/admin/bonus-transactions', adminController.getBonusTransactions);
