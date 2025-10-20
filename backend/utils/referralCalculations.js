@@ -14,19 +14,22 @@ export const calculateMultilevelReferralEarnings = async (userId) => {
     // Get Level 1 referrals (direct referrals)
     const level1Referrals = await User.find({ 
       referredBy: userId, 
-      isActive: true 
+      isActive: true,
+      isDeleted: { $ne: true }
     }).select('_id');
 
     // Get Level 2 referrals (referrals of level 1 referrals)
     const level2Referrals = await User.find({ 
       referredBy: { $in: level1Referrals.map(r => r._id) },
-      isActive: true 
+      isActive: true,
+      isDeleted: { $ne: true }
     }).select('_id');
 
     // Get Level 3 referrals (referrals of level 2 referrals)
     const level3Referrals = await User.find({ 
       referredBy: { $in: level2Referrals.map(r => r._id) },
-      isActive: true 
+      isActive: true,
+      isDeleted: { $ne: true }
     }).select('_id');
 
     const level1Count = level1Referrals.length;
@@ -259,7 +262,7 @@ export const getAllMultilevelEarnings = async (options = {}) => {
 export const getUserReferralStructure = async (userId) => {
   try {
     // Get all direct referrals with basic info including mobile number
-    const directReferrals = await User.find({ referredBy: userId })
+    const directReferrals = await User.find({ referredBy: userId, isDeleted: { $ne: true } })
       .select('fullName email mobileNumber isActive createdAt')
       .sort('-createdAt');
 
@@ -291,14 +294,15 @@ export const getUserReferralStructure = async (userId) => {
 export const getDetailedMultilevelStructure = async (userId) => {
   try {
     // Get Level 1 referrals (direct referrals)
-    const level1Referrals = await User.find({ referredBy: userId })
+    const level1Referrals = await User.find({ referredBy: userId, isDeleted: { $ne: true } })
       .select('fullName email mobileNumber isActive createdAt _id')
       .sort('-createdAt');
 
     // Get Level 2 referrals (referrals of level 1 referrals)
     const level1Ids = level1Referrals.map(r => r._id);
     const level2Referrals = await User.find({ 
-      referredBy: { $in: level1Ids }
+      referredBy: { $in: level1Ids },
+      isDeleted: { $ne: true }
     })
       .select('fullName email mobileNumber isActive createdAt _id referredBy')
       .sort('-createdAt');
@@ -306,7 +310,8 @@ export const getDetailedMultilevelStructure = async (userId) => {
     // Get Level 3 referrals (referrals of level 2 referrals)
     const level2Ids = level2Referrals.map(r => r._id);
     const level3Referrals = await User.find({ 
-      referredBy: { $in: level2Ids }
+      referredBy: { $in: level2Ids },
+      isDeleted: { $ne: true }
     })
       .select('fullName email mobileNumber isActive createdAt _id referredBy')
       .sort('-createdAt');

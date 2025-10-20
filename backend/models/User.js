@@ -76,6 +76,15 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: null
   },
+  // Soft delete flags
+  isDeleted: {
+    type: Boolean,
+    default: false
+  },
+  deletedAt: {
+    type: Date,
+    default: null
+  },
   verificationToken: String,
   resetPasswordToken: String,
   resetPasswordExpire: Date,

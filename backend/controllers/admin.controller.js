@@ -59,14 +59,16 @@ export const getUsers = async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search || '';
 
+    const baseFilter = { isDeleted: { $ne: true } };
     const query = search
       ? {
+          ...baseFilter,
           $or: [
             { fullName: { $regex: search, $options: 'i' } },
             { email: { $regex: search, $options: 'i' } },
           ],
         }
-      : {};
+      : baseFilter;
 
     const total = await User.countDocuments(query);
 
@@ -78,6 +80,9 @@ export const getUsers = async (req, res, next) => {
           localField: '_id',
           foreignField: 'referredBy',
           as: 'referrals',
+          pipeline: [
+            { $match: { isDeleted: { $ne: true } } }
+          ]
         },
       },
       {
@@ -143,10 +148,14 @@ export const deleteUser = async (req, res, next) => {
       throw new ErrorResponse('User not found', 404);
     }
 
-    await user.deleteOne();
+    // Soft delete: mark as deleted and detach from referrer tree for earnings
+    user.isDeleted = true;
+    user.deletedAt = new Date();
+    await user.save();
+
     res.status(200).json({
       success: true,
-      message: 'User deleted successfully',
+      message: 'User soft-deleted successfully',
     });
   } catch (error) {
     next(error);

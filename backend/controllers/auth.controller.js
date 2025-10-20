@@ -15,9 +15,20 @@ export const register = async (req, res, next) => {
         { email },
         { mobileNumber }
       ]
-    });
+    }).select('+password');
 
     if (userExists) {
+      if (userExists.isDeleted) {
+        // Restore soft-deleted user: keep same _id and referrals
+        userExists.fullName = fullName;
+        userExists.password = password; // will be hashed by pre-save
+        userExists.isDeleted = false;
+        userExists.deletedAt = null;
+        userExists.isVerified = false;
+        userExists.isActive = false;
+        await userExists.save();
+        return sendTokenResponse(userExists, 201, res);
+      }
       if (userExists.email === email) {
         throw new ErrorResponse('Email already registered', 400);
       }
@@ -72,7 +83,8 @@ export const login = async (req, res, next) => {
 
     // Find user - case insensitive search for fullName
     const user = await User.findOne({
-      fullName: { $regex: new RegExp(`^${fullName}$`, 'i') }
+      fullName: { $regex: new RegExp(`^${fullName}$`, 'i') },
+      isDeleted: { $ne: true }
     }).select('+password +fullName +email +role +isActive +referralCode +referralCount +earnings +points +mobileNumber');
 
     if (!user) {
