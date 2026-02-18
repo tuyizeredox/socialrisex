@@ -2,11 +2,13 @@ services:
   - type: web
     name: socialrisex-backend
     env: node
+    region: oregon
     buildCommand: |
       cd backend && npm install
       cd ../frontend && npm install && npm run build
       cd .. && npm install
-    startCommand: npm start
+    startCommand: |
+      cd backend && node server.js
     nodeVersion: 18.x
     envVars:
       - key: NODE_ENV

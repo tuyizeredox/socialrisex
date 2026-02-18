@@ -17,9 +17,13 @@ const __dirname = path.dirname(__filename);
 // Load environment variables
 dotenv.config({ path: path.join(__dirname, './backend/.env') });
 
+// Ensure NODE_ENV is set
+process.env.NODE_ENV = process.env.NODE_ENV || 'production';
+
 // Ensure MongoDB URI is loaded
 if (!process.env.MONGODB_URI) {
   console.error('MONGODB_URI is not defined in environment variables');
+  console.error('Available environment variables:', Object.keys(process.env).filter(key => key.includes('MONGO') || key.includes('DB') || key.includes('URI')));
   process.exit(1);
 }
 
@@ -35,6 +39,8 @@ const connectDB = async () => {
       const conn = await mongoose.connect(process.env.MONGODB_URI, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
+        serverSelectionTimeoutMS: 30000, // Increase timeout to 30 seconds
+        socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
       });
       console.log(`MongoDB Connected: ${conn.connection.host}`);
     } catch (error) {
@@ -55,7 +61,9 @@ connectDB();
 
 // Middleware Setup
 const corsOptions = {
-  origin: ['http://localhost:3000', 'https://worldwideearn.vercel.app'], // Allow both local and production origins
+  origin: process.env.NODE_ENV === 'production' 
+    ? [process.env.FRONTEND_URL || 'https://worldwideearn.vercel.app'] 
+    : ['http://localhost:3000', 'http://localhost:3001', process.env.FRONTEND_URL || 'https://worldwideearn.vercel.app'], // Allow both local and production origins
   credentials: true, // Allow cookies or credentials
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Allowed HTTP methods
   allowedHeaders: [
@@ -78,6 +86,9 @@ app.use(express.json()); // Parse JSON bodies
 // Logger middleware (only in development)
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
+} else {
+  // In production, log basic info
+  app.use(morgan('combined'));
 }
 
 // Add compression middleware (exclude images/videos from compression)
