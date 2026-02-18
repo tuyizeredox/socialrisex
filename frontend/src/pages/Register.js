@@ -42,7 +42,7 @@ import {
 import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
-import worldwideLogo from '../assets/worldwide.png';
+// Logo is in public folder, referenced directly in JSX
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -387,8 +387,8 @@ export default function Register() {
                   }}
                 >
                   <img 
-                    src={worldwideLogo} 
-                    alt="Worldwide Earn" 
+                    src="/logo.png"
+                    alt="Pesa Boost"
                     style={{ 
                       width: 80, 
                       height: 80, 
@@ -432,7 +432,7 @@ export default function Register() {
                     mb: 1,
                   }}
                 >
-                  Join Worldwide Earn
+                  Join Pesa Boost
                 </Typography>
                 
                 <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 2 }}>

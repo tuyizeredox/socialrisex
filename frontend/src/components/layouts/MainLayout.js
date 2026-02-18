@@ -38,7 +38,7 @@ import {
 } from '@mui/icons-material';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
-import worldwideLogo from '../../assets/worldwide.png';
+// Logo is in public folder, referenced directly in JSX
 
 const drawerWidth = 280;
 
@@ -96,14 +96,14 @@ const MainLayout = () => {
       sx={{
         height: '100%',
         background: mode === 'dark' 
-          ? 'linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%)'
-          : 'linear-gradient(180deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+          ? 'linear-gradient(180deg, #062c24 0%, #0a3a2d 50%, #062c24 100%)'
+          : 'linear-gradient(180deg, #059669 0%, #10b981 50%, #06d6a0 100%)',
         p: 2,
         display: 'flex',
         flexDirection: 'column',
         boxShadow: mode === 'dark' 
-          ? 'inset 0 0 20px rgba(0,0,0,0.3), 0 0 30px rgba(103, 126, 234, 0.1)'
-          : 'inset 0 0 20px rgba(255,255,255,0.2), 0 0 30px rgba(103, 126, 234, 0.2)',
+          ? 'inset 0 0 20px rgba(0,0,0,0.3), 0 0 30px rgba(16, 185, 129, 0.1)'
+          : 'inset 0 0 20px rgba(255,255,255,0.2), 0 0 30px rgba(16, 185, 129, 0.2)',
         position: 'relative',
         '&::before': {
           content: '""',
@@ -113,7 +113,7 @@ const MainLayout = () => {
           right: 0,
           bottom: 0,
           background: mode === 'dark'
-            ? 'radial-gradient(circle at 50% 50%, rgba(103, 126, 234, 0.1) 0%, transparent 50%)'
+            ? 'radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 50%)'
             : 'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%)',
           pointerEvents: 'none',
           zIndex: 1,
@@ -125,8 +125,8 @@ const MainLayout = () => {
         <Toolbar sx={{ justifyContent: 'space-between', mb: 1, px: 0 }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <img 
-              src={worldwideLogo} 
-              alt="Worldwide Earn" 
+              src="/logo.png"
+              alt="Pesa Boost" 
               style={{ width: 40, height: 40, marginRight: 10, borderRadius: '8px' }}
             />
             <Typography
@@ -141,7 +141,7 @@ const MainLayout = () => {
                 textShadow: mode === 'dark' ? 'none' : '0 1px 2px rgba(0,0,0,0.1)',
               }}
             >
-              Worldwide Earn
+              Pesa Boost
             </Typography>
           </Box>
           <IconButton
@@ -256,7 +256,7 @@ const MainLayout = () => {
             fontStyle: 'italic',
             textShadow: '0 1px 2px rgba(0,0,0,0.3)'
           }}>
-            "Earn Worldwide with Worldwide Earn!"
+            "Earn Worldwide with Pesa Boost!"
           </Typography>
           <Star sx={{ 
             fontSize: 30, 
@@ -306,8 +306,8 @@ const MainLayout = () => {
       <AppBar
         position="fixed"
         sx={{
-          background: mode === 'dark' ? '#1e1e1e' : 'linear-gradient(45deg, #1976d2, #42a5f5)',
-          boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+          background: mode === 'dark' ? '#0a3a2d' : 'linear-gradient(45deg, #059669, #10b981)',
+          boxShadow: '0 4px 15px rgba(16, 185, 129, 0.2)',
         }}
       >
         <Toolbar>
@@ -331,8 +331,8 @@ const MainLayout = () => {
           )}
           <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
             <img 
-              src={worldwideLogo} 
-              alt="Worldwide Earn" 
+              src="/logo.png"
+              alt="Pesa Boost" 
               style={{ width: 32, height: 32, marginRight: 12, borderRadius: '6px' }}
             />
             <Typography
@@ -343,7 +343,7 @@ const MainLayout = () => {
                 textShadow: '0 2px 4px rgba(0,0,0,0.2)',
               }}
             >
-              Worldwide Earn
+              Pesa Boost
             </Typography>
           </Box>
           <IconButton

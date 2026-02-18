@@ -107,7 +107,7 @@ export default function UserManagement() {
           ...user,
           // Note: earnings should come from backend multilevel calculation
           // Keep old calculation as fallback until backend provides actual earnings
-          earnings: user.totalEarnings || (user.referralCount || 0) * 4000, // Level 1 rate as fallback
+          earnings: user.totalEarnings || (user.referralCount || 0) * 3200, // Level 1 rate as fallback
         }));
         setUsers(usersWithEarnings);
         setPagination({

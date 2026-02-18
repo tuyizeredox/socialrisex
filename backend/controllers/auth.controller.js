@@ -384,7 +384,7 @@ export const submitTransaction = async (req, res, next) => {
     const transaction = await Transaction.create({
       user: userId,
       transactionId: cleanTransactionId,
-      amount: 8000,
+      amount: 6000,
       metadata: {
         ipAddress: req.ip,
         userAgent: req.get('User-Agent'),

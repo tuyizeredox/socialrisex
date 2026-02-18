@@ -43,7 +43,7 @@ import ProgressRing from '../../components/common/ProgressRing';
 import AchievementBadge from '../../components/common/AchievementBadge';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
-import worldwideLogo from '../../assets/worldwide.png';
+// Logo is in public folder, referenced directly in JSX
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -203,24 +203,33 @@ export default function Dashboard() {
         px: { xs: 1, sm: 2, md: 3 },
         pb: { xs: 2, sm: 4 },
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+        background: theme.palette.mode === 'dark' 
+          ? 'linear-gradient(135deg, #062c24 0%, #0a3a2d 25%, #104034 50%, #0a3a2d 75%, #062c24 100%)'
+          : 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 25%, #bbf7d0 50%, #86efac 75%, #4ade80 100%)',
         backgroundAttachment: 'fixed',
+        backdropFilter: 'blur(10px)',
       }}
     >
       {/* Hero Section with Level & Profile */}
       <Paper 
         elevation={0}
         sx={{ 
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%)',
+          background: theme.palette.mode === 'dark'
+            ? 'linear-gradient(135deg, rgba(10, 58, 45, 0.9) 0%, rgba(6, 44, 36, 0.8) 100%)'
+            : 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%)',
           backdropFilter: 'blur(20px)',
-          borderRadius: { xs: 3, sm: 4 },
-          p: { xs: 2, sm: 4 },
-          mb: 3,
+          borderRadius: { xs: 4, sm: 6 },
+          p: { xs: 3, sm: 5 },
+          mb: 4,
           textAlign: 'center',
           position: 'relative',
           overflow: 'hidden',
-          border: '1px solid rgba(255,255,255,0.2)',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+          border: theme.palette.mode === 'dark' 
+            ? '1px solid rgba(16, 185, 129, 0.3)' 
+            : '1px solid rgba(255,255,255,0.2)',
+          boxShadow: theme.palette.mode === 'dark'
+            ? '0 20px 40px rgba(0,0,0,0.3), 0 0 30px rgba(16, 185, 129, 0.1)'
+            : '0 20px 40px rgba(0,0,0,0.1)',
         }}
       >
         {/* Animated Background */}
@@ -231,7 +240,10 @@ export default function Dashboard() {
             left: 0,
             right: 0,
             bottom: 0,
-            background: `url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%236366f1" fill-opacity="0.05"%3E%3Cpath d="M30 30l-10-10 10-10 10 10-10 10zM10 10l10 10-10 10-10-10 10-10zM50 10l10 10-10 10-10-10 10-10zM10 50l10 10-10 10-10-10 10-10zM50 50l10 10-10 10-10-10 10-10z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            background: theme.palette.mode === 'dark'
+              ? `url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%2310b981" fill-opacity="0.1"%3E%3Cpath d="M30 30l-10-10 10-10 10 10-10 10zM10 10l10 10-10 10-10-10 10-10zM50 10l10 10-10 10-10-10 10-10zM10 50l10 10-10 10-10-10 10-10zM50 50l10 10-10 10-10-10 10-10z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+              : `url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%2310b981" fill-opacity="0.05"%3E%3Cpath d="M30 30l-10-10 10-10 10 10-10 10zM10 10l10 10-10 10-10-10 10-10zM50 10l10 10-10 10-10-10 10-10zM10 50l10 10-10 10-10-10 10-10zM50 50l10 10-10 10-10-10 10-10z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            opacity: theme.palette.mode === 'dark' ? 0.3 : 0.6,
             animation: 'float 8s ease-in-out infinite',
             '@keyframes float': {
               '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
@@ -260,12 +272,14 @@ export default function Dashboard() {
               icon={<Rocket />}
               label={`Level ${userLevel}`}
               sx={{
-                background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
-                color: '#000',
+                background: theme.palette.mode === 'dark'
+                  ? 'linear-gradient(135deg, #06d6a0 0%, #048c69 100%)'
+                  : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                color: theme.palette.mode === 'dark' ? '#000' : '#ffffff',
                 fontWeight: 'bold',
                 fontSize: '0.9rem',
                 px: 1,
-                boxShadow: '0 4px 15px rgba(255, 215, 0, 0.4)',
+                boxShadow: '0 4px 15px rgba(16, 185, 129, 0.4)',
                 transition: 'all 0.3s ease',
                 '&:hover': {
                   transform: 'scale(1.1) rotate(-5deg)',
@@ -279,12 +293,14 @@ export default function Dashboard() {
                 icon={<LocalFireDepartment />}
                 label={`${dailyStreak} Day Streak`}
                 sx={{
-                  background: 'linear-gradient(135deg, #FF6F00 0%, #FF3D00 100%)',
-                  color: 'white',
+                  background: theme.palette.mode === 'dark'
+                    ? 'linear-gradient(135deg, #34d399 0%, #10b981 100%)'
+                    : 'linear-gradient(135deg, #06d6a0 0%, #048c69 100%)',
+                  color: theme.palette.mode === 'dark' ? '#000' : '#ffffff',
                   fontWeight: 'bold',
                   fontSize: '0.9rem',
                   px: 1,
-                  boxShadow: '0 4px 15px rgba(255, 111, 0, 0.4)',
+                  boxShadow: '0 4px 15px rgba(16, 185, 129, 0.4)',
                   animation: 'pulse 2s infinite',
                   '@keyframes pulse': {
                     '0%, 100%': { transform: 'scale(1)' },
@@ -301,14 +317,16 @@ export default function Dashboard() {
 
           {/* Profile Section */}
           <Avatar
-            src={worldwideLogo}
+            src="/logo.png"
             sx={{
               width: { xs: 80, sm: 100 },
               height: { xs: 80, sm: 100 },
               mx: 'auto',
               mb: 2,
-              border: '4px solid #FFD700',
-              boxShadow: '0 10px 30px rgba(255, 215, 0, 0.3)',
+              border: theme.palette.mode === 'dark' 
+                ? '4px solid #06d6a0' 
+                : '4px solid #10b981',
+              boxShadow: '0 10px 30px rgba(16, 185, 129, 0.3)',
               animation: 'float 3s ease-in-out infinite',
               '@keyframes float': {
                 '0%, 100%': { transform: 'translateY(0px)' },
@@ -328,7 +346,9 @@ export default function Dashboard() {
             gutterBottom
             sx={{ 
               fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' },
-              background: 'linear-gradient(45deg, #667eea, #764ba2)',
+              background: theme.palette.mode === 'dark'
+                ? 'linear-gradient(45deg, #06d6a0, #10b981)'
+                : 'linear-gradient(45deg, #10b981, #059669)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -378,10 +398,10 @@ export default function Dashboard() {
                 progress={experiencePoints}
                 max={nextLevelXP}
                 size={isMobile ? 100 : 120}
-                color="#4CAF50"
+                color={theme.palette.mode === 'dark' ? "#06d6a0" : "#10b981"}
                 centerContent={
                   <Box textAlign="center">
-                    <Typography variant="h6" fontWeight="bold" color="#4CAF50">
+                    <Typography variant="h6" fontWeight="bold" color={theme.palette.mode === 'dark' ? "#06d6a0" : "#10b981"}>
                       {Math.round((experiencePoints / nextLevelXP) * 100)}%
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
@@ -407,18 +427,22 @@ export default function Dashboard() {
               size="large"
               startIcon={<PlayCircle />}
               sx={{
-                background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                background: theme.palette.mode === 'dark'
+                  ? 'linear-gradient(135deg, #06d6a0 0%, #048c69 100%)'
+                  : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                 borderRadius: 3,
                 px: 3,
                 py: 1.5,
                 fontWeight: 'bold',
                 fontSize: { xs: '0.9rem', sm: '1rem' },
-                boxShadow: '0 8px 20px rgba(79, 172, 254, 0.4)',
+                boxShadow: '0 8px 20px rgba(16, 185, 129, 0.4)',
                 transition: 'all 0.3s ease',
                 '&:hover': { 
                   transform: 'translateY(-2px) scale(1.02)',
                   boxShadow: '0 12px 28px rgba(79, 172, 254, 0.5)',
-                  background: 'linear-gradient(135deg, #00f2fe 0%, #4facfe 100%)',
+                  background: theme.palette.mode === 'dark'
+                    ? 'linear-gradient(135deg, #048c69 0%, #06d6a0 100%)'
+                    : 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
                 }
               }}
               onClick={() => navigate('/app/videos')}
@@ -430,18 +454,22 @@ export default function Dashboard() {
               size="large"
               startIcon={<People />}
               sx={{
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: theme.palette.mode === 'dark'
+                  ? 'linear-gradient(135deg, #34d399 0%, #10b981 100%)'
+                  : 'linear-gradient(135deg, #06d6a0 0%, #048c69 100%)',
                 borderRadius: 3,
                 px: 3,
                 py: 1.5,
                 fontWeight: 'bold',
                 fontSize: { xs: '0.9rem', sm: '1rem' },
-                boxShadow: '0 8px 20px rgba(102, 126, 234, 0.4)',
+                boxShadow: '0 8px 20px rgba(16, 185, 129, 0.4)',
                 transition: 'all 0.3s ease',
                 '&:hover': { 
                   transform: 'translateY(-2px) scale(1.02)',
                   boxShadow: '0 12px 28px rgba(102, 126, 234, 0.5)',
-                  background: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
+                  background: theme.palette.mode === 'dark'
+                    ? 'linear-gradient(135deg, #10b981 0%, #34d399 100%)'
+                    : 'linear-gradient(135deg, #048c69 0%, #06d6a0 100%)',
                 }
               }}
               onClick={() => navigate('/app/referrals')}
@@ -457,14 +485,18 @@ export default function Dashboard() {
         severity="success" 
         sx={{ 
           mb: 3, 
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
-          color: 'white', 
+          background: theme.palette.mode === 'dark'
+            ? 'linear-gradient(135deg, #062c24 0%, #0a3a2d 50%, #104034 100%)'
+            : 'linear-gradient(135deg, #10b981 0%, #06d6a0 50%, #048c69 100%)',
+          color: theme.palette.mode === 'dark' ? '#06d6a0' : 'white', 
           fontWeight: 'bold',
           borderRadius: 3,
           fontSize: { xs: '0.85rem', sm: '0.875rem' },
           backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255,255,255,0.3)',
-          boxShadow: '0 8px 32px rgba(102, 126, 234, 0.3)',
+          border: theme.palette.mode === 'dark' 
+            ? '1px solid rgba(6, 214, 160, 0.3)' 
+            : '1px solid rgba(255,255,255,0.3)',
+          boxShadow: '0 8px 32px rgba(16, 185, 129, 0.3)',
           position: 'relative',
           overflow: 'hidden',
           animation: 'slideInDown 0.5s ease-out',
@@ -479,14 +511,17 @@ export default function Dashboard() {
             left: '-100%',
             width: '100%',
             height: '100%',
-            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+            background: theme.palette.mode === 'dark'
+              ? 'linear-gradient(90deg, transparent, rgba(6, 214, 160, 0.2), transparent)'
+              : 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+            opacity: theme.palette.mode === 'dark' ? 0.6 : 1,
             animation: 'shimmer 3s infinite',
           },
           '@keyframes shimmer': {
             '0%': { left: '-100%' },
             '100%': { left: '100%' }
           },
-          '& .MuiAlert-icon': { color: 'white' },
+          '& .MuiAlert-icon': { color: theme.palette.mode === 'dark' ? '#06d6a0' : 'white' },
           '& .MuiAlert-message': {
             padding: { xs: '8px 0', sm: '12px 0' },
             position: 'relative',
@@ -656,7 +691,9 @@ export default function Dashboard() {
             variant="h5" 
             fontWeight="bold" 
             sx={{
-              background: 'linear-gradient(45deg, #667eea, #764ba2)',
+              background: theme.palette.mode === 'dark'
+                ? 'linear-gradient(45deg, #06d6a0, #10b981)'
+                : 'linear-gradient(45deg, #10b981, #059669)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -798,12 +835,14 @@ export default function Dashboard() {
             }
           }}>
             <Chip 
-              label="L1: 4,000 RWF" 
+              label="L1: 3,200 RWF" 
               sx={{ 
-                background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)', 
-                color: '#000', 
+                background: theme.palette.mode === 'dark'
+                  ? 'linear-gradient(135deg, #06d6a0 0%, #048c69 100%)'
+                  : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                color: theme.palette.mode === 'dark' ? '#000' : '#ffffff',
                 fontWeight: 'bold',
-                boxShadow: '0 4px 15px rgba(255, 215, 0, 0.4)',
+                boxShadow: '0 4px 15px rgba(16, 185, 129, 0.4)',
                 transition: 'all 0.3s ease',
                 '&:hover': {
                   transform: 'scale(1.1)',
@@ -812,12 +851,14 @@ export default function Dashboard() {
               }} 
             />
             <Chip 
-              label="L2: 1,500 RWF" 
+              label="L2: 1,100 RWF" 
               sx={{ 
-                background: 'linear-gradient(135deg, #E8E8E8 0%, #C0C0C0 100%)', 
-                color: '#000', 
+                background: theme.palette.mode === 'dark'
+                  ? 'linear-gradient(135deg, #34d399 0%, #10b981 100%)'
+                  : 'linear-gradient(135deg, #06d6a0 0%, #048c69 100%)',
+                color: theme.palette.mode === 'dark' ? '#000' : '#ffffff',
                 fontWeight: 'bold',
-                boxShadow: '0 4px 15px rgba(192, 192, 192, 0.4)',
+                boxShadow: '0 4px 15px rgba(16, 185, 129, 0.4)',
                 transition: 'all 0.3s ease',
                 '&:hover': {
                   transform: 'scale(1.1)',
@@ -826,12 +867,14 @@ export default function Dashboard() {
               }} 
             />
             <Chip 
-              label="L3: 900 RWF" 
+              label="L3: 700 RWF" 
               sx={{ 
-                background: 'linear-gradient(135deg, #CD7F32 0%, #B87333 100%)', 
-                color: '#fff', 
+                background: theme.palette.mode === 'dark'
+                  ? 'linear-gradient(135deg, #6ee7b7 0%, #34d399 100%)'
+                  : 'linear-gradient(135deg, #048c69 0%, #065f46 100%)',
+                color: theme.palette.mode === 'dark' ? '#000' : '#ffffff',
                 fontWeight: 'bold',
-                boxShadow: '0 4px 15px rgba(205, 127, 50, 0.4)',
+                boxShadow: '0 4px 15px rgba(16, 185, 129, 0.4)',
                 transition: 'all 0.3s ease',
                 '&:hover': {
                   transform: 'scale(1.1)',

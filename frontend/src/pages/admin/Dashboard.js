@@ -35,7 +35,7 @@ import StatCard from '../../components/common/StatCard';
 import GamificationCard from '../../components/common/GamificationCard';
 import ProgressRing from '../../components/common/ProgressRing';
 import AchievementBadge from '../../components/common/AchievementBadge';
-import worldwideLogo from '../../assets/worldwide.png';
+// Logo is in public folder, referenced directly in JSX
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
@@ -122,8 +122,8 @@ export default function AdminDashboard() {
               textAlign: { xs: 'center', sm: 'left' }
             }}>
               <img 
-                src={worldwideLogo} 
-                alt="Worldwide Earn" 
+                src="/logo.png"
+                alt="Pesa Boost"
                 style={{ 
                   width: 60, 
                   height: 60, 
@@ -150,7 +150,7 @@ export default function AdminDashboard() {
                     fontSize: { xs: '1rem', sm: '1.25rem' }
                   }}
                 >
-                  Worldwide Earn Platform Management
+                  Pesa Boost Platform Management
                 </Typography>
               </Box>
             </Box>
@@ -547,7 +547,7 @@ export default function AdminDashboard() {
                   Platform Version
                 </Typography>
                 <Typography variant="body1" fontWeight={600}>
-                  Worldwide Earn v2.0.1
+                  Pesa Boost v2.0.1
                 </Typography>
               </Box>
             </CardContent>

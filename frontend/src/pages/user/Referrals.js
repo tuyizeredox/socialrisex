@@ -180,7 +180,7 @@ export default function Referrals() {
             value={referralData?.stats.level1Count || 0}
             icon={PersonAdd}
             color="success"
-            subtitle="4,000 RWF per active member"
+            subtitle="3,200 RWF per active member"
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
@@ -189,7 +189,7 @@ export default function Referrals() {
             value={referralData?.stats.level2Count || 0}
             icon={People}
             color="warning"
-            subtitle="1,500 RWF per active member"
+            subtitle="1,100 RWF per active member"
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
@@ -198,7 +198,7 @@ export default function Referrals() {
             value={referralData?.stats.level3Count || 0}
             icon={People}
             color="info"
-            subtitle="900 RWF per active member"
+            subtitle="700 RWF per active member"
           />
         </Grid>
       </Grid>
@@ -226,7 +226,7 @@ export default function Referrals() {
           <StatCard
             title="Level 1 Earnings"
             value={`RWF ${(referralData?.stats?.breakdown?.level1 ?? 0).toLocaleString()}`}
-            subtitle={`${referralData?.stats.level1Count || 0} × 4,000 RWF`}
+            subtitle={`${referralData?.stats.level1Count || 0} × 3,200 RWF`}
             icon={MonetizationOn}
             color="info"
           />
@@ -245,7 +245,9 @@ export default function Referrals() {
       <Card 
         sx={{ 
           mb: 4,
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          background: theme.palette.mode === 'dark'
+            ? 'linear-gradient(135deg, #06d6a0 0%, #048c69 100%)'
+            : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
           color: 'white',
           borderRadius: 3,
           boxShadow: 3
@@ -291,7 +293,7 @@ export default function Referrals() {
                   color="success.main"
                   sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}
                 >
-                  4,000 RWF
+                  3,200 RWF
                 </Typography>
                 <Typography 
                   variant="body2" 
@@ -333,7 +335,7 @@ export default function Referrals() {
                   color="warning.main"
                   sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}
                 >
-                  1,500 RWF
+                  1,100 RWF
                 </Typography>
                 <Typography 
                   variant="body2" 
@@ -375,7 +377,7 @@ export default function Referrals() {
                   color="info.main"
                   sx={{ fontSize: { xs: '1.5rem', sm: '2rem' } }}
                 >
-                  900 RWF
+                  700 RWF
                 </Typography>
                 <Typography 
                   variant="body2" 

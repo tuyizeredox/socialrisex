@@ -5,15 +5,15 @@ export const getTheme = (mode) => createTheme({
   palette: {
     mode,
     primary: {
-      main: mode === 'dark' ? '#6366f1' : '#4f46e5',
-      light: mode === 'dark' ? '#818cf8' : '#6366f1',
-      dark: mode === 'dark' ? '#4f46e5' : '#4338ca',
+      main: mode === 'dark' ? '#10b981' : '#059669',
+      light: mode === 'dark' ? '#34d399' : '#10b981',
+      dark: mode === 'dark' ? '#059669' : '#047857',
       contrastText: '#ffffff'
     },
     secondary: {
-      main: mode === 'dark' ? '#ec4899' : '#db2777',
-      light: mode === 'dark' ? '#f472b6' : '#ec4899',
-      dark: mode === 'dark' ? '#db2777' : '#be185d',
+      main: mode === 'dark' ? '#06d6a0' : '#048c69',
+      light: mode === 'dark' ? '#2ce1b4' : '#06d6a0',
+      dark: mode === 'dark' ? '#048c69' : '#037054',
       contrastText: '#ffffff'
     },
     // Enhanced gamification colors
@@ -48,14 +48,14 @@ export const getTheme = (mode) => createTheme({
       contrastText: '#ffffff'
     },
     background: {
-      default: mode === 'dark' ? '#0f172a' : '#f8fafc',
-      paper: mode === 'dark' ? '#1e293b' : '#ffffff',
+      default: mode === 'dark' ? '#062c24' : '#f0fdf4',
+      paper: mode === 'dark' ? '#0a3a2d' : '#ffffff',
       gradient: mode === 'dark'
-        ? 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)'
-        : 'linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)',
+        ? 'linear-gradient(135deg, #0a3a2d 0%, #062c24 100%)'
+        : 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)',
       dashboard: mode === 'dark'
-        ? 'linear-gradient(to right, #0f172a 0%, #1e293b 50%, #0f172a 100%)'
-        : 'linear-gradient(to right, #f8fafc 0%, #ffffff 50%, #f8fafc 100%)'
+        ? 'linear-gradient(to right, #062c24 0%, #0a3a2d 50%, #062c24 100%)'
+        : 'linear-gradient(to right, #ecfdf5 0%, #d1fae5 50%, #a7f3d0 100%)'
     },
     text: {
       primary: mode === 'dark' ? '#f1f5f9' : '#0f172a',

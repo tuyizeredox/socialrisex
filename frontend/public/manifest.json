@@ -1,6 +1,6 @@
 {
-  "short_name": "Worldwide Earn",
-  "name": "Worldwide Earn",
+  "short_name": "Pesa Boost",
+  "name": "Pesa Boost",
   "icons": [
     {
       "src": "favicon.ico",
@@ -8,12 +8,12 @@
       "type": "image/x-icon"
     },
     {
-      "src": "worldwide.png",
+      "src": "logo.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "worldwide.png",
+      "src": "logo.png",
       "type": "image/png",
       "sizes": "512x512"
     }

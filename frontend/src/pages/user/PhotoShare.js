@@ -83,11 +83,11 @@ export default function PhotoShare() {
 
       // Create WhatsApp share link
       const shareText = encodeURIComponent(
-        `🌟 Check out this amazing photo from Worldwide Earn! 📸\\n\\n` +
-        `Join me on this incredible earning platform and start making money today! 💰\\n\\n` +
-        `Use my referral code: ${user.referralCode}\\n` +
+        `🌟 Check out this amazing photo from Pesa Boost! 📸\n\n` +
+        `Join me on this incredible earning platform and start making money today! 💰\n\n` +
+        `Use my referral code: ${user.referralCode}\n` +
         `Sign up here: ${process.env.REACT_APP_FRONTEND_URL || 'https://worldwideearn.com'}/register?ref=${user.referralCode}\\n\\n` +
-        `#WorldwideEarn #EarnMoney #PhotoShare`
+        `#PesaBoost #EarnMoney #PhotoShare`
       );
       
       const whatsappUrl = `https://wa.me/?text=${shareText}`;

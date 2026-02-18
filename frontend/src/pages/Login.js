@@ -42,7 +42,7 @@ import {
   FlashOn
 } from '@mui/icons-material';
 import api from '../utils/api';
-import worldwideLogo from '../assets/worldwide.png';
+// Logo is in public folder, referenced directly in JSX
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -109,8 +109,8 @@ export default function Login() {
         position: 'relative',
         overflow: 'hidden',
         background: theme.palette.mode === 'dark'
-          ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)'
-          : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          ? 'linear-gradient(135deg, #062c24 0%, #0a3a2d 50%, #062c24 100%)'
+          : 'linear-gradient(135deg, #059669 0%, #10b981 50%, #06d6a0 100%)',
         '&::before': {
           content: '""',
           position: 'absolute',
@@ -119,8 +119,8 @@ export default function Login() {
           right: 0,
           bottom: 0,
           background: theme.palette.mode === 'dark'
-            ? 'radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%)'
-            : 'radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%)',
+            ? 'radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(6, 214, 160, 0.1) 0%, transparent 50%)'
+            : 'radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.2) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%)',
           animation: 'float 20s ease-in-out infinite',
         },
         '@keyframes float': {
@@ -248,8 +248,8 @@ export default function Login() {
                     }}
                   >
                     <Avatar
-                      src={worldwideLogo}
-                      alt="Worldwide Earn"
+                      src="/logo.png"
+                      alt="Pesa Boost"
                       sx={{
                         width: 100,
                         height: 100,

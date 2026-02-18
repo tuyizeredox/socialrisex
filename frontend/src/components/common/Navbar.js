@@ -53,7 +53,7 @@ export default function Navbar({ isAdmin, onMenuClick }) {
             fontSize: isMobile ? '1rem' : '1.25rem'
           }}
         >
-          {isAdmin ? 'Admin Dashboard' : 'Worldwide Earn'}
+          {isAdmin ? 'Admin Dashboard' : 'Pesa Boost'}
         </Typography>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>

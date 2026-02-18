@@ -14,7 +14,7 @@ const transactionSchema = new mongoose.Schema({
   },
   amount: {
     type: Number,
-    default: 8000 // Activation fee amount
+    default: 6000 // Activation fee amount
   },
   status: {
     type: String,

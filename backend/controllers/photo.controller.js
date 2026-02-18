@@ -3,23 +3,10 @@ import PhotoShare from '../models/PhotoShare.js';
 import User from '../models/User.js';
 import ErrorResponse from '../utils/errorResponse.js';
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
+import { uploadImageToCloudinary, deleteImageFromCloudinary, extractPublicIdFromUrl } from '../utils/cloudinary.js';
 
 // Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadPath = 'uploads/photos/';
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
-    }
-    cb(null, uploadPath);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, `photo-${uniqueSuffix}${path.extname(file.originalname)}`);
-  }
-});
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image/')) {
@@ -46,18 +33,9 @@ export const getAllPhotos = async (req, res, next) => {
       .populate('uploadedBy', 'fullName email')
       .sort('-createdAt');
 
-    // Convert relative URLs to full URLs
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const photosWithFullUrls = photos.map(photo => {
-      return {
-        ...photo.toObject(),
-        imageUrl: photo.imageUrl.startsWith('http') ? photo.imageUrl : `${baseUrl}${photo.imageUrl}`
-      };
-    });
-
     res.status(200).json({
       success: true,
-      data: photosWithFullUrls
+      data: photos
     });
   } catch (error) {
     next(error);
@@ -73,34 +51,29 @@ export const createPhoto = async (req, res, next) => {
       return next(new ErrorResponse('Image file is required', 400));
     }
 
-    const imageUrl = `/uploads/photos/${req.file.filename}`;
+    // Upload image to Cloudinary
+    const uploadResult = await uploadImageToCloudinary(req.file.buffer, 'photos');
+    const imageUrl = uploadResult.secure_url;
+    const cloudinaryPublicId = uploadResult.public_id;
+    
     const parsedTags = tags ? tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [];
 
     const photo = await Photo.create({
       title,
       description,
       imageUrl,
+      cloudinaryPublicId, // Store Cloudinary public ID for future deletion
       tags: parsedTags,
       isActive: isActive !== 'false',
       uploadedBy: req.user._id
     });
 
-    // Convert relative URL to full URL for response
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const photoWithFullUrl = {
-      ...photo.toObject(),
-      imageUrl: photo.imageUrl.startsWith('http') ? photo.imageUrl : `${baseUrl}${photo.imageUrl}`
-    };
-
     res.status(201).json({
       success: true,
-      data: photoWithFullUrl
+      data: photo
     });
   } catch (error) {
-    // Clean up uploaded file on error
-    if (req.file) {
-      fs.unlink(req.file.path, () => {});
-    }
+    console.error('Photo upload error:', error);
     next(error);
   }
 };
@@ -125,12 +98,15 @@ export const updatePhoto = async (req, res, next) => {
 
     // Update image if new file uploaded
     if (req.file) {
-      // Delete old image file
-      const oldImagePath = path.join(process.cwd(), photo.imageUrl);
-      if (fs.existsSync(oldImagePath)) {
-        fs.unlink(oldImagePath, () => {});
+      // Delete old image from Cloudinary
+      if (photo.cloudinaryPublicId) {
+        await deleteImageFromCloudinary(photo.cloudinaryPublicId);
       }
-      updateData.imageUrl = `/uploads/photos/${req.file.filename}`;
+      
+      // Upload new image to Cloudinary
+      const uploadResult = await uploadImageToCloudinary(req.file.buffer, 'photos');
+      updateData.imageUrl = uploadResult.secure_url;
+      updateData.cloudinaryPublicId = uploadResult.public_id;
     }
 
     const updatedPhoto = await Photo.findByIdAndUpdate(
@@ -139,22 +115,12 @@ export const updatePhoto = async (req, res, next) => {
       { new: true, runValidators: true }
     ).populate('uploadedBy', 'fullName email');
 
-    // Convert relative URL to full URL for response
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const photoWithFullUrl = {
-      ...updatedPhoto.toObject(),
-      imageUrl: updatedPhoto.imageUrl.startsWith('http') ? updatedPhoto.imageUrl : `${baseUrl}${updatedPhoto.imageUrl}`
-    };
-
     res.status(200).json({
       success: true,
-      data: photoWithFullUrl
+      data: updatedPhoto
     });
   } catch (error) {
-    // Clean up uploaded file on error
-    if (req.file) {
-      fs.unlink(req.file.path, () => {});
-    }
+    console.error('Photo update error:', error);
     next(error);
   }
 };
@@ -167,10 +133,9 @@ export const deletePhoto = async (req, res, next) => {
       return next(new ErrorResponse('Photo not found', 404));
     }
 
-    // Delete image file
-    const imagePath = path.join(process.cwd(), photo.imageUrl);
-    if (fs.existsSync(imagePath)) {
-      fs.unlink(imagePath, () => {});
+    // Delete image from Cloudinary
+    if (photo.cloudinaryPublicId) {
+      await deleteImageFromCloudinary(photo.cloudinaryPublicId);
     }
 
     // Delete associated shares
@@ -183,6 +148,7 @@ export const deletePhoto = async (req, res, next) => {
       message: 'Photo deleted successfully'
     });
   } catch (error) {
+    console.error('Photo delete error:', error);
     next(error);
   }
 };
@@ -242,18 +208,9 @@ export const getAvailablePhotos = async (req, res, next) => {
       .select('title description imageUrl tags')
       .sort('-createdAt');
 
-    // Convert relative URLs to full URLs
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const photosWithFullUrls = photos.map(photo => {
-      return {
-        ...photo.toObject(),
-        imageUrl: photo.imageUrl.startsWith('http') ? photo.imageUrl : `${baseUrl}${photo.imageUrl}`
-      };
-    });
-
     res.status(200).json({
       success: true,
-      data: photosWithFullUrls
+      data: photos
     });
   } catch (error) {
     next(error);

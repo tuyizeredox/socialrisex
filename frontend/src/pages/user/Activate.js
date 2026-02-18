@@ -91,7 +91,7 @@ export default function Activate() {
   const paymentMethods = [
     {
       name: 'MTN MoMo',
-      code: '*182*8*1*000564*8000#',
+      code: '*182*8*1*000564*6000#',
       recipient: 'N AND M SHOP LTD',
       color: '#FFC107',
       icon: '💛'
@@ -115,7 +115,7 @@ export default function Activate() {
         transactionId: response.data.transactionId,
         submittedAt: response.data.submittedAt,
         status: response.data.status,
-        amount: 8000
+        amount: 6000
       });
       setSnackbar({
         open: true,
@@ -281,7 +281,7 @@ export default function Activate() {
                         Amount:
                       </Typography>
                       <Typography variant="h6" fontWeight={600} sx={{ color: '#E65100' }}>
-                        8,000 RWF
+                        6,000 RWF
                       </Typography>
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -422,10 +422,10 @@ export default function Activate() {
               fontSize: { xs: '1rem', sm: '1.25rem' }
             }}
           >
-            Join thousands earning with Worldwide Earn!
+            Join thousands earning with Pesa Boost!
           </Typography>
           <Chip
-            label="One-time activation fee: 8,000 RWF"
+            label="One-time activation fee: 6,000 RWF"
             sx={{
               bgcolor: 'rgba(255,255,255,0.2)',
               color: 'white',
@@ -547,7 +547,7 @@ export default function Activate() {
                   border: '2px solid #FF8F00'
                 }}
               >
-                *182*8*1*000564*8000#
+                *182*8*1*000564*6000#
               </Box>
             </Box>
             
@@ -556,7 +556,7 @@ export default function Activate() {
               {[
                 { step: '1', text: 'Dial the code above', icon: '📞' },
                 { step: '2', text: 'Confirm: N AND M SHOP LTD', icon: '👤' },
-                { step: '3', text: 'Amount: 8000 RWF', icon: '💰' },
+                { step: '3', text: 'Amount: 6000 RWF', icon: '💰' },
                 { step: '4', text: 'Enter your PIN', icon: '🔐' },
                 { step: '5', text: 'Save Transaction ID from SMS', icon: '📱' }
               ].map((item, index) => (

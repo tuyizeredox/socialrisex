@@ -3,9 +3,9 @@ import MultilevelEarnings from '../models/MultilevelEarnings.js';
 
 /**
  * Calculate multilevel referral earnings for a user
- * Level 1: 4000 RWF per active referral
- * Level 2: 1500 RWF per active referral  
- * Level 3: 900 RWF per active referral
+ * Level 1: 3200 RWF per active referral
+ * Level 2: 1100 RWF per active referral  
+ * Level 3: 700 RWF per active referral
  * @param {string} userId - The user ID to calculate earnings for
  * @returns {Promise<Object>} Earnings breakdown and totals
  */
@@ -37,9 +37,9 @@ export const calculateMultilevelReferralEarnings = async (userId) => {
     const level3Count = level3Referrals.length;
 
     const earnings = {
-      level1: level1Count * 4000,
-      level2: level2Count * 1500,
-      level3: level3Count * 900
+      level1: level1Count * 3200,
+      level2: level2Count * 1100,
+      level3: level3Count * 700
     };
 
     const totalEarnings = earnings.level1 + earnings.level2 + earnings.level3;
@@ -320,19 +320,19 @@ export const getDetailedMultilevelStructure = async (userId) => {
     const level1WithInfo = level1Referrals.map(ref => ({
       ...ref.toObject(),
       level: 1,
-      earnings: ref.isActive ? 4000 : 0
+      earnings: ref.isActive ? 3200 : 0
     }));
 
     const level2WithInfo = level2Referrals.map(ref => ({
       ...ref.toObject(),
       level: 2,
-      earnings: ref.isActive ? 1500 : 0
+      earnings: ref.isActive ? 1100 : 0
     }));
 
     const level3WithInfo = level3Referrals.map(ref => ({
       ...ref.toObject(),
       level: 3,
-      earnings: ref.isActive ? 900 : 0
+      earnings: ref.isActive ? 700 : 0
     }));
 
     // Combine all referrals

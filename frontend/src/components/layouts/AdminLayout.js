@@ -34,7 +34,7 @@ import {
 } from "@mui/icons-material";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
-import worldwideLogo from '../../assets/worldwide.png';
+// Logo is in public folder, referenced directly in JSX
 
 const drawerWidth = 260;
 
@@ -93,8 +93,8 @@ const menuItems = [
       <Toolbar sx={{ justifyContent: "space-between", mb: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <img 
-            src={worldwideLogo} 
-            alt="Worldwide Earn" 
+            src="/logo.png"
+            alt="Pesa Boost" 
             style={{ 
               width: 32, 
               height: 32, 
@@ -103,7 +103,7 @@ const menuItems = [
             }}
           />
           <Typography variant="h6" sx={{ fontWeight: 700, color: "primary.main" }}>
-            Worldwide Earn
+            Pesa Boost
           </Typography>
         </Box>
         <IconButton onClick={handleDrawerToggle} sx={{ display: { sm: "none" } }}>
@@ -164,8 +164,8 @@ const menuItems = [
         }}
       >
         <img 
-          src={worldwideLogo} 
-          alt="Worldwide Earn" 
+          src="/logo.png"
+          alt="Pesa Boost" 
           style={{ 
             width: 40, 
             height: 40, 
@@ -174,7 +174,7 @@ const menuItems = [
           }}
         />
         <Typography variant="body2" sx={{ fontWeight: 600, fontStyle: 'italic' }}>
-          "Earn Worldwide with Worldwide Earn!"
+          "Earn Worldwide with Pesa Boost!"
         </Typography>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 1 }}>
           <TrendingUp sx={{ fontSize: 20, color: 'primary.main', mr: 0.5 }} />
@@ -210,8 +210,8 @@ const menuItems = [
       <AppBar 
         position="fixed" 
         sx={{ 
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          boxShadow: '0 8px 32px rgba(102, 126, 234, 0.3)',
+          background: "linear-gradient(135deg, #059669 0%, #10b981 100%)",
+          boxShadow: "0 8px 32px rgba(16, 185, 129, 0.3)",
           backdropFilter: 'blur(10px)'
         }}
       >
@@ -233,8 +233,8 @@ const menuItems = [
           )}
           <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
             <img 
-              src={worldwideLogo} 
-              alt="Worldwide Earn" 
+              src="/logo.png"
+              alt="Pesa Boost" 
               style={{ 
                 width: 32, 
                 height: 32, 
@@ -243,7 +243,7 @@ const menuItems = [
               }}
             />
             <Typography variant="h6" sx={{ fontWeight: 700, color: "white" }}>
-              Worldwide Earn Admin
+              Pesa Boost Admin
             </Typography>
           </Box>
           <IconButton 
