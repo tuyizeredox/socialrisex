@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "cd backend && npm run dev",
-    "install": "cd backend && npm install && cd ../frontend && npm install"
+    "install": "cd backend && npm install && cd ../frontend && npm install",
+    "postinstall": "cd backend && npm install && cd ../frontend && npm install"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -23,6 +24,6 @@
     "nodemailer": "^8.0.1"
   },
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   }
 }

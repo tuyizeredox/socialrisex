@@ -25,27 +25,39 @@ if (!process.env.MONGODB_URI) {
   console.error('MONGODB_URI is not defined in environment variables');
   console.error('Available environment variables:', Object.keys(process.env).filter(key => key.includes('MONGO') || key.includes('DB') || key.includes('URI')));
   process.exit(1);
+} else {
+  console.log('MONGODB_URI environment variable is set');
 }
 
 const app = express();
 
 // Optimized MongoDB Connection with Retry Logic
 const connectDB = async () => {
+  console.log('Starting MongoDB connection...');
+  
   let retryAttempts = 5;
   let delay = 3000; // Delay in ms (3 seconds)
 
   const connect = async () => {
     try {
+      console.log('Attempting to connect to MongoDB...');
       const conn = await mongoose.connect(process.env.MONGODB_URI, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
-        serverSelectionTimeoutMS: 30000, // Increase timeout to 30 seconds
-        socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+        serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
+        socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity,
+        maxPoolSize: 10, // Maintain up to 10 socket connections
       });
       console.log(`MongoDB Connected: ${conn.connection.host}`);
     } catch (error) {
+      console.error('MongoDB connection error details:', {
+        message: error.message,
+        code: error.code,
+        name: error.name
+      });
+      
       if (retryAttempts > 0) {
-        console.error(`MongoDB connection failed. Retrying in ${delay / 1000} seconds...`);
+        console.error(`MongoDB connection failed. Retrying in ${delay / 1000} seconds... (${retryAttempts} attempts left)`);
         retryAttempts--;
         setTimeout(connect, delay);
       } else {
@@ -158,8 +170,41 @@ process.on('unhandledRejection', (err) => {
   process.exit(1);
 });
 
-// Start the server
+// Start the server with a startup timeout
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, '0.0.0.0', () => {
+
+// Set a timeout for server startup to detect hanging connections
+const startupTimeout = setTimeout(() => {
+  console.error('Server startup timeout - possible database connection issue');
+  process.exit(1);
+}, 30000); // 30 second timeout
+
+const server = app.listen(PORT, '0.0.0.0', () => {
+  clearTimeout(startupTimeout);
   console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  console.log(`Health check available at http://localhost:${PORT}/health`);
+});
+
+// Add error handling for the server
+server.on('error', (error) => {
+  console.error('Server error:', error);
+  clearTimeout(startupTimeout);
+  process.exit(1);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  clearTimeout(startupTimeout);
+  server.close(() => {
+    console.log('Process terminated');
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully');
+  clearTimeout(startupTimeout);
+  server.close(() => {
+    console.log('Process terminated');
+  });
 });

@@ -4,12 +4,13 @@ services:
     env: node
     region: oregon
     buildCommand: |
-      cd backend && npm install
-      cd ../frontend && npm install && npm run build
-      cd .. && npm install
+      cd backend && npm ci --only=production
+      cd ../frontend && npm ci --only=production && npm run build
+      cd .. && npm ci --only=production
     startCommand: |
       cd backend && node server.js
-    nodeVersion: 18.x
+    healthCheckPath: /health
+    nodeVersion: 20.x
     envVars:
       - key: NODE_ENV
         value: production
