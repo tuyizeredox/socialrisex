@@ -21,6 +21,7 @@ import FacebookShare from './pages/user/FacebookShare';
 import InstagramShare from './pages/user/InstagramShare';
 import Withdraw from './pages/user/Withdraw';
 import Notifications from './pages/user/Notifications';
+import Leaderboard from './pages/user/Leaderboard';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard';
@@ -70,6 +71,7 @@ function App() {
         <Route path="instagram-share" element={<InstagramShare />} />
         <Route path="withdraw" element={<Withdraw />} />
         <Route path="notifications" element={<Notifications />} />
+        <Route path="leaderboard" element={<Leaderboard />} />
         <Route path="activate" element={<Activate />} />
       </Route>
 

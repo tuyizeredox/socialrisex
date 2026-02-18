@@ -29,6 +29,7 @@ router.put('/users/profile', userController.updateProfile);
 router.get('/users/stats', userController.getUserStats);
 router.get('/users/watched-videos', userController.getWatchedVideos);
 router.get('/users/referrals', userController.getReferrals);
+router.get('/users/leaderboard', userController.getLeaderboard);
 router.get('/users/referral-info', userController.getReferralInfo);
 router.get('/users/pending-activation', userController.checkPendingActivation);
 router.post('/users/activate', userController.activateAccount);

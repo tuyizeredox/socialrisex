@@ -70,6 +70,7 @@ const MainLayout = () => {
         { text: 'Dashboard', icon: <Dashboard />, path: '/app/dashboard' },
         { text: 'Videos', icon: <VideoLibrary />, path: '/app/videos' },
         { text: 'Team', icon: <People />, path: '/app/referrals' },
+        { text: 'Leaderboard', icon: <Star />, path: '/app/leaderboard' },
         { text: 'WhatsApp Share', icon: <WhatsApp />, path: '/app/whatsapp-share' },
         { text: 'Facebook Share', icon: <Facebook />, path: '/app/facebook-share' },
         { text: 'Instagram Share', icon: <Instagram />, path: '/app/instagram-share' },

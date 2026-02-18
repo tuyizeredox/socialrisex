@@ -547,3 +547,135 @@ export const getBonusHistory = async (req, res, next) => {
     next(error);
   }
 };
+
+// Get leaderboard data for top referrers
+export const getLeaderboard = async (req, res, next) => {
+  try {
+    // Aggregation pipeline to get referrer performance
+    const aggregationPipeline = [
+      // Match users who have referrals
+      {
+        $lookup: {
+          from: 'users',
+          localField: '_id',
+          foreignField: 'referredBy',
+          as: 'referrals'
+        }
+      },
+      {
+        $match: {
+          'referrals.0': { $exists: true } // Only users with referrals
+        }
+      },
+      {
+        $addFields: {
+          totalReferrals: { $size: '$referrals' },
+          activeReferrals: {
+            $size: {
+              $filter: {
+                input: '$referrals',
+                as: 'referral',
+                cond: { $eq: ['$$referral.isActive', true] }
+              }
+            }
+          }
+        }
+      },
+      {
+        $addFields: {
+          conversionRate: {
+            $cond: [
+              { $eq: ['$totalReferrals', 0] },
+              0,
+              { $multiply: [{ $divide: ['$activeReferrals', '$totalReferrals'] }, 100] }
+            ]
+          },
+          activityScore: {
+            $min: [
+              100,
+              {
+                $add: [
+                  { $multiply: ['$conversionRate', 0.4] }, // 40% weight on conversion
+                  { $multiply: [{ $min: [50, '$totalReferrals'] }, 0.6] } // 60% weight on volume (capped at 50)
+                ]
+              }
+            ]
+          }
+        }
+      },
+      {
+        $project: {
+          password: 0,
+          'referrals.password': 0
+        }
+      }
+    ];
+
+    // Apply sorting by total earnings (using multilevel earnings calculation)
+    const referrers = await User.aggregate([
+      ...aggregationPipeline,
+      { $sort: { totalReferrals: -1 } }
+    ]);
+
+    // Transform referrers data to include user info and calculate multilevel earnings
+    const transformedReferrers = await Promise.all(referrers.map(async (referrer) => {
+      // Calculate actual multilevel earnings
+      const multilevelData = await calculateMultilevelReferralEarnings(referrer._id);
+      
+      return {
+        userId: referrer._id,
+        user: {
+          fullName: referrer.fullName,
+          email: referrer.email,
+          createdAt: referrer.createdAt,
+          isActive: referrer.isActive
+        },
+        totalReferrals: referrer.totalReferrals,
+        activeReferrals: referrer.activeReferrals,
+        totalEarnings: multilevelData.totalEarnings, // Use actual multilevel earnings
+        conversionRate: Math.round(referrer.conversionRate * 10) / 10,
+        activityScore: Math.round(referrer.activityScore),
+        multilevelBreakdown: multilevelData.earnings, // Add detailed breakdown
+        levels: {
+          level1: multilevelData.level1Count,
+          level2: multilevelData.level2Count,
+          level3: multilevelData.level3Count
+        }
+      };
+    }));
+
+    // Sort by total earnings (descending)
+    transformedReferrers.sort((a, b) => b.totalEarnings - a.totalEarnings);
+
+    // Limit to top 10
+    const topTenReferrers = transformedReferrers.slice(0, 10);
+
+    // Calculate overall stats
+    const allReferrers = await User.aggregate(aggregationPipeline);
+    let totalEarnings = 0;
+    for (const referrer of allReferrers) {
+      const multilevelData = await calculateMultilevelReferralEarnings(referrer._id);
+      totalEarnings += multilevelData.totalEarnings;
+    }
+
+    const stats = {
+      totalReferrers: allReferrers.length,
+      totalReferrals: allReferrers.reduce((sum, r) => sum + r.totalReferrals, 0),
+      totalEarnings: totalEarnings, // Use real multilevel earnings
+      activeReferrers: allReferrers.filter(r => r.activeReferrals > 0).length,
+      avgConversionRate: allReferrers.length > 0 
+        ? (allReferrers.reduce((sum, r) => sum + r.conversionRate, 0) / allReferrers.length).toFixed(1)
+        : 0,
+      topEarner: topTenReferrers[0] || null,
+      recentGrowth: 0 // Placeholder for growth data
+    };
+
+    res.json({
+      referrers: topTenReferrers,
+      stats
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
