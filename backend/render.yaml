@@ -13,4 +13,4 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: FRONTEND_URL
-        value: https://socialrisex.vercel.app/  # Update this line
+        value: https://pesaboost.vercel.app # Update this line
