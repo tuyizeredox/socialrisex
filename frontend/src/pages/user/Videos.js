@@ -66,7 +66,12 @@ export default function Videos() {
       ]);
       
       if (videosRes.data) {
-        setVideos(videosRes.data);
+        const vids = Array.isArray(videosRes.data)
+          ? videosRes.data
+          : Array.isArray(videosRes.data.data)
+          ? videosRes.data.data
+          : [];
+        setVideos(vids);
       }
       
       if (statsRes.data?.data) {
@@ -113,18 +118,7 @@ export default function Videos() {
             : video
         )
       );
-    // Update the videos list
-    setVideos(prevVideos => 
-      prevVideos.map(video => 
-        video._id === selectedVideo._id 
-          ? { 
-              ...video, 
-              watched: true,
-              completedAt: new Date()
-            }
-          : video
-      )
-    );
+    // Update the videos list (single update)
     // Dispatch event with points data
     const videoCompletedEvent = new CustomEvent('videoCompleted', {
       detail: {
