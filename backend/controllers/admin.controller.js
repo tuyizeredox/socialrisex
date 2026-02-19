@@ -33,7 +33,7 @@ export const getStats = async (req, res, next) => {
       User.aggregate([{ $group: { _id: null, total: { $sum: '$points' } } }]),
       Withdrawal.aggregate([
         { $match: { status: 'pending' } },
-        { $group: { _id: null, total: { $sum: '$amount' } } }
+        { $group: { _id: null, total: { $sum: { $ifNull: ['$total', '$amount'] } } } }
       ]),
     ]);
 

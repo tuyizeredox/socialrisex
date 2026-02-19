@@ -21,6 +21,7 @@ import {
   Receipt,
   CloudUpload,
   TrendingUp,
+  EmojiEvents,
   Notifications
 } from '@mui/icons-material';
 import { 
@@ -49,6 +50,7 @@ export default function Sidebar({ isAdmin, mobileOpen, onClose }) {
     { text: 'Videos', icon: <VideoLibrary />, path: '/app/videos' },
     { text: 'Team', icon: <People />, path: '/app/referrals' },
     { text: 'Notifications', icon: <Notifications />, path: '/app/notifications' },
+    { text: 'Leaderboard', icon: <EmojiEvents />, path: '/app/leaderboard' },
     { text: 'WhatsApp Share', icon: <WhatsApp />, path: '/app/whatsapp-share' },
     { text: 'Facebook Share', icon: <Facebook />, path: '/app/facebook-share' },
     { text: 'Instagram Share', icon: <Instagram />, path: '/app/instagram-share' },
@@ -62,7 +64,8 @@ export default function Sidebar({ isAdmin, mobileOpen, onClose }) {
     { text: 'Photo Upload', icon: <CloudUpload />, path: '/admin/photos' },
     { text: 'Transaction Approvals', icon: <Receipt />, path: '/admin/transactions' },
     { text: 'Multilevel Earnings', icon: <TrendingUp />, path: '/admin/multilevel-earnings' },
-    { text: 'Withdrawals', icon: <AccountBalance />, path: '/admin/withdrawals' }
+    { text: 'Withdrawals', icon: <AccountBalance />, path: '/admin/withdrawals' },
+    { text: 'Leaderboard', icon: <EmojiEvents />, path: '/admin/leaderboard' }
   ];
 
   const menuItems = isAdmin ? adminMenuItems : userMenuItems;

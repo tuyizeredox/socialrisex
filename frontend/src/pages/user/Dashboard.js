@@ -358,6 +358,59 @@ export default function Dashboard() {
             Welcome back, {user.fullName}! 🌟
           </Typography>
 
+          {/* Quick Stats Comparison */}
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            gap: 2, 
+            mt: 2, 
+            mb: 1,
+            flexWrap: 'wrap'
+          }}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 1.5,
+                px: 3,
+                borderRadius: 4,
+                bgcolor: theme.palette.mode === 'dark' ? 'rgba(6, 214, 160, 0.05)' : 'rgba(16, 185, 129, 0.05)',
+                border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(6, 214, 160, 0.2)' : 'rgba(16, 185, 129, 0.2)'}`,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                minWidth: 140
+              }}
+            >
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                Activation Fee
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 800, color: theme.palette.mode === 'dark' ? '#06d6a0' : '#10b981' }}>
+                6,000 RWF
+              </Typography>
+            </Paper>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 1.5,
+                px: 3,
+                borderRadius: 4,
+                bgcolor: theme.palette.mode === 'dark' ? 'rgba(6, 214, 160, 0.05)' : 'rgba(16, 185, 129, 0.05)',
+                border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(6, 214, 160, 0.2)' : 'rgba(16, 185, 129, 0.2)'}`,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                minWidth: 140
+              }}
+            >
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                Total Earnings
+              </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 800, color: theme.palette.mode === 'dark' ? '#06d6a0' : '#10b981' }}>
+                {stats.earnings.toLocaleString()} RWF
+              </Typography>
+            </Paper>
+          </Box>
+
           {/* XP Progress */}
           <Box sx={{ 
             mt: 3, 

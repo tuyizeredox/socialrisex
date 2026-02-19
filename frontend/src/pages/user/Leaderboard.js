@@ -113,6 +113,14 @@ export default function UserLeaderboard() {
     return `${amount.toLocaleString()} RWF`;
   };
 
+  const formatPercent = (value, digits = 1) => {
+    if (value === null || value === undefined) return (0).toFixed(digits);
+    if (typeof value === 'number') return value.toFixed(digits);
+    const cleaned = String(value).replace('%', '').trim();
+    const n = parseFloat(cleaned);
+    return Number.isFinite(n) ? n.toFixed(digits) : (0).toFixed(digits);
+  };
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -261,8 +269,8 @@ export default function UserLeaderboard() {
               }}>
                 <TrendingUp sx={{ fontSize: { xs: 28, sm: 32, md: 40 }, mr: { xs: 1.5, sm: 2 } }} />
                 <Box sx={{ minWidth: 0, flex: 1 }}>
-                  <Typography variant={isMobile ? 'h6' : 'h5'} fontWeight={700} sx={{ lineHeight: 1.2 }}>
-                    {stats.avgConversionRate.toFixed(1)}%
+                    <Typography variant={isMobile ? 'h6' : 'h5'} fontWeight={700} sx={{ lineHeight: 1.2 }}>
+                    {formatPercent(stats.avgConversionRate, 1)}%
                   </Typography>
                   <Typography variant={isMobile ? 'caption' : 'body2'}>Avg Conversion</Typography>
                 </Box>

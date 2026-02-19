@@ -3,6 +3,8 @@ import User from '../models/User.js';
 import ErrorResponse from '../utils/errorResponse.js';
 import { calculateMultilevelReferralEarnings } from '../utils/referralCalculations.js';
 
+const WITHDRAWAL_FEE = 1500; // RWF
+
 // @desc    Create withdrawal request
 // @route   POST /api/withdrawals
 // @access  Private
@@ -54,7 +56,7 @@ export const createWithdrawal = async (req, res) => {
         {
           $group: {
             _id: null,
-            total: { $sum: '$amount' }
+            total: { $sum: { $ifNull: ['$total', '$amount'] } }
           }
         }
       ]);
@@ -70,7 +72,7 @@ export const createWithdrawal = async (req, res) => {
         {
           $group: {
             _id: null,
-            total: { $sum: '$amount' }
+            total: { $sum: { $ifNull: ['$total', '$amount'] } }
           }
         }
       ]);
@@ -79,18 +81,22 @@ export const createWithdrawal = async (req, res) => {
       const pendingWithdrawals = pendingAmount[0]?.total || 0;
       const availableBalance = totalEarnings - totalWithdrawn - pendingWithdrawals;
 
-      if (amount > availableBalance) {
+      const totalDeduction = Number(amount) + WITHDRAWAL_FEE;
+
+      if (totalDeduction > availableBalance) {
         return res.status(400).json({
           success: false,
-          message: 'Insufficient balance'
+          message: `Insufficient balance. Withdrawal plus fee (RWF ${WITHDRAWAL_FEE}) exceed your available balance.`
         });
       }
     }
 
-    // Create new withdrawal
+    // Create new withdrawal (store fee and total deduction)
     const withdrawal = new Withdrawal({
       user: userId,
       amount,
+      fee: WITHDRAWAL_FEE,
+      total: Number(amount) + WITHDRAWAL_FEE,
       paymentMethod,
       accountDetails,
       status: 'pending'
@@ -131,7 +137,7 @@ export const getUserWithdrawals = async (req, res, next) => {
       {
         $group: {
           _id: null,
-          total: { $sum: '$amount' }
+          total: { $sum: { $ifNull: ['$total', '$amount'] } }
         }
       }
     ]);
@@ -147,7 +153,7 @@ export const getUserWithdrawals = async (req, res, next) => {
       {
         $group: {
           _id: null,
-          total: { $sum: '$amount' }
+          total: { $sum: { $ifNull: ['$total', '$amount'] } }
         }
       }
     ]);
@@ -307,7 +313,7 @@ export const processWithdrawal = async (req, res, next) => {
       {
         $group: {
           _id: null,
-          total: { $sum: '$amount' }
+          total: { $sum: { $ifNull: ['$total', '$amount'] } }
         }
       }
     ]);
@@ -324,7 +330,7 @@ export const processWithdrawal = async (req, res, next) => {
       {
         $group: {
           _id: null,
-          total: { $sum: '$amount' }
+          total: { $sum: { $ifNull: ['$total', '$amount'] } }
         }
       }
     ]);
@@ -346,7 +352,7 @@ export const processWithdrawal = async (req, res, next) => {
     });
 
     // If approving, check if user has sufficient balance
-    if (status === 'approved' && withdrawal.amount > availableBalance) {
+    if (status === 'approved' && withdrawal.total > availableBalance) {
       throw new ErrorResponse('User has insufficient balance', 400);
     }
 

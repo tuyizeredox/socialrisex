@@ -4,24 +4,31 @@ import ErrorResponse from '../utils/errorResponse.js';
 
 export const protect = async (req, res, next) => {
   try {
-    // Get token from header
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    
-    if (!token) {
-      throw new ErrorResponse('No authentication token, access denied', 401);
+    // Read authorization header (handle varying header casing)
+    const authHeader = req.headers.authorization || req.headers.Authorization;
+
+    if (!authHeader || typeof authHeader !== 'string' || !authHeader.startsWith('Bearer ')) {
+      return next(new ErrorResponse('No authentication token, access denied', 401));
     }
 
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    // Modified query to handle projection properly
+    const token = authHeader.replace('Bearer ', '').trim();
+
+    // Verify token and return specific JWT errors when possible
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      const message = err && err.message ? err.message : 'Token verification failed';
+      return next(new ErrorResponse(message, 401));
+    }
+
     const user = await User.findById(decoded.id)
       .select('+fullName +email +role +isActive +referralCode +referralCount +earnings +points +mobileNumber')
       .lean()
       .exec();
 
     if (!user) {
-      throw new ErrorResponse('User not found', 404);
+      return next(new ErrorResponse('User not found', 404));
     }
 
     // Remove sensitive fields
@@ -29,8 +36,10 @@ export const protect = async (req, res, next) => {
     delete user.password;
 
     req.user = user;
-    next();
+    return next();
   } catch (error) {
+    // If an ErrorResponse was thrown earlier, forward it
+    if (error instanceof ErrorResponse) return next(error);
     next(new ErrorResponse('Not authorized to access this route', 401));
   }
 };

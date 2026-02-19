@@ -64,6 +64,7 @@ export default function Withdraw() {
     accountName: ''
   });
   const [isFirstWithdrawal, setIsFirstWithdrawal] = useState(true);
+  const WITHDRAWAL_FEE = 1500; // RWF fee deducted on each withdrawal
 
   const fetchData = useCallback(async () => {
     try {
@@ -100,10 +101,12 @@ export default function Withdraw() {
     
     // Validate withdrawal amount
     const amount = Number(formData.amount);
-    
+    // Calculate max withdrawable after fee
+    const maxWithdrawable = Math.max((balance.availableBalance || 0) - WITHDRAWAL_FEE, 0);
+
     // Skip balance check for first-time withdrawal
-    if (!isFirstWithdrawal && amount > (balance.availableBalance || 0)) {
-      setError('Withdrawal amount cannot exceed your available balance');
+    if (!isFirstWithdrawal && amount > maxWithdrawable) {
+      setError(`Withdrawal amount cannot exceed your available balance after the RWF ${WITHDRAWAL_FEE} fee`);
       return;
     }
 
@@ -233,6 +236,10 @@ export default function Withdraw() {
               RWF {(balance.availableBalance || 0).toLocaleString()}
             </Typography>
 
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              Withdrawal fee: RWF {WITHDRAWAL_FEE.toLocaleString()}. Max withdrawable: RWF {Math.max((balance.availableBalance || 0) - WITHDRAWAL_FEE, 0).toLocaleString()}.
+            </Typography>
+
             <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
               Minimum withdrawal: RWF 5,000
             </Typography>
@@ -269,7 +276,7 @@ export default function Withdraw() {
                 sx={{ mb: 2 }}
                 inputProps={{
                   min: 5000,
-                  max: balance.availableBalance || 0
+                  max: Math.max((balance.availableBalance || 0) - WITHDRAWAL_FEE, 0)
                 }}
               />
 
@@ -314,7 +321,7 @@ export default function Withdraw() {
                 type="submit"
                 variant="contained"
                 fullWidth
-                disabled={submitting || (balance.availableBalance || 0) < 5000}
+                disabled={submitting || Math.max((balance.availableBalance || 0) - WITHDRAWAL_FEE, 0) < 5000}
                 startIcon={<MonetizationOn />}
               >
                 {submitting ? 'Processing...' : 'Request Withdrawal'}

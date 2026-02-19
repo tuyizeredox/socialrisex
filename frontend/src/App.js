@@ -21,7 +21,7 @@ import FacebookShare from './pages/user/FacebookShare';
 import InstagramShare from './pages/user/InstagramShare';
 import Withdraw from './pages/user/Withdraw';
 import Notifications from './pages/user/Notifications';
-import Leaderboard from './pages/user/Leaderboard';
+import UserLeaderboard from './pages/user/Leaderboard';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard';
@@ -30,7 +30,7 @@ import VideoManagement from './pages/admin/VideoManagement';
 import PhotoManagement from './pages/admin/PhotoManagement';
 import WithdrawalManagement from './pages/admin/WithdrawalManagement';
 import Transactions from './pages/admin/Transactions';
-import Leaderboard from './pages/admin/Leaderboard';
+import AdminLeaderboard from './pages/admin/Leaderboard';
 import MultilevelEarnings from './pages/admin/MultilevelEarnings';
 import BonusManagement from './pages/admin/BonusManagement';
 
@@ -71,7 +71,7 @@ function App() {
         <Route path="instagram-share" element={<InstagramShare />} />
         <Route path="withdraw" element={<Withdraw />} />
         <Route path="notifications" element={<Notifications />} />
-        <Route path="leaderboard" element={<Leaderboard />} />
+        <Route path="leaderboard" element={<UserLeaderboard />} />
         <Route path="activate" element={<Activate />} />
       </Route>
 
@@ -89,7 +89,7 @@ function App() {
         <Route path="multilevel-earnings" element={<MultilevelEarnings />} />
         <Route path="bonus" element={<BonusManagement />} />
         <Route path="withdrawals" element={<WithdrawalManagement />} />
-        <Route path="leaderboard" element={<Leaderboard />} />
+        <Route path="leaderboard" element={<AdminLeaderboard />} />
       </Route>
 
       {/* Catch all route - redirect to login for unknown routes */}

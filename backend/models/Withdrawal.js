@@ -11,6 +11,14 @@ const withdrawalSchema = new mongoose.Schema({
     required: [true, 'Amount is required'],
     min: [5000, 'Minimum withdrawal amount is 5,000 RWF']
   },
+  fee: {
+    type: Number,
+    default: 1500
+  },
+  total: {
+    type: Number,
+    default: 0
+  },
   paymentMethod: {
     type: String,
     required: [true, 'Payment method is required'],
