@@ -387,7 +387,7 @@ export default function Register() {
                   }}
                 >
                   <img 
-                    src="/logo.png"
+                    src={process.env.PUBLIC_URL + '/logo.png'}
                     alt="Pesa Boost"
                     style={{ 
                       width: 80, 

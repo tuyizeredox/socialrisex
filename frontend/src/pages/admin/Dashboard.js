@@ -122,7 +122,7 @@ export default function AdminDashboard() {
               textAlign: { xs: 'center', sm: 'left' }
             }}>
               <img 
-                src="/logo.png"
+                src={process.env.PUBLIC_URL + '/logo.png'}
                 alt="Pesa Boost"
                 style={{ 
                   width: 60, 

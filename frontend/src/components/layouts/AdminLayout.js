@@ -93,7 +93,7 @@ const menuItems = [
       <Toolbar sx={{ justifyContent: "space-between", mb: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <img 
-            src="/logo.png"
+            src={process.env.PUBLIC_URL + '/logo.png'}
             alt="Pesa Boost" 
             style={{ 
               width: 32, 
@@ -164,7 +164,7 @@ const menuItems = [
         }}
       >
         <img 
-          src="/logo.png"
+          src={process.env.PUBLIC_URL + '/logo.png'}
           alt="Pesa Boost" 
           style={{ 
             width: 40, 
@@ -233,7 +233,7 @@ const menuItems = [
           )}
           <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
             <img 
-              src="/logo.png"
+              src={process.env.PUBLIC_URL + '/logo.png'}
               alt="Pesa Boost" 
               style={{ 
                 width: 32, 

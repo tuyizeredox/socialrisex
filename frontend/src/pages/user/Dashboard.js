@@ -317,7 +317,7 @@ export default function Dashboard() {
 
           {/* Profile Section */}
           <Avatar
-            src="/logo.png"
+            src={process.env.PUBLIC_URL + '/logo.png'}
             sx={{
               width: { xs: 80, sm: 100 },
               height: { xs: 80, sm: 100 },

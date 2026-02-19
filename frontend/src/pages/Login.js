@@ -248,7 +248,7 @@ export default function Login() {
                     }}
                   >
                     <Avatar
-                      src="/logo.png"
+                      src={process.env.PUBLIC_URL + '/logo.png'}
                       alt="Pesa Boost"
                       sx={{
                         width: 100,
