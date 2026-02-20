@@ -74,8 +74,8 @@ connectDB();
 // Middleware Setup
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
-    ? [process.env.FRONTEND_URL || 'https://worldwideearn.vercel.app'] 
-    : ['http://localhost:3000', 'http://localhost:3001', process.env.FRONTEND_URL || 'https://worldwideearn.vercel.app'], // Allow both local and production origins
+    ? [process.env.FRONTEND_URL || 'https://pesaboost.onrender.com'] 
+    : ['http://localhost:3000', 'http://localhost:3001', process.env.FRONTEND_URL || 'https://pesaboost.onrender.com'], // Allow both local and production origins
   credentials: true, // Allow cookies or credentials
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // Allowed HTTP methods
   allowedHeaders: [
