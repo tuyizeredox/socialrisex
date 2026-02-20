@@ -121,7 +121,8 @@ app.get('/health', (req, res) => {
 // Caching for API GET requests (cached for 5 minutes)
 // Move BEFORE routes to intercept and AFTER to capture
 app.use((req, res, next) => {
-  if (req.method !== 'GET' || req.path.includes('/auth/me')) {
+  // Don't cache admin routes, auth/me, or non-GET requests
+  if (req.method !== 'GET' || req.path.includes('/auth/me') || req.path.startsWith('/api/admin')) {
     return next();
   }
   
@@ -167,7 +168,8 @@ if (process.env.NODE_ENV === 'production') {
 
 // Response caching for static content (1 hour cache)
 app.use((req, res, next) => {
-  if (req.method === 'GET') {
+  // Only apply to GET requests that are NOT API or uploads
+  if (req.method === 'GET' && !req.path.startsWith('/api') && !req.path.startsWith('/uploads')) {
     res.set('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
   }
   next();
