@@ -4,6 +4,7 @@ import {
   getUsers,
   updateUser,
   deleteUser,
+  bulkDeleteUsers,
   getAdminVideos,
   createVideo,
   updateVideo,
@@ -41,6 +42,7 @@ router.get('/stats', getStats);
 // User Management
 router.get('/users', getUsers);
 router.put('/users/:id', updateUser);
+router.delete('/users/bulk', bulkDeleteUsers);
 router.delete('/users/:id', deleteUser);
 
 // Video Management

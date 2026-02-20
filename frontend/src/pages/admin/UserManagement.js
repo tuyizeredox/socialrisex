@@ -34,6 +34,7 @@ import {
   Card,
   CardContent,
   Avatar,
+  Checkbox,
   useMediaQuery,
   useTheme
 } from '@mui/material';
@@ -66,6 +67,10 @@ export default function UserManagement() {
   const [search, setSearch] = useState('');
   const [pagination, setPagination] = useState({ page: 0, limit: 10, total: 0 });
   const [viewMode, setViewMode] = useState('table'); // 'table' or 'cards'
+  
+  // Selection state
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
   
   // Delete dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -164,6 +169,34 @@ export default function UserManagement() {
     }
   };
 
+  const handleBulkDelete = async () => {
+    try {
+      await api.post('/admin/users/bulk-delete', { userIds: selectedUsers });
+      showNotification(`${selectedUsers.length} users deleted successfully`, 'success');
+      setSelectedUsers([]);
+      setBulkDeleteDialogOpen(false);
+      fetchUsers();
+    } catch (error) {
+      showNotification(error.message || 'Failed to delete users', 'error');
+    }
+  };
+
+  const handleToggleSelect = (userId) => {
+    setSelectedUsers(prev => 
+      prev.includes(userId) 
+        ? prev.filter(id => id !== userId) 
+        : [...prev, userId]
+    );
+  };
+
+  const handleSelectAll = (event) => {
+    if (event.target.checked) {
+      setSelectedUsers(users.map(user => user._id));
+    } else {
+      setSelectedUsers([]);
+    }
+  };
+
   const openDeleteDialog = (user) => {
     setUserToDelete(user);
     setDeleteDialogOpen(true);
@@ -228,6 +261,23 @@ export default function UserManagement() {
   };
 
   const columns = [
+    {
+      field: 'selection',
+      label: (
+        <Checkbox
+          indeterminate={selectedUsers.length > 0 && selectedUsers.length < users.length}
+          checked={users.length > 0 && selectedUsers.length === users.length}
+          onChange={handleSelectAll}
+          sx={{ color: 'white' }}
+        />
+      ),
+      render: (row) => (
+        <Checkbox
+          checked={selectedUsers.includes(row._id)}
+          onChange={() => handleToggleSelect(row._id)}
+        />
+      ),
+    },
     {
       field: 'fullName',
       label: 'Name',
@@ -807,6 +857,22 @@ export default function UserManagement() {
                   </Button>
                 </>
               )}
+              {selectedUsers.length > 0 && (
+                <Button
+                  variant="contained"
+                  color="error"
+                  startIcon={<Delete />}
+                  onClick={() => setBulkDeleteDialogOpen(true)}
+                  size="small"
+                  sx={{ 
+                    px: { xs: 1.5, sm: 2 },
+                    fontSize: '0.75rem',
+                    boxShadow: '0 4px 12px rgba(244, 67, 54, 0.3)',
+                  }}
+                >
+                  Delete ({selectedUsers.length})
+                </Button>
+              )}
               <IconButton
                 size={isMobile ? 'small' : 'medium'}
                 sx={{
@@ -1266,6 +1332,35 @@ export default function UserManagement() {
             sx={{ borderRadius: 2 }}
           >
             Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Bulk Delete Users Dialog */}
+      <Dialog
+        open={bulkDeleteDialogOpen}
+        onClose={() => setBulkDeleteDialogOpen(false)}
+        PaperProps={{ sx: { borderRadius: 2 } }}
+      >
+        <DialogTitle sx={{ bgcolor: 'error.light', color: 'white' }}>
+          Delete Multiple Users
+        </DialogTitle>
+        <DialogContent sx={{ mt: 2 }}>
+          <DialogContentText>
+            Are you sure you want to delete {selectedUsers.length} selected users? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setBulkDeleteDialogOpen(false)} sx={{ color: 'text.secondary' }}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleBulkDelete}
+            variant="contained"
+            color="error"
+            sx={{ borderRadius: 2 }}
+          >
+            Delete All Selected
           </Button>
         </DialogActions>
       </Dialog>

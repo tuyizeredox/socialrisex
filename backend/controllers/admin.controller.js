@@ -162,6 +162,33 @@ export const deleteUser = async (req, res, next) => {
   }
 };
 
+export const bulkDeleteUsers = async (req, res, next) => {
+  try {
+    const { userIds } = req.body;
+
+    if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
+      throw new ErrorResponse('Please provide an array of user IDs', 400);
+    }
+
+    await User.updateMany(
+      { _id: { $in: userIds } },
+      { 
+        $set: { 
+          isDeleted: true, 
+          deletedAt: new Date() 
+        } 
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `${userIds.length} users soft-deleted successfully`,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Video Management
 export const getAdminVideos = async (req, res, next) => {
   try {

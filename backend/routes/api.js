@@ -53,6 +53,7 @@ router.post('/withdrawals', withdrawalController.createWithdrawal);
 router.use('/admin', adminCheck); // Apply admin check middleware to all admin routes
 router.get('/admin/stats', adminController.getStats);
 router.get('/admin/users', adminController.getUsers);
+router.post('/admin/users/bulk-delete', adminController.bulkDeleteUsers);
 router.put('/admin/users/:id', adminController.updateUser);
 router.delete('/admin/users/:id', adminController.deleteUser); // New DELETE route for deleting users
 
