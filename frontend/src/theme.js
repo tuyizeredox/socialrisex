@@ -5,10 +5,17 @@ export const getTheme = (mode) => createTheme({
   palette: {
     mode,
     primary: {
-      main: mode === 'dark' ? '#818cf8' : '#4f46e5',
-      light: mode === 'dark' ? '#a5b4fc' : '#6366f1',
-      dark: mode === 'dark' ? '#6366f1' : '#3730a3',
+      main: mode === 'dark' ? '#38bdf8' : '#0284c7', // Sky blue for dark, Ocean blue for light
+      light: mode === 'dark' ? '#7dd3fc' : '#38bdf8',
+      dark: mode === 'dark' ? '#0284c7' : '#0369a1',
       contrastText: '#ffffff'
+    },
+    attractiveBlue: {
+      light: '#e0f2fe',
+      main: '#0ea5e9',
+      dark: '#0369a1',
+      deep: '#0c4a6e',
+      gradient: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)'
     },
     secondary: {
       main: mode === 'dark' ? '#fb7185' : '#e11d48',

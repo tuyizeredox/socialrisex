@@ -354,7 +354,7 @@ export default function Dashboard() {
             gutterBottom
             sx={{ 
               fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' },
-              background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+              background: `linear-gradient(45deg, #0284c7, #38bdf8)`,
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -379,8 +379,8 @@ export default function Dashboard() {
                 p: 1.5,
                 px: 3,
                 borderRadius: 4,
-                bgcolor: theme.palette.mode === 'dark' ? 'rgba(6, 214, 160, 0.05)' : 'rgba(16, 185, 129, 0.05)',
-                border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(6, 214, 160, 0.2)' : 'rgba(16, 185, 129, 0.2)'}`,
+                bgcolor: 'rgba(56, 189, 248, 0.05)',
+                border: `1px solid rgba(56, 189, 248, 0.2)`,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
@@ -391,7 +391,7 @@ export default function Dashboard() {
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                 Activation Fee
               </Typography>
-              <Typography variant="h6" sx={{ fontWeight: 800, color: theme.palette.mode === 'dark' ? '#06d6a0' : '#10b981' }}>
+              <Typography variant="h6" sx={{ fontWeight: 800, color: '#0284c7' }}>
                 6,000 RWF
               </Typography>
             </Paper>
@@ -401,8 +401,8 @@ export default function Dashboard() {
                 p: 1.5,
                 px: 3,
                 borderRadius: 4,
-                bgcolor: theme.palette.mode === 'dark' ? 'rgba(6, 214, 160, 0.05)' : 'rgba(16, 185, 129, 0.05)',
-                border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(6, 214, 160, 0.2)' : 'rgba(16, 185, 129, 0.2)'}`,
+                bgcolor: 'rgba(56, 189, 248, 0.05)',
+                border: `1px solid rgba(56, 189, 248, 0.2)`,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
@@ -413,7 +413,7 @@ export default function Dashboard() {
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                 Total Earnings
               </Typography>
-              <Typography variant="h6" sx={{ fontWeight: 800, color: theme.palette.mode === 'dark' ? '#06d6a0' : '#10b981' }}>
+              <Typography variant="h6" sx={{ fontWeight: 800, color: '#0284c7' }}>
                 {stats.earnings.toLocaleString()} RWF
               </Typography>
             </Paper>
@@ -489,22 +489,18 @@ export default function Dashboard() {
               size="large"
               startIcon={<PlayCircle />}
               sx={{
-                background: theme.palette.mode === 'dark'
-                  ? 'linear-gradient(135deg, #06d6a0 0%, #048c69 100%)'
-                  : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
                 borderRadius: 3,
                 px: 3,
                 py: 1.5,
                 fontWeight: 'bold',
                 fontSize: { xs: '0.9rem', sm: '1rem' },
-                boxShadow: '0 8px 20px rgba(16, 185, 129, 0.4)',
+                boxShadow: '0 8px 20px rgba(2, 132, 199, 0.4)',
                 transition: 'all 0.3s ease',
                 '&:hover': { 
                   transform: 'translateY(-2px) scale(1.02)',
-                  boxShadow: '0 12px 28px rgba(79, 172, 254, 0.5)',
-                  background: theme.palette.mode === 'dark'
-                    ? 'linear-gradient(135deg, #048c69 0%, #06d6a0 100%)'
-                    : 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+                  boxShadow: '0 12px 28px rgba(56, 189, 248, 0.5)',
+                  background: 'linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%)',
                 }
               }}
               onClick={() => navigate('/app/videos')}
@@ -516,22 +512,18 @@ export default function Dashboard() {
               size="large"
               startIcon={<People />}
               sx={{
-                background: theme.palette.mode === 'dark'
-                  ? 'linear-gradient(135deg, #34d399 0%, #10b981 100%)'
-                  : 'linear-gradient(135deg, #06d6a0 0%, #048c69 100%)',
+                background: 'linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%)',
                 borderRadius: 3,
                 px: 3,
                 py: 1.5,
                 fontWeight: 'bold',
                 fontSize: { xs: '0.9rem', sm: '1rem' },
-                boxShadow: '0 8px 20px rgba(16, 185, 129, 0.4)',
+                boxShadow: '0 8px 20px rgba(56, 189, 248, 0.4)',
                 transition: 'all 0.3s ease',
                 '&:hover': { 
                   transform: 'translateY(-2px) scale(1.02)',
-                  boxShadow: '0 12px 28px rgba(102, 126, 234, 0.5)',
-                  background: theme.palette.mode === 'dark'
-                    ? 'linear-gradient(135deg, #10b981 0%, #34d399 100%)'
-                    : 'linear-gradient(135deg, #048c69 0%, #06d6a0 100%)',
+                  boxShadow: '0 12px 28px rgba(125, 211, 252, 0.5)',
+                  background: 'linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)',
                 }
               }}
               onClick={() => navigate('/app/referrals')}

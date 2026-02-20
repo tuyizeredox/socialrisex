@@ -97,14 +97,14 @@ const MainLayout = () => {
       sx={{
         height: '100%',
         background: mode === 'dark' 
-          ? 'linear-gradient(180deg, #062c24 0%, #0a3a2d 50%, #062c24 100%)'
-          : 'linear-gradient(180deg, #059669 0%, #10b981 50%, #06d6a0 100%)',
+          ? 'linear-gradient(180deg, #0c4a6e 0%, #082f49 100%)' // Deep blue gradient
+          : 'linear-gradient(180deg, #0284c7 0%, #0ea5e9 50%, #38bdf8 100%)', // Vibrant blue gradient
         p: 2,
         display: 'flex',
         flexDirection: 'column',
         boxShadow: mode === 'dark' 
-          ? 'inset 0 0 20px rgba(0,0,0,0.3), 0 0 30px rgba(16, 185, 129, 0.1)'
-          : 'inset 0 0 20px rgba(255,255,255,0.2), 0 0 30px rgba(16, 185, 129, 0.2)',
+          ? 'inset 0 0 20px rgba(0,0,0,0.3), 0 0 30px rgba(56, 189, 248, 0.1)'
+          : 'inset 0 0 20px rgba(255,255,255,0.2), 0 0 30px rgba(2, 132, 199, 0.2)',
         position: 'relative',
         '&::before': {
           content: '""',
@@ -114,7 +114,7 @@ const MainLayout = () => {
           right: 0,
           bottom: 0,
           background: mode === 'dark'
-            ? 'radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.1) 0%, transparent 50%)'
+            ? 'radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.1) 0%, transparent 50%)'
             : 'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%)',
           pointerEvents: 'none',
           zIndex: 1,
@@ -135,8 +135,8 @@ const MainLayout = () => {
               sx={{
                 fontWeight: 700,
                 background: mode === 'dark'
-                  ? 'linear-gradient(45deg, #667eea, #764ba2)'
-                  : 'linear-gradient(45deg, #ffffff, #f8fafc)',
+                  ? 'linear-gradient(45deg, #7dd3fc, #38bdf8)'
+                  : 'linear-gradient(45deg, #ffffff, #e0f2fe)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 textShadow: mode === 'dark' ? 'none' : '0 1px 2px rgba(0,0,0,0.1)',
@@ -149,9 +149,9 @@ const MainLayout = () => {
             onClick={handleDrawerToggle}
             sx={{ 
               display: { sm: 'none' }, 
-              color: mode === 'dark' ? '#667eea' : 'white',
+              color: 'white',
               '&:hover': {
-                backgroundColor: mode === 'dark' ? 'rgba(102, 126, 234, 0.1)' : 'rgba(255, 255, 255, 0.1)',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
               }
             }}
           >
@@ -160,13 +160,9 @@ const MainLayout = () => {
         </Toolbar>
         <Divider sx={{ 
           mb: 2, 
-          bgcolor: mode === 'dark' 
-            ? 'rgba(102, 126, 234, 0.3)' 
-            : 'rgba(255, 255, 255, 0.3)',
+          bgcolor: 'rgba(255, 255, 255, 0.3)',
           height: 1,
-          boxShadow: mode === 'dark' 
-            ? '0 1px 2px rgba(102, 126, 234, 0.2)' 
-            : '0 1px 2px rgba(255, 255, 255, 0.5)'
+          boxShadow: '0 1px 2px rgba(255, 255, 255, 0.5)'
         }} />
       </Box>
 
@@ -182,41 +178,27 @@ const MainLayout = () => {
                 my: 1,
                 borderRadius: 2,
                 backgroundColor: location.pathname === item.path 
-                  ? mode === 'dark' 
-                    ? 'rgba(102, 126, 234, 0.8)' 
-                    : 'rgba(255, 255, 255, 0.2)'
+                  ? 'rgba(255, 255, 255, 0.2)'
                   : 'transparent',
-                color: location.pathname === item.path 
-                  ? 'white' 
-                  : mode === 'dark' ? '#e1e5e9' : '#ffffff',
+                color: 'white',
                 backdropFilter: location.pathname === item.path ? 'blur(10px)' : 'none',
                 boxShadow: location.pathname === item.path 
-                  ? mode === 'dark' 
-                    ? '0 4px 8px rgba(102, 126, 234, 0.3)' 
-                    : '0 4px 8px rgba(255, 255, 255, 0.3)'
+                  ? '0 4px 8px rgba(0, 0, 0, 0.1)' 
                   : 'none',
                 '&:hover': {
-                  backgroundColor: mode === 'dark' 
-                    ? 'rgba(102, 126, 234, 0.6)' 
-                    : 'rgba(255, 255, 255, 0.15)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
                   color: 'white',
                   transform: 'translateX(5px)',
                   transition: 'all 0.2s ease-in-out',
                   backdropFilter: 'blur(10px)',
-                  boxShadow: mode === 'dark' 
-                    ? '0 6px 12px rgba(102, 126, 234, 0.4)' 
-                    : '0 6px 12px rgba(255, 255, 255, 0.4)',
+                  boxShadow: '0 6px 12px rgba(0, 0, 0, 0.15)',
                 },
                 transition: 'all 0.2s ease-in-out',
               }}
             >
               <ListItemIcon
                 sx={{
-                  color: location.pathname === item.path 
-                    ? 'white' 
-                    : mode === 'dark' 
-                      ? '#667eea' 
-                      : '#ffffff',
+                  color: 'white',
                   minWidth: '40px',
                 }}
               >
@@ -224,7 +206,11 @@ const MainLayout = () => {
               </ListItemIcon>
               <ListItemText
                 primary={item.text}
-                sx={{ fontWeight: location.pathname === item.path ? 700 : 500 }}
+                sx={{ 
+                  '& .MuiListItemText-primary': {
+                    fontWeight: location.pathname === item.path ? 700 : 500,
+                  }
+                }}
               />
             </ListItem>
           ))}
@@ -235,21 +221,16 @@ const MainLayout = () => {
       <Box sx={{ position: 'relative', zIndex: 2, mt: 'auto' }}>
         <Divider sx={{ 
           my: 2, 
-          bgcolor: mode === 'dark' 
-            ? 'rgba(102, 126, 234, 0.3)' 
-            : 'rgba(255, 255, 255, 0.3)',
+          bgcolor: 'rgba(255, 255, 255, 0.3)',
           height: 1,
-          boxShadow: mode === 'dark' 
-            ? '0 1px 2px rgba(102, 126, 234, 0.2)' 
-            : '0 1px 2px rgba(255, 255, 255, 0.5)'
         }} />
         <Box textAlign="center" sx={{ 
-          color: mode === 'dark' ? '#e1e5e9' : 'rgba(255, 255, 255, 0.9)', 
+          color: 'rgba(255, 255, 255, 0.9)', 
           py: 2 
         }}>
           <TrendingUp sx={{ 
             fontSize: 30, 
-            color: mode === 'dark' ? '#667eea' : '#ffffff',
+            color: 'white',
             filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
           }} />
           <Typography variant="body2" sx={{ 
@@ -259,12 +240,6 @@ const MainLayout = () => {
           }}>
             "Earn Worldwide with Pesa Boost!"
           </Typography>
-          <Star sx={{ 
-            fontSize: 30, 
-            color: mode === 'dark' ? '#f093fb' : '#ffffff', 
-            mt: 1,
-            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
-          }} />
         </Box>
         <Button
           fullWidth
@@ -276,22 +251,11 @@ const MainLayout = () => {
             borderRadius: 2,
             py: 1.2,
             fontWeight: 'bold',
-            background: mode === 'dark' 
-              ? 'linear-gradient(45deg, #d32f2f, #f44336)'
-              : 'linear-gradient(45deg, rgba(211, 47, 47, 0.9), rgba(244, 67, 54, 0.9))',
+            background: 'linear-gradient(45deg, #ef4444, #f87171)',
             backdropFilter: 'blur(10px)',
-            border: mode === 'dark' ? 'none' : '1px solid rgba(255, 255, 255, 0.2)',
-            boxShadow: mode === 'dark' 
-              ? '0 4px 8px rgba(211, 47, 47, 0.3)'
-              : '0 4px 8px rgba(255, 255, 255, 0.3)',
             '&:hover': {
-              background: mode === 'dark'
-                ? 'linear-gradient(45deg, #b71c1c, #d32f2f)'
-                : 'linear-gradient(45deg, rgba(183, 28, 28, 0.9), rgba(211, 47, 47, 0.9))',
+              background: 'linear-gradient(45deg, #dc2626, #ef4444)',
               transform: 'scale(1.02)',
-              boxShadow: mode === 'dark' 
-                ? '0 6px 12px rgba(211, 47, 47, 0.4)'
-                : '0 6px 12px rgba(255, 255, 255, 0.4)',
             },
             transition: 'all 0.3s ease-in-out',
           }}
