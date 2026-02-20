@@ -4,6 +4,9 @@ import Withdrawal from '../models/Withdrawal.js';
 import Transaction from '../models/Transaction.js';
 import MultilevelEarnings from '../models/MultilevelEarnings.js';
 import BonusTransaction from '../models/BonusTransaction.js';
+import WatchedVideo from '../models/WatchedVideo.js';
+import PhotoShare from '../models/PhotoShare.js';
+import Photo from '../models/Photo.js';
 import ErrorResponse from '../utils/errorResponse.js';
 import { 
   calculateMultilevelReferralEarnings,
@@ -59,16 +62,14 @@ export const getUsers = async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search || '';
 
-    const baseFilter = { isDeleted: { $ne: true } };
     const query = search
       ? {
-          ...baseFilter,
           $or: [
             { fullName: { $regex: search, $options: 'i' } },
             { email: { $regex: search, $options: 'i' } },
           ],
         }
-      : baseFilter;
+      : {};
 
     const total = await User.countDocuments(query);
 
@@ -80,9 +81,6 @@ export const getUsers = async (req, res, next) => {
           localField: '_id',
           foreignField: 'referredBy',
           as: 'referrals',
-          pipeline: [
-            { $match: { isDeleted: { $ne: true } } }
-          ]
         },
       },
       {
@@ -148,14 +146,27 @@ export const deleteUser = async (req, res, next) => {
       throw new ErrorResponse('User not found', 404);
     }
 
-    // Soft delete: mark as deleted and detach from referrer tree for earnings
-    user.isDeleted = true;
-    user.deletedAt = new Date();
-    await user.save();
+    // Hard delete: remove all associated data
+    const userId = user._id;
+
+    await Promise.all([
+      User.deleteOne({ _id: userId }),
+      Withdrawal.deleteMany({ user: userId }),
+      Transaction.deleteMany({ user: userId }),
+      MultilevelEarnings.deleteMany({ user: userId }),
+      BonusTransaction.deleteMany({ user: userId }),
+      WatchedVideo.deleteMany({ user: userId }),
+      PhotoShare.deleteMany({ user: userId }),
+      Photo.deleteMany({ uploadedBy: userId }),
+      // Update those who were referred by this user
+      User.updateMany({ referredBy: userId }, { referredBy: null }),
+      // Update the referrer's count
+      user.referredBy ? User.findByIdAndUpdate(user.referredBy, { $inc: { referralCount: -1 } }) : Promise.resolve()
+    ]);
 
     res.status(200).json({
       success: true,
-      message: 'User soft-deleted successfully',
+      message: 'User and all associated data deleted successfully (Hard Delete)',
     });
   } catch (error) {
     next(error);
@@ -170,19 +181,23 @@ export const bulkDeleteUsers = async (req, res, next) => {
       throw new ErrorResponse('Please provide an array of user IDs', 400);
     }
 
-    await User.updateMany(
-      { _id: { $in: userIds } },
-      { 
-        $set: { 
-          isDeleted: true, 
-          deletedAt: new Date() 
-        } 
-      }
-    );
+    // Hard delete for multiple users
+    await Promise.all([
+      User.deleteMany({ _id: { $in: userIds } }),
+      Withdrawal.deleteMany({ user: { $in: userIds } }),
+      Transaction.deleteMany({ user: { $in: userIds } }),
+      MultilevelEarnings.deleteMany({ user: { $in: userIds } }),
+      BonusTransaction.deleteMany({ user: { $in: userIds } }),
+      WatchedVideo.deleteMany({ user: { $in: userIds } }),
+      PhotoShare.deleteMany({ user: { $in: userIds } }),
+      Photo.deleteMany({ uploadedBy: { $in: userIds } }),
+      // Update those who were referred by these users
+      User.updateMany({ referredBy: { $in: userIds } }, { referredBy: null })
+    ]);
 
     res.status(200).json({
       success: true,
-      message: `${userIds.length} users soft-deleted successfully`,
+      message: `${userIds.length} users and their associated data deleted successfully (Hard Delete)`,
     });
   } catch (error) {
     next(error);
