@@ -27,14 +27,18 @@ import {
   addBonusToUser,
   getBonusTransaction,
   updateBonusTransaction,
-  getBonusStats
+  getBonusStats,
+  ensureAllUsersHaveEarnings
 } from '../controllers/admin.controller.js';
-import { protect } from '../middleware/auth.js';
+import * as photoController from '../controllers/photo.controller.js';
+import * as withdrawalController from '../controllers/withdrawal.controller.js';
+import { protect, adminCheck } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
 // All routes require authentication and admin role
 router.use(protect);
+router.use(adminCheck);
 
 // Dashboard stats
 router.get('/stats', getStats);
@@ -42,7 +46,7 @@ router.get('/stats', getStats);
 // User Management
 router.get('/users', getUsers);
 router.put('/users/:id', updateUser);
-router.delete('/users/bulk', bulkDeleteUsers);
+router.post('/users/bulk-delete', bulkDeleteUsers);
 router.delete('/users/:id', deleteUser);
 
 // Video Management
@@ -52,8 +56,9 @@ router.put('/videos/:id', updateVideo);
 router.delete('/videos/:id', deleteVideo);
 
 // Withdrawal Management
-router.get('/withdrawals', getPendingWithdrawals);
-router.put('/withdrawals/:id', updateWithdrawal);
+router.get('/withdrawals', withdrawalController.getAllWithdrawals);
+router.get('/withdrawals/pending', getPendingWithdrawals);
+router.put('/withdrawals/:id', withdrawalController.processWithdrawal);
 
 // Transaction Management
 router.get('/transactions', getPendingTransactions);
@@ -72,6 +77,7 @@ router.get('/multilevel-earnings/stats', getMultilevelEarningsStats);
 router.put('/multilevel-earnings/:userId', updateUserMultilevelEarnings);
 router.put('/multilevel-earnings/:userId/edit', editUserMultilevelEarnings);
 router.post('/multilevel-earnings/recalculate-all', recalculateAllMultilevelEarnings);
+router.post('/multilevel-earnings/ensure-all-users', ensureAllUsersHaveEarnings);
 
 // Bonus Management
 router.get('/bonus-transactions', getBonusTransactions);
@@ -79,5 +85,13 @@ router.get('/bonus-transactions/stats', getBonusStats);
 router.post('/bonus-transactions', addBonusToUser);
 router.get('/bonus-transactions/:id', getBonusTransaction);
 router.put('/bonus-transactions/:id', updateBonusTransaction);
+
+// Photo Management
+router.get('/photos', photoController.getAllPhotos);
+router.post('/photos', photoController.upload.single('image'), photoController.createPhoto);
+router.put('/photos/:id', photoController.upload.single('image'), photoController.updatePhoto);
+router.delete('/photos/:id', photoController.deletePhoto);
+router.patch('/photos/:id/toggle-status', photoController.togglePhotoStatus);
+router.get('/photo-stats', photoController.getPhotoStats);
 
 export default router; 

@@ -8,6 +8,7 @@ import * as videoController from '../controllers/video.controller.js';
 import * as withdrawalController from '../controllers/withdrawal.controller.js';
 import * as adminController from '../controllers/admin.controller.js';
 import * as photoController from '../controllers/photo.controller.js';
+import adminRoutes from './admin.routes.js';
 
 const router = express.Router();
 
@@ -50,54 +51,6 @@ router.get('/withdrawals', withdrawalController.getUserWithdrawals);
 router.post('/withdrawals', withdrawalController.createWithdrawal);
 
 // Admin routes
-router.use('/admin', adminCheck); // Apply admin check middleware to all admin routes
-router.get('/admin/stats', adminController.getStats);
-router.get('/admin/users', adminController.getUsers);
-router.post('/admin/users/bulk-delete', adminController.bulkDeleteUsers);
-router.put('/admin/users/:id', adminController.updateUser);
-router.delete('/admin/users/:id', adminController.deleteUser); // New DELETE route for deleting users
-
-// Admin video routes
-router.get('/admin/videos', adminController.getAdminVideos);
-router.post('/admin/videos', adminController.createVideo);
-router.put('/admin/videos/:id', adminController.updateVideo);
-router.delete('/admin/videos/:id', adminController.deleteVideo);
-
-// Admin withdrawal routes
-router.get('/admin/withdrawals', withdrawalController.getAllWithdrawals);
-router.get('/admin/withdrawals/pending', withdrawalController.getPendingWithdrawals);
-router.put('/admin/withdrawals/:id', withdrawalController.processWithdrawal);
-
-// Admin transaction routes
-router.get('/admin/transactions', adminController.getPendingTransactions);
-router.get('/admin/transactions/:id', adminController.getTransactionDetails);
-router.put('/admin/transactions/:id', adminController.processTransaction);
-
-// Admin leaderboard routes
-router.get('/admin/leaderboard', adminController.getLeaderboard);
-router.get('/admin/referrers/:userId', adminController.getReferrerDetails);
-
-// Admin photo routes
-router.get('/admin/photos', photoController.getAllPhotos);
-router.post('/admin/photos', photoController.upload.single('image'), photoController.createPhoto);
-router.put('/admin/photos/:id', photoController.upload.single('image'), photoController.updatePhoto);
-router.delete('/admin/photos/:id', photoController.deletePhoto);
-router.patch('/admin/photos/:id/toggle-status', photoController.togglePhotoStatus);
-router.get('/admin/photo-stats', photoController.getPhotoStats);
-
-// Admin multilevel earnings routes
-router.get('/admin/multilevel-earnings', adminController.getMultilevelEarnings);
-router.get('/admin/multilevel-earnings/stats', adminController.getMultilevelEarningsStats);
-router.put('/admin/multilevel-earnings/:userId', adminController.updateUserMultilevelEarnings);
-router.put('/admin/multilevel-earnings/:userId/edit', adminController.editUserMultilevelEarnings);
-router.post('/admin/multilevel-earnings/recalculate-all', adminController.recalculateAllMultilevelEarnings);
-router.post('/admin/multilevel-earnings/ensure-all-users', adminController.ensureAllUsersHaveEarnings);
-
-// Admin bonus management routes
-router.get('/admin/bonus-transactions', adminController.getBonusTransactions);
-router.get('/admin/bonus-transactions/stats', adminController.getBonusStats);
-router.post('/admin/bonus-transactions', adminController.addBonusToUser);
-router.get('/admin/bonus-transactions/:id', adminController.getBonusTransaction);
-router.put('/admin/bonus-transactions/:id', adminController.updateBonusTransaction);
+router.use('/admin', adminRoutes);
 
 export default router;
