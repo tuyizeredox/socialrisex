@@ -113,38 +113,27 @@ app.use(
   })
 );
 
-// Serve static files in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/build')));
-
-  // Catch-all route to serve the frontend
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
-  });
-}
-
-// Serve uploaded files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString(), env: process.env.NODE_ENV });
 });
 
-// API Routes
-app.use('/api', apiRoutes);
-
 // Caching for API GET requests (cached for 5 minutes)
+// Move BEFORE routes to intercept and AFTER to capture
 app.use((req, res, next) => {
+  if (req.method !== 'GET' || req.path.includes('/auth/me')) {
+    return next();
+  }
+  
   const key = `__express__${req.originalUrl}` || req.url;
   const cachedBody = cache.get(key);
 
-  if (cachedBody && req.method === 'GET') {
+  if (cachedBody) {
     return res.send(cachedBody);
   } else {
     res.sendResponse = res.send;
     res.send = (body) => {
-      if (req.method === 'GET') {
+      if (res.statusCode === 200) {
         cache.put(key, body, 300000); // Cache for 5 minutes
       }
       res.sendResponse(body);
@@ -152,6 +141,29 @@ app.use((req, res, next) => {
     next();
   }
 });
+
+// API Routes
+app.use('/api', apiRoutes);
+
+// Serve static files in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../frontend/build')));
+}
+
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Catch-all route to serve the frontend in production (must be last)
+if (process.env.NODE_ENV === 'production') {
+  app.get('*', (req, res) => {
+    // Only serve index.html for non-API and non-uploads routes
+    if (!req.path.startsWith('/api') && !req.path.startsWith('/uploads')) {
+      res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
+    } else {
+      res.status(404).json({ message: 'Resource not found' });
+    }
+  });
+}
 
 // Response caching for static content (1 hour cache)
 app.use((req, res, next) => {

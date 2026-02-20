@@ -5,63 +5,69 @@ export const getTheme = (mode) => createTheme({
   palette: {
     mode,
     primary: {
-      main: mode === 'dark' ? '#10b981' : '#059669',
-      light: mode === 'dark' ? '#34d399' : '#10b981',
-      dark: mode === 'dark' ? '#059669' : '#047857',
+      main: mode === 'dark' ? '#818cf8' : '#4f46e5',
+      light: mode === 'dark' ? '#a5b4fc' : '#6366f1',
+      dark: mode === 'dark' ? '#6366f1' : '#3730a3',
       contrastText: '#ffffff'
     },
     secondary: {
-      main: mode === 'dark' ? '#06d6a0' : '#048c69',
-      light: mode === 'dark' ? '#2ce1b4' : '#06d6a0',
-      dark: mode === 'dark' ? '#048c69' : '#037054',
+      main: mode === 'dark' ? '#fb7185' : '#e11d48',
+      light: mode === 'dark' ? '#fda4af' : '#fb7185',
+      dark: mode === 'dark' ? '#e11d48' : '#be123c',
       contrastText: '#ffffff'
+    },
+    lime: {
+      main: '#a3e635',
+      light: '#bef264',
+      dark: '#84cc16',
+      contrastText: '#000000'
     },
     // Enhanced gamification colors
     gamification: {
-      gold: '#FFD700',
-      silver: '#C0C0C0',
-      bronze: '#CD7F32',
-      diamond: '#B9F2FF',
-      emerald: '#50C878',
-      ruby: '#E0115F',
-      experience: '#9C27B0',
-      achievement: '#FF6F00',
-      streak: '#4CAF50',
-      bonus: '#FF9800'
+      gold: '#fbbf24',
+      silver: '#94a3b8',
+      bronze: '#d97706',
+      diamond: '#38bdf8',
+      emerald: '#34d399',
+      ruby: '#f43f5e',
+      experience: '#818cf8',
+      achievement: '#fb923c',
+      streak: '#4ade80',
+      bonus: '#f472b6'
     },
     success: {
-      main: mode === 'dark' ? '#10b981' : '#059669',
-      light: mode === 'dark' ? '#34d399' : '#10b981',
-      dark: mode === 'dark' ? '#059669' : '#047857',
+      main: mode === 'dark' ? '#34d399' : '#10b981',
+      light: mode === 'dark' ? '#6ee7b7' : '#34d399',
+      dark: mode === 'dark' ? '#10b981' : '#059669',
       contrastText: '#ffffff'
     },
     warning: {
-      main: mode === 'dark' ? '#f59e0b' : '#d97706',
-      light: mode === 'dark' ? '#fbbf24' : '#f59e0b',
-      dark: mode === 'dark' ? '#d97706' : '#b45309',
+      main: mode === 'dark' ? '#fbbf24' : '#f59e0b',
+      light: mode === 'dark' ? '#fcd34d' : '#fbbf24',
+      dark: mode === 'dark' ? '#f59e0b' : '#d97706',
       contrastText: '#ffffff'
     },
     info: {
-      main: mode === 'dark' ? '#0ea5e9' : '#0284c7',
-      light: mode === 'dark' ? '#38bdf8' : '#0ea5e9',
-      dark: mode === 'dark' ? '#0284c7' : '#0369a1',
+      main: mode === 'dark' ? '#60a5fa' : '#3b82f6',
+      light: mode === 'dark' ? '#93c5fd' : '#60a5fa',
+      dark: mode === 'dark' ? '#3b82f6' : '#2563eb',
       contrastText: '#ffffff'
     },
     background: {
-      default: mode === 'dark' ? '#062c24' : '#f0fdf4',
-      paper: mode === 'dark' ? '#0a3a2d' : '#ffffff',
+      default: mode === 'dark' ? '#0f172a' : '#f8fafc',
+      paper: mode === 'dark' ? '#1e293b' : '#ffffff',
       gradient: mode === 'dark'
-        ? 'linear-gradient(135deg, #0a3a2d 0%, #062c24 100%)'
-        : 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)',
+        ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)'
+        : 'linear-gradient(135deg, #f1f5f9 0%, #f8fafc 100%)',
       dashboard: mode === 'dark'
-        ? 'linear-gradient(to right, #062c24 0%, #0a3a2d 50%, #062c24 100%)'
-        : 'linear-gradient(to right, #ecfdf5 0%, #d1fae5 50%, #a7f3d0 100%)'
+        ? 'linear-gradient(to right, #0f172a 0%, #1e293b 50%, #0f172a 100%)'
+        : 'linear-gradient(to right, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)'
     },
     text: {
-      primary: mode === 'dark' ? '#f1f5f9' : '#0f172a',
+      primary: mode === 'dark' ? '#f8fafc' : '#0f172a',
       secondary: mode === 'dark' ? '#94a3b8' : '#475569'
     },
-    divider: mode === 'dark' ? 'rgba(241, 245, 249, 0.12)' : 'rgba(15, 23, 42, 0.12)'
+    divider: mode === 'dark' ? 'rgba(148, 163, 184, 0.12)' : 'rgba(15, 23, 42, 0.08)'
   },
   typography: {
     fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
@@ -130,6 +136,20 @@ export const getTheme = (mode) => createTheme({
         },
         '*': {
           boxSizing: 'border-box',
+          '&::-webkit-scrollbar': {
+            width: '8px',
+            height: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: mode === 'dark' ? '#0f172a' : '#f8fafc',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: mode === 'dark' ? '#334155' : '#cbd5e1',
+            borderRadius: '10px',
+            '&:hover': {
+              background: mode === 'dark' ? '#475569' : '#94a3b8',
+            },
+          },
         }
       }
     },
@@ -151,8 +171,8 @@ export const getTheme = (mode) => createTheme({
           '&:hover': {
             transform: 'translateY(-1px)',
             boxShadow: mode === 'dark' 
-              ? '0 4px 12px rgba(99, 102, 241, 0.4)'
-              : '0 4px 12px rgba(79, 70, 229, 0.2)'
+              ? '0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+              : '0 10px 15px -3px rgba(79, 70, 229, 0.3), 0 4px 6px -2px rgba(79, 70, 229, 0.1)'
           },
           '&.logout-button': {
             background: mode === 'dark'
@@ -205,24 +225,28 @@ export const getTheme = (mode) => createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 16,
+          borderRadius: 20,
+          border: mode === 'dark' 
+            ? '1px solid rgba(148, 163, 184, 0.1)' 
+            : '1px solid rgba(15, 23, 42, 0.05)',
           boxShadow: mode === 'dark'
-            ? '0 8px 32px rgba(0,0,0,0.3)'
-            : '0 4px 20px rgba(0,0,0,0.08)',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+            : '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           overflow: 'hidden',
           position: 'relative',
+          backgroundColor: mode === 'dark' ? '#1e293b' : '#ffffff',
           '@media (max-width: 600px)': {
-            borderRadius: 12,
-            boxShadow: mode === 'dark'
-              ? '0 4px 16px rgba(0,0,0,0.2)'
-              : '0 2px 12px rgba(0,0,0,0.06)',
+            borderRadius: 16,
           },
           '&:hover': {
-            transform: 'translateY(-4px) scale(1.02)',
+            transform: 'translateY(-4px)',
             boxShadow: mode === 'dark'
-              ? '0 16px 48px rgba(0,0,0,0.4)'
-              : '0 8px 32px rgba(0,0,0,0.12)'
+              ? '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+              : '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            borderColor: mode === 'dark' 
+              ? 'rgba(129, 140, 248, 0.5)' 
+              : 'rgba(79, 70, 229, 0.2)',
           },
           '&.gamification-card': {
             background: mode === 'dark'
@@ -235,7 +259,7 @@ export const getTheme = (mode) => createTheme({
               left: 0,
               right: 0,
               height: '4px',
-              background: 'linear-gradient(90deg, #FFD700, #FF6F00, #4CAF50, #2196F3, #9C27B0)',
+              background: 'linear-gradient(90deg, #6366f1, #ec4899, #8b5cf6)',
               zIndex: 1
             }
           }
@@ -254,11 +278,14 @@ export const getTheme = (mode) => createTheme({
       styleOverrides: {
         root: {
           background: mode === 'dark'
-            ? 'linear-gradient(45deg, #1e293b 30%, #0f172a 90%)'
-            : 'linear-gradient(45deg, #4f46e5 30%, #6366f1 90%)',
-          boxShadow: mode === 'dark'
-            ? '0 4px 8px rgba(0,0,0,0.4)'
-            : '0 4px 8px rgba(79,70,229,0.2)'
+            ? 'rgba(15, 23, 42, 0.8)'
+            : 'rgba(255, 255, 255, 0.8)',
+          backdropFilter: 'blur(12px)',
+          borderBottom: mode === 'dark' 
+            ? '1px solid rgba(148, 163, 184, 0.1)'
+            : '1px solid rgba(15, 23, 42, 0.05)',
+          color: mode === 'dark' ? '#f8fafc' : '#0f172a',
+          boxShadow: 'none'
         }
       }
     },

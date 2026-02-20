@@ -397,11 +397,14 @@ const MainLayout = () => {
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          mt: 8,
+          p: { xs: 1, sm: 2, md: 3 },
+          width: { xs: '100%', sm: `calc(100% - ${drawerWidth}px)` },
+          mt: { xs: 7, sm: 8 },
           minHeight: '100vh',
           bgcolor: mode === 'dark' ? '#121212' : '#f5f7fa',
+          overflowX: 'hidden',
+          display: 'flex',
+          flexDirection: 'column'
         }}
       >
         <Outlet />

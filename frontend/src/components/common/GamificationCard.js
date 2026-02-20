@@ -47,8 +47,8 @@ const GamificationCard = ({
   
   // Dynamic gradient based on theme mode
   const defaultGradient = isDark 
-    ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-    : 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)';
+    ? 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)'
+    : 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)';
     
   const cardGradient = gradient || defaultGradient;
 
@@ -57,9 +57,9 @@ const GamificationCard = ({
       className="gamification-card"
       sx={{
         background: isDark 
-          ? 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%)'
-          : 'linear-gradient(135deg, #667eea 0%, #764ba2 30%, #f093fb 70%, #f5576c 100%)',
-        color: 'white',
+          ? 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)'
+          : 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+        color: isDark ? 'white' : 'text.primary',
         position: 'relative',
         overflow: 'visible',
         borderRadius: { xs: 3, sm: 4 },

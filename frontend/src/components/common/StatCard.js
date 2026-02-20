@@ -10,12 +10,13 @@ export default function StatCard({
   subtitle
 }) {
   const colorMap = {
-    primary: 'linear-gradient(135deg, #2196F3 0%, #21CBF3 100%)',
-    secondary: 'linear-gradient(135deg, #9C27B0 0%, #673AB7 100%)',
-    success: 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)',
-    warning: 'linear-gradient(135deg, #FF9800 0%, #FF5722 100%)',
-    info: 'linear-gradient(135deg, #00BCD4 0%, #0097A7 100%)',
-    error: 'linear-gradient(135deg, #F44336 0%, #D32F2F 100%)'
+    primary: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+    secondary: 'linear-gradient(135deg, #ec4899 0%, #d946ef 100%)',
+    success: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+    warning: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+    info: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+    error: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+    lime: 'linear-gradient(135deg, #a3e635 0%, #84cc16 100%)'
   };
 
   return (
@@ -23,12 +24,13 @@ export default function StatCard({
       sx={{
         background: colorMap[color] || colorMap.primary,
         color: 'white',
-        borderRadius: 3,
-        boxShadow: 3,
-        transition: 'transform 0.3s ease',
+        borderRadius: 5,
+        border: 'none',
+        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         '&:hover': { 
-          transform: 'translateY(-5px)',
-          boxShadow: 5
+          transform: 'translateY(-8px)',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
         }
       }}
     >

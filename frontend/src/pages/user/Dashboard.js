@@ -204,8 +204,8 @@ export default function Dashboard() {
         pb: { xs: 2, sm: 4 },
         minHeight: '100vh',
         background: theme.palette.mode === 'dark' 
-          ? 'linear-gradient(135deg, #062c24 0%, #0a3a2d 25%, #104034 50%, #0a3a2d 75%, #062c24 100%)'
-          : 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 25%, #bbf7d0 50%, #86efac 75%, #4ade80 100%)',
+          ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #334155 50%, #1e293b 75%, #0f172a 100%)'
+          : 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 25%, #e2e8f0 50%, #dcfce7 75%, #ecfdf5 100%)',
         backgroundAttachment: 'fixed',
         backdropFilter: 'blur(10px)',
       }}
@@ -215,8 +215,8 @@ export default function Dashboard() {
         elevation={0}
         sx={{ 
           background: theme.palette.mode === 'dark'
-            ? 'linear-gradient(135deg, rgba(10, 58, 45, 0.9) 0%, rgba(6, 44, 36, 0.8) 100%)'
-            : 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%)',
+            ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.8) 100%)'
+            : 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.85) 100%)',
           backdropFilter: 'blur(20px)',
           borderRadius: { xs: 4, sm: 6 },
           p: { xs: 3, sm: 5 },
@@ -225,11 +225,11 @@ export default function Dashboard() {
           position: 'relative',
           overflow: 'hidden',
           border: theme.palette.mode === 'dark' 
-            ? '1px solid rgba(16, 185, 129, 0.3)' 
-            : '1px solid rgba(255,255,255,0.2)',
+            ? '1px solid rgba(148, 163, 184, 0.1)' 
+            : '1px solid rgba(15, 23, 42, 0.05)',
           boxShadow: theme.palette.mode === 'dark'
-            ? '0 20px 40px rgba(0,0,0,0.3), 0 0 30px rgba(16, 185, 129, 0.1)'
-            : '0 20px 40px rgba(0,0,0,0.1)',
+            ? '0 20px 40px rgba(0,0,0,0.3)'
+            : '0 20px 40px rgba(0,0,0,0.05)',
         }}
       >
         {/* Animated Background */}
@@ -241,8 +241,8 @@ export default function Dashboard() {
             right: 0,
             bottom: 0,
             background: theme.palette.mode === 'dark'
-              ? `url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%2310b981" fill-opacity="0.1"%3E%3Cpath d="M30 30l-10-10 10-10 10 10-10 10zM10 10l10 10-10 10-10-10 10-10zM50 10l10 10-10 10-10-10 10-10zM10 50l10 10-10 10-10-10 10-10zM50 50l10 10-10 10-10-10 10-10z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-              : `url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%2310b981" fill-opacity="0.05"%3E%3Cpath d="M30 30l-10-10 10-10 10 10-10 10zM10 10l10 10-10 10-10-10 10-10zM50 10l10 10-10 10-10-10 10-10zM10 50l10 10-10 10-10-10 10-10zM50 50l10 10-10 10-10-10 10-10z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              ? `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.05'%3E%3Cpath d='M30 30l-10-10 10-10 10 10-10 10zM10 10l10 10-10 10-10-10 10-10zM50 10l10 10-10 10-10-10 10-10zM10 50l10 10-10 10-10-10 10-10zM50 50l10 10-10 10-10-10 10-10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+              : `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234f46e5' fill-opacity='0.03'%3E%3Cpath d='M30 30l-10-10 10-10 10 10-10 10zM10 10l10 10-10 10-10-10 10-10zM50 10l10 10-10 10-10-10 10-10zM10 50l10 10-10 10-10-10 10-10zM50 50l10 10-10 10-10-10 10-10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
             opacity: theme.palette.mode === 'dark' ? 0.3 : 0.6,
             animation: 'float 8s ease-in-out infinite',
             '@keyframes float': {
@@ -272,20 +272,18 @@ export default function Dashboard() {
               icon={<Rocket />}
               label={`Level ${userLevel}`}
               sx={{
-                background: theme.palette.mode === 'dark'
-                  ? 'linear-gradient(135deg, #06d6a0 0%, #048c69 100%)'
-                  : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                color: theme.palette.mode === 'dark' ? '#000' : '#ffffff',
+                background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                color: '#ffffff',
                 fontWeight: 'bold',
                 fontSize: '0.9rem',
                 px: 1,
-                boxShadow: '0 4px 15px rgba(16, 185, 129, 0.4)',
+                boxShadow: '0 4px 15px rgba(79, 70, 229, 0.4)',
                 transition: 'all 0.3s ease',
                 '&:hover': {
                   transform: 'scale(1.1) rotate(-5deg)',
-                  boxShadow: '0 6px 20px rgba(255, 215, 0, 0.6)',
+                  boxShadow: '0 6px 20px rgba(99, 102, 241, 0.6)',
                 },
-                '& .MuiChip-icon': { color: '#000' }
+                '& .MuiChip-icon': { color: '#ffffff' }
               }}
             />
             {dailyStreak > 0 && (
@@ -293,14 +291,12 @@ export default function Dashboard() {
                 icon={<LocalFireDepartment />}
                 label={`${dailyStreak} Day Streak`}
                 sx={{
-                  background: theme.palette.mode === 'dark'
-                    ? 'linear-gradient(135deg, #34d399 0%, #10b981 100%)'
-                    : 'linear-gradient(135deg, #06d6a0 0%, #048c69 100%)',
-                  color: theme.palette.mode === 'dark' ? '#000' : '#ffffff',
+                  background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                  color: '#ffffff',
                   fontWeight: 'bold',
                   fontSize: '0.9rem',
                   px: 1,
-                  boxShadow: '0 4px 15px rgba(16, 185, 129, 0.4)',
+                  boxShadow: '0 4px 15px rgba(217, 119, 6, 0.4)',
                   animation: 'pulse 2s infinite',
                   '@keyframes pulse': {
                     '0%, 100%': { transform: 'scale(1)' },
@@ -308,11 +304,25 @@ export default function Dashboard() {
                   },
                   '&:hover': {
                     transform: 'scale(1.1)',
-                    boxShadow: '0 6px 20px rgba(255, 111, 0, 0.6)',
-                  }
+                    boxShadow: '0 6px 20px rgba(245, 158, 11, 0.6)',
+                  },
+                  '& .MuiChip-icon': { color: '#ffffff' }
                 }}
               />
             )}
+            <Chip
+              icon={<Star />}
+              label="Elite"
+              sx={{
+                background: 'linear-gradient(135deg, #a3e635 0%, #84cc16 100%)', // Yellowish green
+                color: '#000000',
+                fontWeight: 'bold',
+                fontSize: '0.9rem',
+                px: 1,
+                boxShadow: '0 4px 15px rgba(163, 230, 53, 0.4)',
+                '& .MuiChip-icon': { color: '#000000' }
+              }}
+            />
           </Box>
 
           {/* Profile Section */}
@@ -323,10 +333,8 @@ export default function Dashboard() {
               height: { xs: 80, sm: 100 },
               mx: 'auto',
               mb: 2,
-              border: theme.palette.mode === 'dark' 
-                ? '4px solid #06d6a0' 
-                : '4px solid #10b981',
-              boxShadow: '0 10px 30px rgba(16, 185, 129, 0.3)',
+              border: `4px solid ${theme.palette.primary.main}`,
+              boxShadow: `0 10px 30px ${theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(79, 70, 229, 0.2)'}`,
               animation: 'float 3s ease-in-out infinite',
               '@keyframes float': {
                 '0%, 100%': { transform: 'translateY(0px)' },
@@ -335,7 +343,7 @@ export default function Dashboard() {
               transition: 'all 0.3s ease',
               '&:hover': {
                 transform: 'scale(1.1) rotate(5deg)',
-                boxShadow: '0 15px 40px rgba(255, 215, 0, 0.5)',
+                boxShadow: '0 15px 40px rgba(79, 70, 229, 0.4)',
               }
             }}
           />
@@ -346,9 +354,7 @@ export default function Dashboard() {
             gutterBottom
             sx={{ 
               fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' },
-              background: theme.palette.mode === 'dark'
-                ? 'linear-gradient(45deg, #06d6a0, #10b981)'
-                : 'linear-gradient(45deg, #10b981, #059669)',
+              background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -378,7 +384,8 @@ export default function Dashboard() {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                minWidth: 140
+                minWidth: { xs: '100%', sm: 140 },
+                flex: { xs: '1 1 100%', sm: 'none' }
               }}
             >
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
@@ -399,7 +406,8 @@ export default function Dashboard() {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                minWidth: 140
+                minWidth: { xs: '100%', sm: 140 },
+                flex: { xs: '1 1 100%', sm: 'none' }
               }}
             >
               <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
@@ -472,7 +480,8 @@ export default function Dashboard() {
             justifyContent: 'center', 
             gap: { xs: 1, sm: 2 }, 
             flexDirection: { xs: 'column', sm: 'row' },
-            maxWidth: 400,
+            width: '100%',
+            maxWidth: { xs: '100%', sm: 500 },
             mx: 'auto',
           }}>
             <Button

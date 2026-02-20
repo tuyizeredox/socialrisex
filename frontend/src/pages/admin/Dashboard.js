@@ -84,8 +84,8 @@ export default function AdminDashboard() {
       <Box 
         sx={{ 
           background: isDark 
-            ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-            : 'linear-gradient(135deg, #5e35b1 0%, #7b1fa2 100%)',
+            ? 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)'
+            : `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
           borderRadius: { xs: 3, sm: 4 },
           p: { xs: 3, sm: 4 },
           mb: 4,
@@ -93,8 +93,8 @@ export default function AdminDashboard() {
           position: 'relative',
           overflow: 'hidden',
           boxShadow: isDark 
-            ? '0 20px 40px rgba(102, 126, 234, 0.3)'
-            : '0 20px 40px rgba(94, 53, 177, 0.4)',
+            ? '0 20px 40px rgba(0, 0, 0, 0.4)'
+            : `0 20px 40px ${theme.palette.primary.main}40`,
           '&::before': {
             content: '""',
             position: 'absolute',
@@ -139,7 +139,10 @@ export default function AdminDashboard() {
                   variant="h3" 
                   fontWeight={800} 
                   gutterBottom
-                  sx={{ fontSize: { xs: '1.8rem', sm: '2.5rem', md: '3rem' } }}
+                  sx={{ 
+                    fontSize: { xs: '1.8rem', sm: '2.5rem', md: '3rem' },
+                    textShadow: '0 2px 10px rgba(0,0,0,0.2)'
+                  }}
                 >
                   🌐 Admin Control Center
                 </Typography>
