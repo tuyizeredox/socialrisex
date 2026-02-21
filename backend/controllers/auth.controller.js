@@ -4,6 +4,7 @@ import ErrorResponse from '../utils/errorResponse.js';
 import sendEmail from '../utils/sendEmail.js';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
+import { updateMultilevelEarnings } from '../utils/referralCalculations.js';
 
 export const register = async (req, res, next) => {
   try {
@@ -65,6 +66,23 @@ export const register = async (req, res, next) => {
       referredBy: referredBy?._id
       // referralCode will be auto-generated from fullName in the pre-save hook
     });
+
+    if (referredBy?._id) {
+      try {
+        await updateMultilevelEarnings(referredBy._id);
+        
+        if (referredBy.referredBy) {
+          await updateMultilevelEarnings(referredBy.referredBy);
+          
+          const level2Referrer = await User.findById(referredBy.referredBy);
+          if (level2Referrer?.referredBy) {
+            await updateMultilevelEarnings(level2Referrer.referredBy);
+          }
+        }
+      } catch (earningsError) {
+        console.error('Error updating referral earnings:', earningsError);
+      }
+    }
 
     sendTokenResponse(user, 201, res);
   } catch (error) {
@@ -269,6 +287,25 @@ export const activateAccount = async (req, res, next) => {
     user.isActive = true;
     await user.save();
 
+    // Update referrer's earnings now that the referral is active
+    if (user.referredBy) {
+      try {
+        await updateMultilevelEarnings(user.referredBy);
+        
+        const referrer = await User.findById(user.referredBy);
+        if (referrer?.referredBy) {
+          await updateMultilevelEarnings(referrer.referredBy);
+          
+          const level2Referrer = await User.findById(referrer.referredBy);
+          if (level2Referrer?.referredBy) {
+            await updateMultilevelEarnings(level2Referrer.referredBy);
+          }
+        }
+      } catch (earningsError) {
+        console.error('Error updating referral earnings on activation:', earningsError);
+      }
+    }
+
     res.status(200).json({
       success: true,
       message: 'Account activated successfully',
@@ -315,6 +352,25 @@ export const verifyPayment = async (req, res, next) => {
     user.isActive = true;
     user.activatedAt = new Date();
     await user.save();
+
+    // Update referrer's earnings now that the referral is active
+    if (user.referredBy) {
+      try {
+        await updateMultilevelEarnings(user.referredBy);
+        
+        const referrer = await User.findById(user.referredBy);
+        if (referrer?.referredBy) {
+          await updateMultilevelEarnings(referrer.referredBy);
+          
+          const level2Referrer = await User.findById(referrer.referredBy);
+          if (level2Referrer?.referredBy) {
+            await updateMultilevelEarnings(level2Referrer.referredBy);
+          }
+        }
+      } catch (earningsError) {
+        console.error('Error updating referral earnings on activation:', earningsError);
+      }
+    }
 
     // Give welcome bonus
     if (!user.welcomeBonusGiven) {

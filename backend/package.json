@@ -10,7 +10,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "health-check": "node health-check.js"
+    "health-check": "node health-check.js",
+    "rebuild-indexes": "node scripts/rebuild-indexes.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

@@ -1,5 +1,7 @@
 import Withdrawal from '../models/Withdrawal.js';
 import User from '../models/User.js';
+import WatchedVideo from '../models/WatchedVideo.js';
+import PhotoShare from '../models/PhotoShare.js';
 import ErrorResponse from '../utils/errorResponse.js';
 import { calculateMultilevelReferralEarnings } from '../utils/referralCalculations.js';
 
@@ -38,12 +40,13 @@ export const createWithdrawal = async (req, res) => {
     
     // Skip balance check for first-time withdrawal
     if (!isFirstWithdrawal) {
-      // Calculate multilevel referral earnings
-      const referralData = await calculateMultilevelReferralEarnings(userId);
-      const totalReferralEarnings = referralData.totalEarnings;
+      // Withdrawal is only for referral and bonus earnings (NOT video/photo earnings)
+      const multilevelData = await calculateMultilevelReferralEarnings(userId);
+      const referralEarnings = multilevelData.totalEarnings;
+      const bonusEarnings = user.bonusEarnings || 0;
       
-      // Include bonus earnings in total earnings (but NOT welcome bonus for withdrawal)
-      const totalEarnings = totalReferralEarnings + (user.bonusEarnings || 0);
+      // Total earnings from referrals and bonuses only (but NOT welcome bonus for withdrawal)
+      const totalEarnings = referralEarnings + bonusEarnings;
 
       // Get total approved withdrawals
       const withdrawnAmount = await Withdrawal.aggregate([
@@ -160,13 +163,14 @@ export const getUserWithdrawals = async (req, res, next) => {
 
     const user = await User.findById(req.user._id);
     
-    // Calculate multilevel referral earnings
-    const referralData = await calculateMultilevelReferralEarnings(req.user._id);
-    const totalReferralEarnings = referralData.totalEarnings;
+    // Calculate fresh referral earnings
+    const multilevelData = await calculateMultilevelReferralEarnings(req.user._id);
+    const referralEarnings = multilevelData.totalEarnings;
+    const bonusEarnings = user.bonusEarnings || 0;
     
-    // Include bonus earnings in total earnings (but NOT welcome bonus for withdrawal)
+    // Include bonus and referral earnings in total earnings (but NOT welcome bonus for withdrawal)
     const welcomeBonus = 3000;
-    const totalEarnings = totalReferralEarnings + (user.bonusEarnings || 0);
+    const totalEarnings = referralEarnings + bonusEarnings;
     const totalEarningsWithWelcome = totalEarnings + welcomeBonus; // For display only
     
     // Calculate available balance (without welcome bonus)
@@ -201,24 +205,26 @@ export const getPendingWithdrawals = async (req, res, next) => {
     const withdrawals = await Withdrawal.find({ status: 'pending' })
       .populate({
         path: 'user',
-        select: 'name email earnings referralEarnings',
+        select: 'name email earnings _id',
         model: User
       })
       .select('amount status accountDetails paymentMethod createdAt')
       .sort('-createdAt')
       .lean();
 
-    // Calculate total earnings for each withdrawal
-    const withdrawalsWithTotalEarnings = withdrawals.map(withdrawal => {
+    // Calculate total earnings for each withdrawal with fresh referral calculations
+    const withdrawalsWithTotalEarnings = await Promise.all(withdrawals.map(async (withdrawal) => {
       const user = withdrawal.user || {};
+      const multilevelData = await calculateMultilevelReferralEarnings(user._id);
+      const referralEarnings = multilevelData.totalEarnings;
       return {
         ...withdrawal,
         user: {
           ...user,
-          earnings: (user.earnings || 0) + (user.referralEarnings || 0)
+          earnings: (user.earnings || 0) + referralEarnings
         }
       };
-    });
+    }));
 
     res.status(200).json({
       success: true,
@@ -240,24 +246,26 @@ export const getAllWithdrawals = async (req, res, next) => {
     const withdrawals = await Withdrawal.find()
       .populate({
         path: 'user',
-        select: 'name email earnings referralEarnings',
+        select: 'name email earnings _id',
         model: User
       })
       .select('amount status accountDetails paymentMethod createdAt')
       .sort('-createdAt')
       .lean();
 
-    // Calculate total earnings for each withdrawal
-    const withdrawalsWithTotalEarnings = withdrawals.map(withdrawal => {
+    // Calculate total earnings for each withdrawal with fresh referral calculations
+    const withdrawalsWithTotalEarnings = await Promise.all(withdrawals.map(async (withdrawal) => {
       const user = withdrawal.user || {};
+      const multilevelData = await calculateMultilevelReferralEarnings(user._id);
+      const referralEarnings = multilevelData.totalEarnings;
       return {
         ...withdrawal,
         user: {
           ...user,
-          earnings: (user.earnings || 0) + (user.referralEarnings || 0)
+          earnings: (user.earnings || 0) + referralEarnings
         }
       };
-    });
+    }));
 
     res.status(200).json({
       success: true,
@@ -294,12 +302,13 @@ export const processWithdrawal = async (req, res, next) => {
       throw new ErrorResponse('User not found', 404);
     }
 
-    // Calculate multilevel referral earnings
-    const referralData = await calculateMultilevelReferralEarnings(withdrawal.user._id);
-    const totalReferralEarnings = referralData.totalEarnings;
+    // Calculate fresh referral earnings
+    const multilevelData = await calculateMultilevelReferralEarnings(withdrawal.user._id);
+    const referralEarnings = multilevelData.totalEarnings;
+    const bonusEarnings = user.bonusEarnings || 0;
 
-    // Include bonus earnings in total earnings (but NOT welcome bonus for withdrawal)
-    const totalEarnings = totalReferralEarnings + (user.bonusEarnings || 0);
+    // Include bonus and referral earnings in total earnings (but NOT welcome bonus for withdrawal)
+    const totalEarnings = referralEarnings + bonusEarnings;
 
     // Get total approved withdrawals
     const withdrawnAmount = await Withdrawal.aggregate([

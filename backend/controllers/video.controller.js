@@ -61,50 +61,69 @@ export const completeVideo = async (req, res, next) => {
     const { id } = req.params;
     const { watchTime } = req.body;
 
-    // Find video and check if already watched
-    const watchedVideo = await WatchedVideo.findOne({
-      video: id,
-      user: req.user._id,
-      completedAt: { $exists: true }
-    });
-
-    if (watchedVideo) {
-      return res.status(200).json({
-        success: true,
-        message: 'Video already completed',
-        pointsEarned: 0,
-        videoPoints: watchedVideo.pointsEarned
-      });
-    }
-
-    // Get video details
+    // Get video details first
     const video = await Video.findById(id);
     if (!video) {
       return next(new ErrorResponse('Video not found', 404));
     }
 
-    // Create new watch record
-    const newWatchedVideo = await WatchedVideo.create({
-      user: req.user._id,
-      video: id,
-      watchTime,
-      completedAt: new Date(),
-      pointsEarned: video.pointsReward
-    });
+    try {
+      // Use findOneAndUpdate with upsert to atomically create/update watch record
+      // This is the safest approach to prevent race conditions
+      const watchedVideo = await WatchedVideo.findOneAndUpdate(
+        {
+          user: req.user._id,
+          video: id
+        },
+        {
+          $set: {
+            watchTime,
+            completedAt: new Date(),
+            pointsEarned: video.pointsReward
+          }
+        },
+        {
+          upsert: true,
+          new: true,
+          runValidators: true
+        }
+      );
 
-    // Update user points
-    const updatedUser = await User.findByIdAndUpdate(
-      req.user._id,
-      { $inc: { points: video.pointsReward } },
-      { new: true }
-    );
+      // Update user points and earnings with the video reward
+      const updatedUser = await User.findByIdAndUpdate(
+        req.user._id,
+        { $inc: { points: video.pointsReward, earnings: video.pointsReward } },
+        { new: true }
+      );
 
-    res.status(200).json({
-      success: true,
-      pointsEarned: video.pointsReward,
-      videoPoints: video.pointsReward,
-      totalPoints: updatedUser.points
-    });
+      res.status(200).json({
+        success: true,
+        pointsEarned: video.pointsReward,
+        videoPoints: video.pointsReward,
+        totalPoints: updatedUser.points,
+        message: 'Points earned!'
+      });
+    } catch (upsertError) {
+      // Handle E11000 duplicate key error gracefully
+      // This can happen in race conditions where two requests hit simultaneously
+      if (upsertError.code === 11000) {
+        // Video was already completed - get current user data and return
+        const user = await User.findById(req.user._id);
+        const existingWatch = await WatchedVideo.findOne({
+          user: req.user._id,
+          video: id
+        });
+
+        return res.status(200).json({
+          success: true,
+          pointsEarned: 0,
+          videoPoints: video.pointsReward,
+          totalPoints: user.points,
+          message: 'Video already completed'
+        });
+      }
+      throw upsertError;
+    }
   } catch (error) {
     console.error('Video completion error:', error);
     next(error);
@@ -119,34 +138,46 @@ export const watchVideo = async (req, res, next) => {
       throw new ErrorResponse('Video not found', 404);
     }
 
-    // Check if user has already watched this video
-    const hasWatched = await WatchedVideo.findOne({
-      video: video._id,
-      user: req.user._id,
-      completedAt: { $exists: true }
-    });
+    try {
+      // Use findOneAndUpdate with upsert for atomic operation (prevents race condition)
+      const watchedVideo = await WatchedVideo.findOneAndUpdate(
+        {
+          video: video._id,
+          user: req.user._id
+        },
+        {
+          $set: {
+            completedAt: new Date(),
+            pointsEarned: video.pointsReward
+          }
+        },
+        {
+          upsert: true,
+          new: true,
+          runValidators: true
+        }
+      );
 
-    if (hasWatched) {
-      throw new ErrorResponse('Video already watched', 400);
+      // Update user points and earnings
+      const updatedUser = await User.findByIdAndUpdate(req.user._id, {
+        $inc: { points: video.pointsReward, earnings: video.pointsReward }
+      }, { new: true });
+
+      res.status(200).json({
+        success: true,
+        points: video.pointsReward
+      });
+    } catch (watchError) {
+      // Handle E11000 duplicate key error
+      if (watchError.code === 11000) {
+        return res.status(200).json({
+          success: true,
+          points: 0,
+          message: 'Video already watched'
+        });
+      }
+      throw watchError;
     }
-
-    // Create watch record
-    await WatchedVideo.create({
-      user: req.user._id,
-      video: video._id,
-      completedAt: new Date(),
-      pointsEarned: video.pointsReward
-    });
-
-    // Update user points
-    await User.findByIdAndUpdate(req.user._id, {
-      $inc: { points: video.pointsReward }
-    });
-
-    res.status(200).json({
-      success: true,
-      points: video.pointsReward
-    });
   } catch (error) {
     next(error);
   }

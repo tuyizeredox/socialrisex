@@ -320,30 +320,19 @@ export default function UserLeaderboard() {
                         <Avatar sx={{ mr: 2, bgcolor: 'primary.light' }}>
                           <Person />
                         </Avatar>
-                        <Box>
-                          <Typography variant="body1" fontWeight={600}>
-                            {referrer.user?.fullName || 'N/A'}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {referrer.user?.email || 'N/A'}
-                          </Typography>
-                        </Box>
+                        <Typography variant="body1" fontWeight={600}>
+                          {referrer.user?.fullName || 'N/A'}
+                        </Typography>
                       </Box>
                     </TableCell>
                     <TableCell>
                       <Box sx={{ minWidth: 150 }}>
                         <Typography variant="h6" fontWeight={700} color="primary.main">
-                          {referrer.totalReferrals}
+                          {referrer.activeReferrals}
                         </Typography>
                         <Typography variant="body2" color="success.main">
-                          {referrer.activeReferrals} active
+                          Active referrals
                         </Typography>
-                        <Chip
-                          size="small"
-                          label={`${referrer.conversionRate}% conversion`}
-                          color={referrer.conversionRate > 50 ? 'success' : referrer.conversionRate > 25 ? 'warning' : 'error'}
-                          variant="outlined"
-                        />
                       </Box>
                     </TableCell>
                     <TableCell>

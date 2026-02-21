@@ -66,6 +66,7 @@ export const getUserStats = async (req, res, next) => {
     const watchedVideos = await WatchedVideo.find({ user: userId })
       .populate('video', 'pointsReward');
     
+    // Calculate video earnings from actual watched videos
     const videoPoints = watchedVideos.reduce((total, watch) => 
       total + (watch.pointsEarned || 0), 0);
     
@@ -87,7 +88,13 @@ export const getUserStats = async (req, res, next) => {
     
     // Use actual user points from database (includes all earnings: video + photo + bonuses)
     const totalPoints = user.points || 0;
-    const totalEarnings = (user.earnings || 0) + (user.bonusEarnings || 0) + multilevelData.totalEarnings + welcomeBonus;
+    
+    // Calculate total earnings from all sources
+    // videoEarnings = actual video earnings from watched videos
+    const videoEarnings = videoPoints;
+    const bonusEarnings = user.bonusEarnings || 0;
+    const referralEarnings = multilevelData.totalEarnings;
+    const totalEarnings = videoEarnings + photoPoints + bonusEarnings + referralEarnings + welcomeBonus;
 
     res.status(200).json({
       success: true,
@@ -98,6 +105,10 @@ export const getUserStats = async (req, res, next) => {
         photoShares: photoSharesCount,
         welcomeBonus,
         earnings: totalEarnings,
+        videoEarnings,
+        photoEarnings: photoPoints,
+        bonusEarnings,
+        referralEarnings,
         referrals: referralCount,
         activeReferrals,
         level1Count: multilevelData.level1Count,
@@ -466,30 +477,85 @@ export const sharePhoto = async (req, res, next) => {
       return next(new ErrorResponse('Photo not found or inactive', 404));
     }
 
-    // Create share record
-    const photoShare = await PhotoShare.create({
-      user: userId,
-      photo: photoId,
-      platform: platform || 'whatsapp',
-      rwfEarned: 50
+    // CHECK FOR DUPLICATE SHARE BY THIS USER ONLY
+    // Allow different users to share the same photo - only prevent the SAME user from sharing the same photo twice
+    const userSharedPhoto = await PhotoShare.findOne({ 
+      user: userId, 
+      photo: photoId 
     });
 
-    // Update photo share count
-    await Photo.findByIdAndUpdate(photoId, {
-      $inc: { shareCount: 1, totalRwfPaid: 50 }
-    });
+    if (userSharedPhoto) {
+      // This specific user already shared this photo
+      const user = await User.findById(userId);
+      return res.status(200).json({
+        success: true,
+        message: 'You have already shared this photo',
+        pointsEarned: 0,
+        data: userSharedPhoto,
+        totalPoints: user.points,
+        totalEarnings: user.earnings
+      });
+    }
 
-    // Update user points/earnings
-    await User.findByIdAndUpdate(userId, {
-      $inc: { points: 50, earnings: 50 }
-    });
+    try {
+      // Create share record (upsert to handle any race conditions)
+      const photoShare = await PhotoShare.findOneAndUpdate(
+        {
+          user: userId,
+          photo: photoId
+        },
+        {
+          $setOnInsert: {
+            user: userId,
+            photo: photoId,
+            platform: platform || 'whatsapp',
+            rwfEarned: 50
+          }
+        },
+        {
+          upsert: true,
+          new: true,
+          runValidators: true
+        }
+      );
 
-    res.status(201).json({
-      success: true,
-      data: photoShare,
-      message: 'Photo shared successfully! You earned 50 RWF!'
-    });
+      // Update photo share count
+      await Photo.findByIdAndUpdate(photoId, {
+        $inc: { shareCount: 1, totalRwfPaid: 50 }
+      });
+
+      // Update user points/earnings and get updated user
+      const updatedUser = await User.findByIdAndUpdate(userId, {
+        $inc: { points: 50, earnings: 50 }
+      }, { new: true });
+
+      res.status(201).json({
+        success: true,
+        data: photoShare,
+        pointsEarned: 50,
+        totalPoints: updatedUser.points,
+        totalEarnings: updatedUser.earnings,
+        message: 'Photo shared successfully! You earned 50 RWF!'
+      });
+    } catch (createError) {
+      // Handle any remaining E11000 errors gracefully
+      if (createError.code === 11000) {
+        console.log(`User ${userId} attempted to share photo ${photoId} - duplicate detected`);
+        const user = await User.findById(userId);
+        const share = await PhotoShare.findOne({ user: userId, photo: photoId });
+        return res.status(200).json({
+          success: true,
+          message: 'You have already shared this photo',
+          pointsEarned: 0,
+          data: share,
+          totalPoints: user.points,
+          totalEarnings: user.earnings
+        });
+      }
+      throw createError;
+    }
   } catch (error) {
+    console.error('Photo share error:', error);
     next(error);
   }
 };
@@ -626,16 +692,14 @@ export const getLeaderboard = async (req, res, next) => {
         userId: referrer._id,
         user: {
           fullName: referrer.fullName,
-          email: referrer.email,
           createdAt: referrer.createdAt,
           isActive: referrer.isActive
         },
-        totalReferrals: referrer.totalReferrals,
         activeReferrals: referrer.activeReferrals,
-        totalEarnings: multilevelData.totalEarnings, // Use actual multilevel earnings
+        totalEarnings: multilevelData.totalEarnings,
         conversionRate: Math.round(referrer.conversionRate * 10) / 10,
         activityScore: Math.round(referrer.activityScore),
-        multilevelBreakdown: multilevelData.earnings, // Add detailed breakdown
+        multilevelBreakdown: multilevelData.earnings,
         levels: {
           level1: multilevelData.level1Count,
           level2: multilevelData.level2Count,

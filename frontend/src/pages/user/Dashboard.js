@@ -127,23 +127,31 @@ export default function Dashboard() {
       if (statsRes.data?.data) {
         const data = statsRes.data.data;
         
-        // Calculate referral earnings from breakdown (level1 + level2 + level3)
+        // Use backend calculations directly - no need to recalculate
         const referralBreakdown = data.referralBreakdown || { level1: 0, level2: 0, level3: 0 };
-        const referralEarnings = (referralBreakdown.level1 || 0) + 
-                                 (referralBreakdown.level2 || 0) + 
-                                 (referralBreakdown.level3 || 0);
+        const referralEarnings = data.referralEarnings || 0;
         
-        const totalPoints = (data.points || 0) + referralEarnings;
+        // Total earnings breakdown for reference
+        const videoEarnings = data.videoEarnings || 0;
+        const photoEarnings = data.photoEarnings || 0;
+        const bonusEarnings = data.bonusEarnings || 0;
+        const welcomeBonus = data.welcomeBonus || 3000;
+        
+        // Total points for gamification (use points from backend which includes all sources)
+        const totalPoints = (data.points || 0);
         const currentLevel = calculateLevel(totalPoints);
         const nextLevelThreshold = calculateNextLevelXP(currentLevel);
         
+        // Total earnings is what backend calculated
+        const totalEarnings = data.earnings || 0;
+        
         setStats({
           points: data.points || 0,
-          videoPoints: data.videoPoints || 0,
-          photoPoints: data.photoPoints || 0,
+          videoPoints: videoEarnings,
+          photoPoints: photoEarnings,
           photoShares: data.photoShares || 0,
-          welcomeBonus: data.welcomeBonus || 3000,
-          earnings: data.earnings || 0,
+          welcomeBonus: welcomeBonus,
+          earnings: totalEarnings,
           referralEarnings: referralEarnings,
           activeReferrals: data.activeReferrals || 0,
           referrals: data.referrals || 0,
@@ -176,6 +184,23 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchDashboardData();
+    
+    // Listen for video completion and photo share events and refresh dashboard
+    const handleVideoCompleted = () => {
+      fetchDashboardData();
+    };
+    
+    const handlePhotoShared = () => {
+      fetchDashboardData();
+    };
+    
+    window.addEventListener('videoCompleted', handleVideoCompleted);
+    window.addEventListener('photoShared', handlePhotoShared);
+    
+    return () => {
+      window.removeEventListener('videoCompleted', handleVideoCompleted);
+      window.removeEventListener('photoShared', handlePhotoShared);
+    };
   }, [fetchDashboardData]);
 
   if (loading) {

@@ -6,9 +6,15 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import compression from 'compression';
-import cache from 'memory-cache'; // In-memory caching
 import apiRoutes from './routes/api.js'; // Route imports
 import errorHandler from './middleware/error.js'; // Error handler
+
+// Import models to sync indexes
+import User from './models/User.js';
+import WatchedVideo from './models/WatchedVideo.js';
+import PhotoShare from './models/PhotoShare.js';
+import Video from './models/Video.js';
+import Photo from './models/Photo.js';
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -31,6 +37,25 @@ if (!process.env.MONGODB_URI) {
 
 const app = express();
 
+// Ensure indexes exist (creates missing indexes without recreating existing ones)
+const ensureIndexes = async () => {
+  try {
+    console.log('Ensuring database indexes exist...');
+    const models = [User, WatchedVideo, PhotoShare, Video, Photo];
+    
+    for (const model of models) {
+      // createIndexes() only creates missing indexes, doesn't drop existing ones
+      await model.createIndexes();
+      console.log(`✓ Ensured indexes for ${model.modelName}`);
+    }
+    
+    console.log('✓ All indexes verified');
+  } catch (error) {
+    console.error('Warning: Index verification had issues:', error.message);
+    // Continue anyway - indexes might already exist
+  }
+};
+
 // Optimized MongoDB Connection with Retry Logic
 const connectDB = async () => {
   console.log('Starting MongoDB connection...');
@@ -49,6 +74,10 @@ const connectDB = async () => {
         maxPoolSize: 10, // Maintain up to 10 socket connections
       });
       console.log(`MongoDB Connected: ${conn.connection.host}`);
+      
+      // Ensure indexes exist (only creates missing indexes on first run or when models change)
+      // createIndexes() is fast and idempotent - it won't recreate existing indexes
+      await ensureIndexes();
     } catch (error) {
       console.error('MongoDB connection error details:', {
         message: error.message,
@@ -118,29 +147,12 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', timestamp: new Date().toISOString(), env: process.env.NODE_ENV });
 });
 
-// Caching for API GET requests (cached for 5 minutes)
-// Move BEFORE routes to intercept and AFTER to capture
-app.use((req, res, next) => {
-  // Don't cache admin routes, auth/me, or non-GET requests
-  if (req.method !== 'GET' || req.path.includes('/auth/me') || req.path.startsWith('/api/admin')) {
-    return next();
-  }
-  
-  const key = `__express__${req.originalUrl}` || req.url;
-  const cachedBody = cache.get(key);
-
-  if (cachedBody) {
-    return res.send(cachedBody);
-  } else {
-    res.sendResponse = res.send;
-    res.send = (body) => {
-      if (res.statusCode === 200) {
-        cache.put(key, body, 300000); // Cache for 5 minutes
-      }
-      res.sendResponse(body);
-    };
-    next();
-  }
+// Disable caching for API routes
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
 });
 
 // API Routes

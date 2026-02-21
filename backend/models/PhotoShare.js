@@ -36,4 +36,7 @@ photoShareSchema.index({ createdAt: -1 });
 // Compound index for user stats
 photoShareSchema.index({ user: 1, createdAt: -1 });
 
+// Unique index to prevent duplicate shares of the same photo by the same user
+photoShareSchema.index({ user: 1, photo: 1 }, { unique: true });
+
 export default mongoose.model('PhotoShare', photoShareSchema);

@@ -48,6 +48,10 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  referralEarnings: {
+    type: Number,
+    default: 0
+  },
   points: {
     type: Number,
     default: 0

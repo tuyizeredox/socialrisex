@@ -102,37 +102,24 @@ export const updateMultilevelEarnings = async (userId) => {
       { upsert: true, new: true }
     );
 
-    // Update user's network income and withdrawal balance
+    // Update user's referral earnings
     if (earningsDifference !== 0) {
       try {
         const User = (await import('../models/User.js')).default;
-        const Withdrawal = (await import('../models/Withdrawal.js')).default;
         
-        // Update user's network income
+        // Update user's referral earnings field
         await User.findByIdAndUpdate(
           userId,
           {
             $inc: {
-              networkIncome: earningsDifference,
-              totalEarnings: earningsDifference
+              referralEarnings: earningsDifference
             }
           }
         );
 
-        // Update user's withdrawal balance
-        await Withdrawal.findOneAndUpdate(
-          { user: userId },
-          {
-            $inc: {
-              availableBalance: earningsDifference
-            }
-          },
-          { upsert: true }
-        );
-
-        console.log(`Updated user ${userId} network income by ${earningsDifference}`);
+        console.log(`Updated user ${userId} referral earnings by ${earningsDifference}`);
       } catch (updateError) {
-        console.error('Error updating user network income:', updateError);
+        console.error('Error updating user referral earnings:', updateError);
         // Don't throw error here, just log it as the main operation succeeded
       }
     }

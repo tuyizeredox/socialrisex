@@ -49,6 +49,7 @@ export default function Referrals() {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('all'); // 'all', 'level1', 'level2', 'level3'
+  const [selectedStatus, setSelectedStatus] = useState('all'); // 'all', 'active', 'inactive'
   const { user } = useAuth();
   const { showNotification } = useNotification();
 
@@ -100,8 +101,14 @@ export default function Referrals() {
     window.open(whatsappUrl, '_blank');
   };
 
-  // Filter referrals based on search query and selected level
+  // Filter referrals based on search query, selected level, and status
   const filteredReferrals = referralData?.referrals.filter((referral) => {
+    // Filter by status
+    if (selectedStatus !== 'all') {
+      if (selectedStatus === 'active' && !referral.isActive) return false;
+      if (selectedStatus === 'inactive' && referral.isActive) return false;
+    }
+    
     // Filter by level
     if (selectedLevel !== 'all') {
       const levelMap = { level1: 1, level2: 2, level3: 3 };
@@ -180,7 +187,7 @@ export default function Referrals() {
             value={referralData?.stats.level1Count || 0}
             icon={PersonAdd}
             color="success"
-            subtitle="3,200 RWF per active member"
+            subtitle={`${referralData?.stats.level1Active || 0} active • 3,200 RWF each`}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
@@ -189,7 +196,7 @@ export default function Referrals() {
             value={referralData?.stats.level2Count || 0}
             icon={People}
             color="warning"
-            subtitle="1,100 RWF per active member"
+            subtitle={`${referralData?.stats.level2Active || 0} active • 1,100 RWF each`}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
@@ -198,7 +205,7 @@ export default function Referrals() {
             value={referralData?.stats.level3Count || 0}
             icon={People}
             color="info"
-            subtitle="700 RWF per active member"
+            subtitle={`${referralData?.stats.level3Active || 0} active • 700 RWF each`}
           />
         </Grid>
       </Grid>
@@ -481,7 +488,10 @@ export default function Referrals() {
             />
             
             {/* Level Filter Buttons */}
-            <Box sx={{ mt: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            <Typography variant="body2" fontWeight={600} sx={{ mt: 2, mb: 1, color: 'text.secondary' }}>
+              Filter by Level:
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
               <Button
                 variant={selectedLevel === 'all' ? 'contained' : 'outlined'}
                 size="small"
@@ -518,8 +528,40 @@ export default function Referrals() {
                 Level 3 ({referralData?.level3Referrals?.length || 0})
               </Button>
             </Box>
+
+            {/* Status Filter Buttons */}
+            <Typography variant="body2" fontWeight={600} sx={{ mb: 1, color: 'text.secondary' }}>
+              Filter by Status:
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              <Button
+                variant={selectedStatus === 'all' ? 'contained' : 'outlined'}
+                size="small"
+                onClick={() => setSelectedStatus('all')}
+                sx={{ borderRadius: 2 }}
+              >
+                All Members ({referralData?.referrals.length || 0})
+              </Button>
+              <Button
+                variant={selectedStatus === 'active' ? 'contained' : 'outlined'}
+                size="small"
+                onClick={() => setSelectedStatus('active')}
+                color="success"
+                sx={{ borderRadius: 2 }}
+              >
+                Active ({referralData?.referrals.filter(r => r.isActive).length || 0})
+              </Button>
+              <Button
+                variant={selectedStatus === 'inactive' ? 'contained' : 'outlined'}
+                size="small"
+                onClick={() => setSelectedStatus('inactive')}
+                sx={{ borderRadius: 2 }}
+              >
+                Inactive ({referralData?.referrals.filter(r => !r.isActive).length || 0})
+              </Button>
+            </Box>
             
-            {(searchQuery || selectedLevel !== 'all') && (
+            {(searchQuery || selectedLevel !== 'all' || selectedStatus !== 'all') && (
               <Typography 
                 variant="body2" 
                 color="text.secondary" 
@@ -527,6 +569,7 @@ export default function Referrals() {
               >
                 Found {filteredReferrals.length} result{filteredReferrals.length !== 1 ? 's' : ''}
                 {selectedLevel !== 'all' && ` in Level ${selectedLevel.replace('level', '')}`}
+                {selectedStatus !== 'all' && ` with ${selectedStatus} status`}
               </Typography>
             )}
           </CardContent>

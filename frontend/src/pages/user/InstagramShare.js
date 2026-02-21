@@ -79,22 +79,39 @@ export default function InstagramShare() {
     setSharing(true);
     try {
       // Record the share action
-      await api.post('/users/share-photo', {
+      const response = await api.post('/users/share-photo', {
         photoId: selectedPhoto._id,
         platform: 'instagram'
       });
 
+      const pointsEarned = response.data?.pointsEarned || 0;
+      const earnedMessage = pointsEarned > 0 
+        ? `Photo downloaded! Upload it to Instagram with the caption provided. You earned 50 RWF!`
+        : `Photo already shared. Upload new photos to earn more!`;
+
+      showNotification(earnedMessage, 'success');
+
       // Download the photo first
       downloadPhoto(selectedPhoto);
-      
-      showNotification('Photo downloaded! Upload it to Instagram with the caption provided. You earned 50 RWF!', 'success');
       
       // Keep dialog open to show caption
       fetchUserShares(); // Refresh shares
       
+      // Always dispatch event to notify Dashboard to refresh (even if already shared)
+      const photoSharedEvent = new CustomEvent('photoShared', {
+        detail: {
+          photoId: selectedPhoto._id,
+          earnings: pointsEarned
+        }
+      });
+      window.dispatchEvent(photoSharedEvent);
+      
     } catch (error) {
       console.error('Error sharing photo:', error);
-      showNotification('Failed to record photo share', 'error');
+      showNotification(
+        error.response?.data?.message || 'Failed to record photo share', 
+        'error'
+      );
     } finally {
       setSharing(false);
     }

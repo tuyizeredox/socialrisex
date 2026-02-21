@@ -77,10 +77,17 @@ export default function WhatsAppShare() {
     setSharing(true);
     try {
       // Record the share action
-      await api.post('/users/share-photo', {
+      const response = await api.post('/users/share-photo', {
         photoId: selectedPhoto._id,
         platform: 'whatsapp'
       });
+
+      const pointsEarned = response.data?.pointsEarned || 0;
+      const earnedMessage = pointsEarned > 0 
+        ? `Photo shared successfully! You earned 50 RWF!`
+        : `You have already shared this photo`;
+
+      showNotification(earnedMessage, 'success');
 
       // Create WhatsApp share link
       const shareText = encodeURIComponent(
@@ -94,13 +101,24 @@ export default function WhatsAppShare() {
       const whatsappUrl = `https://wa.me/?text=${shareText}`;
       window.open(whatsappUrl, '_blank');
       
-      showNotification('Photo shared successfully! You earned 50 RWF!', 'success');
       setOpenDialog(false);
       fetchUserShares(); // Refresh shares
       
+      // Always dispatch event to notify Dashboard to refresh (even if already shared)
+      const photoSharedEvent = new CustomEvent('photoShared', {
+        detail: {
+          photoId: selectedPhoto._id,
+          earnings: pointsEarned
+        }
+      });
+      window.dispatchEvent(photoSharedEvent);
+      
     } catch (error) {
       console.error('Error sharing photo:', error);
-      showNotification('Failed to record photo share', 'error');
+      showNotification(
+        error.response?.data?.message || 'Failed to record photo share', 
+        'error'
+      );
     } finally {
       setSharing(false);
     }
