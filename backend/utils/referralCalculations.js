@@ -11,30 +11,30 @@ import MultilevelEarnings from '../models/MultilevelEarnings.js';
  */
 export const calculateMultilevelReferralEarnings = async (userId) => {
   try {
-    // Get Level 1 referrals (direct referrals)
-    const level1Referrals = await User.find({ 
+    // Get ALL Level 1 referrals (direct referrals) to find their downlines
+    const level1ReferralsAll = await User.find({ 
       referredBy: userId, 
-      isActive: true,
       isDeleted: { $ne: true }
-    }).select('_id');
+    }).select('_id isActive');
 
-    // Get Level 2 referrals (referrals of level 1 referrals)
-    const level2Referrals = await User.find({ 
-      referredBy: { $in: level1Referrals.map(r => r._id) },
-      isActive: true,
+    // Get ALL Level 2 referrals (referrals of ANY level 1 referrals)
+    const level1Ids = level1ReferralsAll.map(r => r._id);
+    const level2ReferralsAll = await User.find({ 
+      referredBy: { $in: level1Ids },
       isDeleted: { $ne: true }
-    }).select('_id');
+    }).select('_id isActive');
 
-    // Get Level 3 referrals (referrals of level 2 referrals)
-    const level3Referrals = await User.find({ 
-      referredBy: { $in: level2Referrals.map(r => r._id) },
-      isActive: true,
+    // Get ALL Level 3 referrals (referrals of ANY level 2 referrals)
+    const level2Ids = level2ReferralsAll.map(r => r._id);
+    const level3ReferralsAll = await User.find({ 
+      referredBy: { $in: level2Ids },
       isDeleted: { $ne: true }
-    }).select('_id');
+    }).select('_id isActive');
 
-    const level1Count = level1Referrals.length;
-    const level2Count = level2Referrals.length;
-    const level3Count = level3Referrals.length;
+    // Count ONLY ACTIVE referrals for earnings
+    const level1Count = level1ReferralsAll.filter(r => r.isActive).length;
+    const level2Count = level2ReferralsAll.filter(r => r.isActive).length;
+    const level3Count = level3ReferralsAll.filter(r => r.isActive).length;
 
     const earnings = {
       level1: level1Count * 3200,
@@ -51,7 +51,7 @@ export const calculateMultilevelReferralEarnings = async (userId) => {
       earnings,
       totalEarnings,
       totalReferrals: level1Count + level2Count + level3Count,
-      activeReferrals: level1Count // Direct referrals for backwards compatibility
+      activeReferrals: level1Count + level2Count + level3Count // Total active referrals across all levels
     };
   } catch (error) {
     console.error('Error calculating multilevel referral earnings:', error);

@@ -695,7 +695,7 @@ export const getLeaderboard = async (req, res, next) => {
           createdAt: referrer.createdAt,
           isActive: referrer.isActive
         },
-        activeReferrals: referrer.activeReferrals,
+        activeReferrals: multilevelData.activeReferrals,
         totalEarnings: multilevelData.totalEarnings,
         conversionRate: Math.round(referrer.conversionRate * 10) / 10,
         activityScore: Math.round(referrer.activityScore),

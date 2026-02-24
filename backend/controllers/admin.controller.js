@@ -860,8 +860,8 @@ export const getLeaderboard = async (req, res, next) => {
         $addFields: {
           // Note: totalEarnings will be calculated separately using multilevel system
           // These are kept for backward compatibility but will be overridden
-          totalEarnings: { $multiply: ['$activeReferrals', 4000] }, // Level 1 base rate
-          recentEarnings: { $multiply: ['$recentReferrals', 4000] }, // Level 1 base rate
+          totalEarnings: { $multiply: ['$activeReferrals', 3200] }, // Level 1 base rate
+          recentEarnings: { $multiply: ['$recentReferrals', 3200] }, // Level 1 base rate
           conversionRate: {
             $cond: [
               { $eq: ['$totalReferrals', 0] },
@@ -935,7 +935,7 @@ export const getLeaderboard = async (req, res, next) => {
           isActive: referrer.isActive
         },
         totalReferrals: referrer.totalReferrals,
-        activeReferrals: referrer.activeReferrals,
+        activeReferrals: multilevelData.activeReferrals,
         totalEarnings: multilevelData.totalEarnings, // Use actual multilevel earnings
         recentEarnings: referrer.recentEarnings, // Keep aggregated recent earnings for now
         conversionRate: Math.round(referrer.conversionRate * 10) / 10,
@@ -1094,7 +1094,7 @@ export const exportLeaderboard = async (req, res, next) => {
       },
       {
         $addFields: {
-          totalEarnings: { $multiply: ['$activeReferrals', 4000] }, // Placeholder - will be recalculated with multilevel
+          totalEarnings: { $multiply: ['$activeReferrals', 3200] }, // Placeholder - will be recalculated with multilevel
           conversionRate: {
             $cond: [
               { $eq: ['$totalReferrals', 0] },
@@ -1452,17 +1452,17 @@ export const editUserMultilevelEarnings = async (req, res, next) => {
       {
         user: existingEarnings.user,
         level1: {
-          count: Math.floor(level1Earnings / 4000), // Estimate count based on earnings
+          count: Math.floor(level1Earnings / 3200), // Estimate count based on earnings
           earnings: level1Earnings,
           lastUpdated: new Date()
         },
         level2: {
-          count: Math.floor(level2Earnings / 1500), // Estimate count based on earnings
+          count: Math.floor(level2Earnings / 1100), // Estimate count based on earnings
           earnings: level2Earnings,
           lastUpdated: new Date()
         },
         level3: {
-          count: Math.floor(level3Earnings / 900), // Estimate count based on earnings
+          count: Math.floor(level3Earnings / 700), // Estimate count based on earnings
           earnings: level3Earnings,
           lastUpdated: new Date()
         },
@@ -1569,7 +1569,6 @@ export const recalculateAllMultilevelEarnings = async (req, res, next) => {
 
 export const getMultilevelEarningsStats = async (req, res, next) => {
   try {
-    console.log('getMultilevelEarningsStats called');
     // Check if multilevel earnings data exists
     const earningsCount = await MultilevelEarnings.countDocuments();
     
@@ -1621,10 +1620,10 @@ export const getMultilevelEarningsStats = async (req, res, next) => {
         .lean();
 
       result.totalUsers = usersWithReferrals.length;
-      result.totalEarnings = usersWithReferrals.reduce((sum, user) => sum + (user.referralCount * 4000), 0);
+      result.totalEarnings = usersWithReferrals.reduce((sum, user) => sum + (user.referralCount * 3200), 0);
       result.avgEarnings = result.totalUsers > 0 ? result.totalEarnings / result.totalUsers : 0;
-      result.maxEarnings = Math.max(...usersWithReferrals.map(u => u.referralCount * 4000), 0);
-      result.minEarnings = Math.min(...usersWithReferrals.map(u => u.referralCount * 4000), 0);
+      result.maxEarnings = Math.max(...usersWithReferrals.map(u => u.referralCount * 3200), 0);
+      result.minEarnings = Math.min(...usersWithReferrals.map(u => u.referralCount * 3200), 0);
     }
 
     res.json({

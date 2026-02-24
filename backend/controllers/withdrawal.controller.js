@@ -352,7 +352,7 @@ export const processWithdrawal = async (req, res, next) => {
     console.log('Withdrawal Balance Debug:', {
       userId: user._id,
       withdrawalAmount: withdrawal.amount,
-      totalReferralEarnings,
+      referralEarnings,
       bonusEarnings: user.bonusEarnings || 0,
       totalEarnings,
       totalWithdrawn,

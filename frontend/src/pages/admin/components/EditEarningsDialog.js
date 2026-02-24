@@ -119,7 +119,7 @@ export default function EditEarningsDialog({
               value={formData.level1Earnings}
               onChange={handleChange('level1Earnings')}
               inputProps={{ min: 0, step: 100 }}
-              helperText="4000 RWF per active referral"
+              helperText="3200 RWF per active referral"
             />
           </Grid>
 
