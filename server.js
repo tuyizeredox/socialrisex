@@ -113,6 +113,14 @@ app.use(
   })
 );
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
+// API Routes
+app.use('/api', apiRoutes);
+
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'frontend/build')));
@@ -125,14 +133,6 @@ if (process.env.NODE_ENV === 'production') {
 
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'backend/uploads')));
-
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
-});
-
-// API Routes
-app.use('/api', apiRoutes);
 
 // Caching for API GET requests (cached for 5 minutes)
 app.use((req, res, next) => {

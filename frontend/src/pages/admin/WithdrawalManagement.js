@@ -54,7 +54,7 @@ export default function WithdrawalManagement() {
     try {
       setLoading(true);
       const response = await getPendingWithdrawals();
-      setWithdrawals(response.data || []);
+      setWithdrawals(response.withdrawals || []);
     } catch (error) {
       showNotification('Failed to fetch withdrawals', 'error');
       setWithdrawals([]);
@@ -95,7 +95,7 @@ export default function WithdrawalManagement() {
       label: 'User',
       render: (row) => (
         <Typography variant="body2">
-          <strong>{row.user?.name || 'N/A'}</strong>
+          <strong>{row.user?.fullName || 'N/A'}</strong>
           <br />
           {row.user?.email || 'N/A'}
         </Typography>
@@ -199,7 +199,7 @@ export default function WithdrawalManagement() {
             <Box display="flex" justifyContent="space-between" alignItems="flex-start">
               <Box>
                 <Typography variant="h6" component="div">
-                  {withdrawal.user?.name || 'N/A'}
+                  {withdrawal.user?.fullName || 'N/A'}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   {withdrawal.user?.email || 'N/A'}
@@ -346,7 +346,7 @@ export default function WithdrawalManagement() {
                     User
                   </Typography>
                   <Typography variant="body1">
-                    {selectedWithdrawal.user?.name || 'N/A'}
+                    {selectedWithdrawal.user?.fullName || 'N/A'}
                   </Typography>
                 </Box>
                 

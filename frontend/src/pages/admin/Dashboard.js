@@ -287,7 +287,7 @@ export default function AdminDashboard() {
         <Grid item xs={12} sm={6} md={3}>
           <GamificationCard
             title="Total Platform Earnings"
-            value={`RWF ${((stats?.activeUsers || 0) * 8000).toLocaleString()}`}
+            value={`RWF ${((stats?.activeUsers || 0) * 6000).toLocaleString()}`}
             subtitle={`From ${stats?.activeUsers || 0} active users`}
             icon={TrendingUp}
             gradient={isDark 

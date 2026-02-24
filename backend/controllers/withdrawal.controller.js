@@ -126,7 +126,7 @@ export const createWithdrawal = async (req, res) => {
 export const getUserWithdrawals = async (req, res, next) => {
   try {
     const withdrawals = await Withdrawal.find({ user: req.user._id })
-      .populate('user', 'name email earnings')
+      .populate('user', 'fullName email earnings')
       .sort('-createdAt');
 
     // Get total pending withdrawals
@@ -205,7 +205,7 @@ export const getPendingWithdrawals = async (req, res, next) => {
     const withdrawals = await Withdrawal.find({ status: 'pending' })
       .populate({
         path: 'user',
-        select: 'name email earnings _id',
+        select: 'fullName email earnings _id',
         model: User
       })
       .select('amount status accountDetails paymentMethod createdAt')
@@ -246,7 +246,7 @@ export const getAllWithdrawals = async (req, res, next) => {
     const withdrawals = await Withdrawal.find()
       .populate({
         path: 'user',
-        select: 'name email earnings _id',
+        select: 'fullName email earnings _id',
         model: User
       })
       .select('amount status accountDetails paymentMethod createdAt')
@@ -285,7 +285,7 @@ export const processWithdrawal = async (req, res, next) => {
   try {
     const { status, notes } = req.body;
     const withdrawal = await Withdrawal.findById(req.params.id)
-      .populate('user', 'name email earnings referrals');
+      .populate('user', 'fullName email earnings referrals');
 
     if (!withdrawal) {
       throw new ErrorResponse('Withdrawal request not found', 404);
@@ -373,7 +373,7 @@ export const processWithdrawal = async (req, res, next) => {
     await withdrawal.save();
 
     // Populate updated withdrawal
-    await withdrawal.populate('user', 'name email');
+    await withdrawal.populate('user', 'fullName email');
 
     res.status(200).json({
       success: true,
