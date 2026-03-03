@@ -91,11 +91,11 @@ export default function WhatsAppShare() {
 
       // Create WhatsApp share link
       const shareText = encodeURIComponent(
-        `🌟 Check out this amazing photo from SocialRise X! 📸\n\n` +
+        `🌟 Check out this amazing photo from Pesa Boost! 📸\n\n` +
         `Join me on this incredible earning platform and start making money today! 💰\n\n` +
         `Use my referral code: ${user.referralCode}\n` +
-        `Sign up here: ${process.env.REACT_APP_FRONTEND_URL || 'https://socialrisex.com'}/register?ref=${user.referralCode}\n\n` +
-        `#SocialRiseX #EarnMoney #WhatsAppShare`
+        `Sign up here: ${process.env.REACT_APP_FRONTEND_URL || 'https://pesaboost.onrender.com'}/register?ref=${user.referralCode}\n\n` +
+        `#PesaBoost #EarnMoney #WhatsAppShare`
       );
       
       const whatsappUrl = `https://wa.me/?text=${shareText}`;
@@ -127,7 +127,7 @@ export default function WhatsAppShare() {
   const downloadPhoto = (photo) => {
     const link = document.createElement('a');
     link.href = photo.imageUrl;
-    link.download = `socialrisex-whatsapp-${photo._id}.jpg`;
+    link.download = `pesaboost-whatsapp-${photo._id}.jpg`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -246,7 +246,7 @@ export default function WhatsAppShare() {
                   sx={{ objectFit: 'cover' }}
                   onError={(e) => {
                     console.error('Image failed to load:', photo.imageUrl);
-                    e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"%3E%3Crect width="200" height="200" fill="%23f5f5f5"/%3E%3Ctext x="50%" y="50%" text-anchor="middle" dy="0.3em" font-family="Arial" font-size="14" fill="%23999"%3EImage not available%3C/text%3E%3C/svg%3E';
+                    e.target.src = process.env.PUBLIC_URL + '/logo.png';
                   }}
                 />
                 <CardContent>
@@ -347,6 +347,9 @@ export default function WhatsAppShare() {
                   src={selectedPhoto.imageUrl} 
                   alt={selectedPhoto.title}
                   style={{ maxWidth: '100%', height: 'auto', maxHeight: '200px', borderRadius: '8px' }}
+                  onError={(e) => {
+                    e.target.src = process.env.PUBLIC_URL + '/logo.png';
+                  }}
                 />
               </Box>
               <Typography variant="h6" gutterBottom>

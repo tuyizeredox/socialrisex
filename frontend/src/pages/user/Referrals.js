@@ -94,7 +94,7 @@ export default function Referrals() {
     const cleanPhone = mobileNumber.replace(/\D/g, '');
     
     // Create WhatsApp URL with optional pre-filled message
-    const message = encodeURIComponent(`Hi ${name}, I wanted to reach out to you from SocialRise X!`);
+    const message = encodeURIComponent(`Hi ${name}, I wanted to reach out to you from Pesa Boost!`);
     const whatsappUrl = `https://wa.me/${cleanPhone}?text=${message}`;
     
     // Open WhatsApp in a new window

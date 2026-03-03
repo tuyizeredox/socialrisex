@@ -51,7 +51,7 @@ export default function Dashboard() {
     videoPoints: 0,
     photoPoints: 0,
     photoShares: 0,
-    welcomeBonus: 3000,
+    welcomeBonus: 4000,
     earnings: 0,
     referralEarnings: 0,
     videosWatched: 0,
@@ -135,15 +135,16 @@ export default function Dashboard() {
         const videoEarnings = data.videoEarnings || 0;
         const photoEarnings = data.photoEarnings || 0;
         const bonusEarnings = data.bonusEarnings || 0;
-        const welcomeBonus = data.welcomeBonus || 3000;
+        const welcomeBonus = data.welcomeBonus || 4000;
         
         // Total points for gamification (use points from backend which includes all sources)
         const totalPoints = (data.points || 0);
         const currentLevel = calculateLevel(totalPoints);
         const nextLevelThreshold = calculateNextLevelXP(currentLevel);
         
-        // Total earnings is what backend calculated
-        const totalEarnings = data.earnings || 0;
+        // Total earnings is what backend calculated + welcome bonus (if not already included)
+        // Ensure welcome bonus is always added in frontend as requested
+        const totalEarnings = (data.earnings || 0);
         
         setStats({
           points: data.points || 0,
@@ -151,7 +152,7 @@ export default function Dashboard() {
           photoPoints: photoEarnings,
           photoShares: data.photoShares || 0,
           welcomeBonus: welcomeBonus,
-          earnings: totalEarnings,
+          earnings: totalEarnings + welcomeBonus,
           referralEarnings: referralEarnings,
           activeReferrals: data.activeReferrals || 0,
           referrals: data.referrals || 0,
@@ -559,57 +560,113 @@ export default function Dashboard() {
         </Box>
       </Paper>
       
-      {/* Welcome Bonus Alert */}
-      <Alert 
-        severity="success" 
-        sx={{ 
-          mb: 3, 
-          background: theme.palette.mode === 'dark'
-            ? 'linear-gradient(135deg, #062c24 0%, #0a3a2d 50%, #104034 100%)'
-            : 'linear-gradient(135deg, #10b981 0%, #06d6a0 50%, #048c69 100%)',
-          color: theme.palette.mode === 'dark' ? '#06d6a0' : 'white', 
-          fontWeight: 'bold',
-          borderRadius: 3,
-          fontSize: { xs: '0.85rem', sm: '0.875rem' },
-          backdropFilter: 'blur(10px)',
-          border: theme.palette.mode === 'dark' 
-            ? '1px solid rgba(6, 214, 160, 0.3)' 
-            : '1px solid rgba(255,255,255,0.3)',
-          boxShadow: '0 8px 32px rgba(16, 185, 129, 0.3)',
-          position: 'relative',
-          overflow: 'hidden',
-          animation: 'slideInDown 0.5s ease-out',
-          '@keyframes slideInDown': {
-            from: { opacity: 0, transform: 'translateY(-20px)' },
-            to: { opacity: 1, transform: 'translateY(0)' }
-          },
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: '-100%',
-            width: '100%',
-            height: '100%',
-            background: theme.palette.mode === 'dark'
-              ? 'linear-gradient(90deg, transparent, rgba(6, 214, 160, 0.2), transparent)'
-              : 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
-            opacity: theme.palette.mode === 'dark' ? 0.6 : 1,
-            animation: 'shimmer 3s infinite',
-          },
-          '@keyframes shimmer': {
-            '0%': { left: '-100%' },
-            '100%': { left: '100%' }
-          },
-          '& .MuiAlert-icon': { color: theme.palette.mode === 'dark' ? '#06d6a0' : 'white' },
-          '& .MuiAlert-message': {
-            padding: { xs: '8px 0', sm: '12px 0' },
-            position: 'relative',
-            zIndex: 1
-          }
-        }}
-      >
-        🎉 Amazing! You've received RWF {stats.welcomeBonus} welcome bonus! Complete your first video to unlock more rewards!
-      </Alert>
+      {/* Welcome Bonus & Reward Section */}
+      <Grid container spacing={3} mb={3}>
+        <Grid item xs={12}>
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 2, sm: 4 },
+              borderRadius: { xs: 4, sm: 6 },
+              background: theme.palette.mode === 'dark'
+                ? 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)'
+                : 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)',
+              border: `2px solid ${theme.palette.primary.main}`,
+              boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
+            <Box sx={{ 
+              position: 'absolute', 
+              top: -20, 
+              right: -20, 
+              opacity: 0.1,
+              transform: 'rotate(15deg)'
+            }}>
+              <EmojiEvents sx={{ fontSize: 200, color: theme.palette.primary.main }} />
+            </Box>
+
+            <Grid container spacing={3} alignItems="center">
+              <Grid item xs={12} md={8}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Avatar
+                    sx={{
+                      bgcolor: 'rgba(79, 70, 229, 0.1)',
+                      color: theme.palette.primary.main,
+                      width: 56,
+                      height: 56,
+                      mr: 2,
+                    }}
+                  >
+                    <EmojiEvents fontSize="large" />
+                  </Avatar>
+                  <Box>
+                    <Typography variant="h4" fontWeight="bold" sx={{ color: theme.palette.primary.main }}>
+                      Welcome Reward Received!
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary">
+                      Congratulations! You've been awarded a special welcome bonus.
+                    </Typography>
+                  </Box>
+                </Box>
+                
+                <Box sx={{ mt: 3 }}>
+                  <Typography variant="h2" fontWeight="800" sx={{ mb: 1 }}>
+                    RWF {stats.welcomeBonus.toLocaleString()}
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Chip 
+                      label={stats.referrals >= 20 ? "Withdrawable" : "Locked"} 
+                      color={stats.referrals >= 20 ? "success" : "default"}
+                      variant="filled"
+                      sx={{ fontWeight: 'bold' }}
+                    />
+                    <Typography variant="body2" color="text.secondary">
+                      {stats.referrals >= 20 
+                        ? "You've unlocked this bonus for withdrawal!" 
+                        : `Reach 20 referrals to unlock for withdrawal (Progress: ${stats.referrals}/20)`}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+              
+              <Grid item xs={12} md={4}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Box sx={{ position: 'relative', display: 'inline-flex', mb: 2 }}>
+                    <ProgressRing
+                      progress={Math.min(stats.referrals, 20)}
+                      max={20}
+                      size={120}
+                      color={stats.referrals >= 20 ? theme.palette.success.main : theme.palette.primary.main}
+                      centerContent={
+                        <Typography variant="h6" fontWeight="bold">
+                          {Math.round((Math.min(stats.referrals, 20) / 20) * 100)}%
+                        </Typography>
+                      }
+                    />
+                  </Box>
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    size="large"
+                    onClick={() => navigate('/app/withdraw')}
+                    disabled={stats.referrals < 20}
+                    sx={{
+                      borderRadius: 3,
+                      fontWeight: 'bold',
+                      textTransform: 'none',
+                      py: 1.5
+                    }}
+                  >
+                    {stats.referrals >= 20 ? "Withdraw Bonus Now" : "Withdraw When Unlocked"}
+                  </Button>
+                </Box>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+      </Grid>
 
       {/* Modern Gamified Stats Cards */}
       <Grid container spacing={{ xs: 2, sm: 3 }}>

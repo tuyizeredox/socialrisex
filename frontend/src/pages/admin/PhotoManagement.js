@@ -321,7 +321,7 @@ export default function PhotoManagement() {
                   sx={{ objectFit: 'cover' }}
                   onError={(e) => {
                     console.error('Image failed to load:', photo.imageUrl);
-                    e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"%3E%3Crect width="200" height="200" fill="%23f5f5f5"/%3E%3Ctext x="50%" y="50%" text-anchor="middle" dy="0.3em" font-family="Arial" font-size="14" fill="%23999"%3EImage not available%3C/text%3E%3C/svg%3E';
+                    e.target.src = process.env.PUBLIC_URL + '/logo.png';
                   }}
                 />
                 <CardContent>

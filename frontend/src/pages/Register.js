@@ -203,8 +203,8 @@ export default function Register() {
     }
     if (!formData.mobileNumber.trim()) {
       newErrors.mobileNumber = 'Phone number is required';
-    } else if (!/^\d{9}$/.test(formData.mobileNumber)) {
-      newErrors.mobileNumber = 'Enter a valid 9-digit phone number';
+    } else if (!/^\d{5,15}$/.test(formData.mobileNumber)) {
+      newErrors.mobileNumber = 'Enter a valid phone number';
     }
     if (!formData.password) {
       newErrors.password = 'Password is required';
@@ -567,9 +567,8 @@ export default function Register() {
                     value={formData.mobileNumber}
                     onChange={handleChange}
                     error={!!errors.mobileNumber}
-                    helperText={errors.mobileNumber || 'Enter 9 digits (e.g., 791786228)'}
+                    helperText={errors.mobileNumber || 'Enter your mobile number'}
                     variant="outlined"
-                    inputProps={{ maxLength: 9 }}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">

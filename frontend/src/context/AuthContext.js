@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }) => {
         return res.data;
       }
     } catch (error) {
-      const message = error.response?.data?.error || 'Registration failed';
+      const message = error.response?.data?.message || error.response?.data?.error || 'Registration failed';
       showNotification(message, 'error');
       throw new Error(message);
     }
@@ -93,7 +93,7 @@ export const AuthProvider = ({ children }) => {
       showNotification('Login successful!', 'success');
       return res.data;
     } catch (error) {
-      const message = error.response?.data?.message || error.message || 'Login failed';
+      const message = error.response?.data?.message || error.response?.data?.error || error.message || 'Login failed';
       showNotification(message, 'error');
       throw new Error(message);
     }

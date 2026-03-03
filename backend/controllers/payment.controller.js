@@ -20,7 +20,7 @@ exports.initiatePayment = async (req, res) => {
     }
 
     const payload = {
-      tx_ref: `SRX-${Date.now()}-${userId}`,
+      tx_ref: `PB-${Date.now()}-${userId}`,
       amount: "5000",
       currency: "RWF",
       redirect_url: `${process.env.FRONTEND_URL}/payment/callback`,
@@ -29,7 +29,7 @@ exports.initiatePayment = async (req, res) => {
         name: user.fullName
       },
       customizations: {
-        title: "SocialRise X Account Activation",
+        title: "Pesa Boost Account Activation",
         description: "One-time account activation payment",
         logo: "https://your-logo-url.com/logo.png"
       }

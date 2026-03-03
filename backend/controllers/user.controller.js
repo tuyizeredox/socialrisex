@@ -84,7 +84,7 @@ export const getUserStats = async (req, res, next) => {
     // Calculate multi-level referral earnings using utility
     const multilevelData = await calculateMultilevelReferralEarnings(userId);
 
-    const welcomeBonus = 3000;
+    const welcomeBonus = 4000;
     
     // Use actual user points from database (includes all earnings: video + photo + bonuses)
     const totalPoints = user.points || 0;
@@ -94,7 +94,7 @@ export const getUserStats = async (req, res, next) => {
     const videoEarnings = videoPoints;
     const bonusEarnings = user.bonusEarnings || 0;
     const referralEarnings = multilevelData.totalEarnings;
-    const totalEarnings = videoEarnings + photoPoints + bonusEarnings + referralEarnings + welcomeBonus;
+    const totalEarnings = videoEarnings + photoPoints + bonusEarnings + referralEarnings + (user.welcomeBonusGiven ? welcomeBonus : 0);
 
     res.status(200).json({
       success: true,
@@ -159,7 +159,7 @@ export const getUserReferrals = async (req, res, next) => {
 export const getUserReferralInfo = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);
-    const referralLink = `${process.env.FRONTEND_URL}/register?ref=${user.referralCode}`;
+    const referralLink = `${process.env.FRONTEND_URL || 'https://pesaboost.onrender.com'}/register?ref=${user.referralCode}`;
     const totalReferrals = await User.countDocuments({ referredBy: req.user._id });
     const activeReferrals = await User.countDocuments({ 
       referredBy: req.user._id,

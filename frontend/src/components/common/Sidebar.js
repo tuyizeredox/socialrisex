@@ -144,7 +144,7 @@ export default function Sidebar({ isAdmin, mobileOpen, onClose }) {
               textShadow: isAdmin ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'
             }}
           >
-            SocialRise X
+            Pesa Boost
           </Typography>
           <Typography 
             variant="caption" 

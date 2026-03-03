@@ -48,7 +48,9 @@ export default function Withdraw() {
     availableBalance: 0,
     bonusEarnings: 0,
     welcomeBonus: 0,
-    withdrawableEarnings: 0
+    withdrawableEarnings: 0,
+    referralCount: 0,
+    welcomeBonusWithdrawable: false
   });
   
   const { user } = useAuth();
@@ -79,7 +81,9 @@ export default function Withdraw() {
         availableBalance: data.availableBalance,
         bonusEarnings: data.bonusEarnings || 0,
         welcomeBonus: data.welcomeBonus || 0,
-        withdrawableEarnings: data.withdrawableEarnings || 0
+        withdrawableEarnings: data.withdrawableEarnings || 0,
+        referralCount: data.referralCount || 0,
+        welcomeBonusWithdrawable: data.welcomeBonusWithdrawable || false
       });
       
       // Check if user has any previous withdrawals
@@ -195,7 +199,7 @@ export default function Withdraw() {
             value={`RWF ${(balance.welcomeBonus || 0).toLocaleString()}`}
             icon={MonetizationOn}
             color="info"
-            subtitle="Not withdrawable"
+            subtitle={balance.welcomeBonusWithdrawable ? "Withdrawable (20+ referrals)" : `Need ${Math.max(20 - (balance.referralCount || 0), 0)} more referrals to withdraw`}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={2}>
@@ -252,7 +256,13 @@ export default function Withdraw() {
                     <> Your withdrawable balance includes RWF {(balance.bonusEarnings || 0).toLocaleString()} in admin bonus earnings.</>
                   )}
                   {(balance.welcomeBonus || 0) > 0 && (
-                    <> The welcome bonus of RWF {(balance.welcomeBonus || 0).toLocaleString()} is for display only and cannot be withdrawn.</>
+                    <>
+                      {balance.welcomeBonusWithdrawable ? (
+                        <> The welcome bonus of RWF {(balance.welcomeBonus || 0).toLocaleString()} is now withdrawable because you have 20+ referrals.</>
+                      ) : (
+                        <> The welcome bonus of RWF {(balance.welcomeBonus || 0).toLocaleString()} will be withdrawable once you reach 20 referrals (current: {balance.referralCount || 0}).</>
+                      )}
+                    </>
                   )}
                 </Typography>
               </Alert>

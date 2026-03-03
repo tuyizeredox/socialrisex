@@ -106,13 +106,13 @@ export const login = async (req, res, next) => {
     }).select('+password +fullName +email +role +isActive +referralCode +referralCount +earnings +points +mobileNumber');
 
     if (!user) {
-      throw new ErrorResponse('Invalid credentials', 401);
+      throw new ErrorResponse('User not found. Please check your username.', 401);
     }
 
     // Check password
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
-      throw new ErrorResponse('Invalid credentials', 401);
+      throw new ErrorResponse('Incorrect password. Please try again.', 401);
     }
 
     // Generate token
@@ -374,7 +374,7 @@ export const verifyPayment = async (req, res, next) => {
 
     // Give welcome bonus
     if (!user.welcomeBonusGiven) {
-      user.points += 3000;
+      user.points += 4000;
       user.welcomeBonusGiven = true;
       await user.save();
     }
@@ -385,7 +385,7 @@ export const verifyPayment = async (req, res, next) => {
       data: {
         isActive: true,
         transactionId: transactionId,
-        welcomeBonus: user.welcomeBonusGiven ? 3000 : 0
+        welcomeBonus: user.welcomeBonusGiven ? 4000 : 0
       }
     });
 
