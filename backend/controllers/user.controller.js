@@ -695,15 +695,13 @@ export const getLeaderboard = async (req, res, next) => {
           createdAt: referrer.createdAt,
           isActive: referrer.isActive
         },
-        activeReferrals: multilevelData.activeReferrals,
-        totalEarnings: multilevelData.totalEarnings,
+        activeReferrals: multilevelData.level1Count,
+        totalEarnings: multilevelData.earnings.level1,
         conversionRate: Math.round(referrer.conversionRate * 10) / 10,
         activityScore: Math.round(referrer.activityScore),
-        multilevelBreakdown: multilevelData.earnings,
+        multilevelBreakdown: { level1: multilevelData.earnings.level1 },
         levels: {
-          level1: multilevelData.level1Count,
-          level2: multilevelData.level2Count,
-          level3: multilevelData.level3Count
+          level1: multilevelData.level1Count
         }
       };
     }));
@@ -719,13 +717,13 @@ export const getLeaderboard = async (req, res, next) => {
     let totalEarnings = 0;
     for (const referrer of allReferrers) {
       const multilevelData = await calculateMultilevelReferralEarnings(referrer._id);
-      totalEarnings += multilevelData.totalEarnings;
+      totalEarnings += multilevelData.earnings.level1;
     }
 
     const stats = {
       totalReferrers: allReferrers.length,
       totalReferrals: allReferrers.reduce((sum, r) => sum + r.totalReferrals, 0),
-      totalEarnings: totalEarnings, // Use real multilevel earnings
+      totalEarnings: totalEarnings, // Use only level 1 earnings
       activeReferrers: allReferrers.filter(r => r.activeReferrals > 0).length,
       avgConversionRate: allReferrers.length > 0 
         ? (allReferrers.reduce((sum, r) => sum + r.conversionRate, 0) / allReferrers.length).toFixed(1)

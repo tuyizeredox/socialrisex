@@ -162,7 +162,7 @@ export default function UserLeaderboard() {
             🏆 Top Referrers
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            See the top earners from referrals in the platform
+            See the top earners from level 1 referrals in the platform
           </Typography>
         </Box>
       </Box>
@@ -205,7 +205,7 @@ export default function UserLeaderboard() {
                   <Typography variant={isMobile ? 'h6' : 'h5'} fontWeight={700} sx={{ lineHeight: 1.2 }}>
                     {stats.totalReferrals}
                   </Typography>
-                  <Typography variant={isMobile ? 'caption' : 'body2'}>Total Referrals</Typography>
+                  <Typography variant={isMobile ? 'caption' : 'body2'}>Level 1 Referrals</Typography>
                 </Box>
               </Box>
             </CardContent>
@@ -230,7 +230,7 @@ export default function UserLeaderboard() {
                   >
                     {formatEarnings(stats.totalEarnings)}
                   </Typography>
-                  <Typography variant={isMobile ? 'caption' : 'body2'}>Total Earnings</Typography>
+                  <Typography variant={isMobile ? 'caption' : 'body2'}>Level 1 Earnings</Typography>
                 </Box>
               </Box>
             </CardContent>
@@ -251,7 +251,7 @@ export default function UserLeaderboard() {
                   <Typography variant={isMobile ? 'h6' : 'h5'} fontWeight={700} sx={{ lineHeight: 1.2 }}>
                     {stats.activeReferrers}
                   </Typography>
-                  <Typography variant={isMobile ? 'caption' : 'body2'}>Active Referrers</Typography>
+                  <Typography variant={isMobile ? 'caption' : 'body2'}>Active Level 1</Typography>
                 </Box>
               </Box>
             </CardContent>
@@ -288,8 +288,8 @@ export default function UserLeaderboard() {
               <TableRow>
                 <TableCell sx={{ fontWeight: 700, fontSize: '0.95rem' }}>Rank</TableCell>
                 <TableCell sx={{ fontWeight: 700, fontSize: '0.95rem' }}>Referrer</TableCell>
-                <TableCell sx={{ fontWeight: 700, fontSize: '0.95rem' }}>Referrals</TableCell>
-                <TableCell sx={{ fontWeight: 700, fontSize: '0.95rem' }}>Earnings</TableCell>
+                <TableCell sx={{ fontWeight: 700, fontSize: '0.95rem' }}>Level 1 Referrals</TableCell>
+                <TableCell sx={{ fontWeight: 700, fontSize: '0.95rem' }}>Level 1 Earnings</TableCell>
                 <TableCell sx={{ fontWeight: 700, fontSize: '0.95rem' }}>Conversion Rate</TableCell>
               </TableRow>
             </TableHead>

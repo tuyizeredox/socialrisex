@@ -603,10 +603,10 @@ export default function Dashboard() {
                   </Avatar>
                   <Box>
                     <Typography variant="h4" fontWeight="bold" sx={{ color: theme.palette.primary.main }}>
-                      Welcome Reward Received!
+                      Welcome bonus received!
                     </Typography>
                     <Typography variant="body1" color="text.secondary">
-                      Congratulations! You've been awarded a special welcome bonus.
+                      Congratulations! You've been awarded a special welcome bonus only.
                     </Typography>
                   </Box>
                 </Box>
@@ -617,49 +617,34 @@ export default function Dashboard() {
                   </Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Chip 
-                      label={stats.referrals >= 20 ? "Withdrawable" : "Locked"} 
-                      color={stats.referrals >= 20 ? "success" : "default"}
+                      label="Bonus Received" 
+                      color="success"
                       variant="filled"
                       sx={{ fontWeight: 'bold' }}
                     />
                     <Typography variant="body2" color="text.secondary">
-                      {stats.referrals >= 20 
-                        ? "You've unlocked this bonus for withdrawal!" 
-                        : `Reach 20 referrals to unlock for withdrawal (Progress: ${stats.referrals}/20)`}
+                      You've received your welcome bonus of RWF 4,000!
                     </Typography>
                   </Box>
                 </Box>
               </Grid>
               
               <Grid item xs={12} md={4}>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Box sx={{ position: 'relative', display: 'inline-flex', mb: 2 }}>
-                    <ProgressRing
-                      progress={Math.min(stats.referrals, 20)}
-                      max={20}
-                      size={120}
-                      color={stats.referrals >= 20 ? theme.palette.success.main : theme.palette.primary.main}
-                      centerContent={
-                        <Typography variant="h6" fontWeight="bold">
-                          {Math.round((Math.min(stats.referrals, 20) / 20) * 100)}%
-                        </Typography>
-                      }
-                    />
-                  </Box>
+                <Box sx={{ textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%' }}>
                   <Button
                     variant="contained"
                     fullWidth
                     size="large"
                     onClick={() => navigate('/app/withdraw')}
-                    disabled={stats.referrals < 20}
                     sx={{
                       borderRadius: 3,
                       fontWeight: 'bold',
                       textTransform: 'none',
-                      py: 1.5
+                      py: 1.5,
+                      boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
                     }}
                   >
-                    {stats.referrals >= 20 ? "Withdraw Bonus Now" : "Withdraw When Unlocked"}
+                    Withdraw My Earnings
                   </Button>
                 </Box>
               </Grid>

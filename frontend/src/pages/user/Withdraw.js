@@ -256,13 +256,7 @@ export default function Withdraw() {
                     <> Your withdrawable balance includes RWF {(balance.bonusEarnings || 0).toLocaleString()} in admin bonus earnings.</>
                   )}
                   {(balance.welcomeBonus || 0) > 0 && (
-                    <>
-                      {balance.welcomeBonusWithdrawable ? (
-                        <> The welcome bonus of RWF {(balance.welcomeBonus || 0).toLocaleString()} is now withdrawable because you have 20+ referrals.</>
-                      ) : (
-                        <> The welcome bonus of RWF {(balance.welcomeBonus || 0).toLocaleString()} will be withdrawable once you reach 20 referrals (current: {balance.referralCount || 0}).</>
-                      )}
-                    </>
+                    <> Your withdrawable balance includes your welcome bonus of RWF {(balance.welcomeBonus || 0).toLocaleString()}! Received!</>
                   )}
                 </Typography>
               </Alert>
