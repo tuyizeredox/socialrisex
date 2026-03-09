@@ -253,18 +253,38 @@ export const getUserReferralStructure = async (userId) => {
       .select('fullName email mobileNumber isActive createdAt')
       .sort('-createdAt');
 
-    const earnings = await calculateMultilevelReferralEarnings(userId);
+    // Try to get stats from MultilevelEarnings cache first
+    let statsData;
+    const cachedEarnings = await MultilevelEarnings.findOne({ user: userId });
+    
+    if (cachedEarnings) {
+      statsData = {
+        level1Count: cachedEarnings.level1.count,
+        level2Count: cachedEarnings.level2.count,
+        level3Count: cachedEarnings.level3.count,
+        totalEarnings: cachedEarnings.totalEarnings,
+        earnings: {
+          level1: cachedEarnings.level1.earnings,
+          level2: cachedEarnings.level2.earnings,
+          level3: cachedEarnings.level3.earnings
+        },
+        activeReferrals: cachedEarnings.level1.count + cachedEarnings.level2.count + cachedEarnings.level3.count
+      };
+    } else {
+      // Fallback to calculation if no cache
+      statsData = await calculateMultilevelReferralEarnings(userId);
+    }
 
     return {
       referrals: directReferrals,
       stats: {
         total: directReferrals.length,
         active: directReferrals.filter(ref => ref.isActive).length,
-        level1Count: earnings.level1Count,
-        level2Count: earnings.level2Count,
-        level3Count: earnings.level3Count,
-        earnings: earnings.totalEarnings,
-        breakdown: earnings.earnings
+        level1Count: statsData.level1Count,
+        level2Count: statsData.level2Count,
+        level3Count: statsData.level3Count,
+        earnings: statsData.totalEarnings,
+        breakdown: statsData.earnings
       }
     };
   } catch (error) {
@@ -325,7 +345,25 @@ export const getDetailedMultilevelStructure = async (userId) => {
     // Combine all referrals
     const allReferrals = [...level1WithInfo, ...level2WithInfo, ...level3WithInfo];
 
-    const earnings = await calculateMultilevelReferralEarnings(userId);
+    // Try to get stats from MultilevelEarnings cache
+    let statsData;
+    const cachedEarnings = await MultilevelEarnings.findOne({ user: userId });
+    
+    if (cachedEarnings) {
+      statsData = {
+        level1Count: cachedEarnings.level1.count,
+        level2Count: cachedEarnings.level2.count,
+        level3Count: cachedEarnings.level3.count,
+        totalEarnings: cachedEarnings.totalEarnings,
+        earnings: {
+          level1: cachedEarnings.level1.earnings,
+          level2: cachedEarnings.level2.earnings,
+          level3: cachedEarnings.level3.earnings
+        }
+      };
+    } else {
+      statsData = await calculateMultilevelReferralEarnings(userId);
+    }
 
     return {
       referrals: allReferrals,
@@ -341,8 +379,8 @@ export const getDetailedMultilevelStructure = async (userId) => {
         level1Active: level1WithInfo.filter(ref => ref.isActive).length,
         level2Active: level2WithInfo.filter(ref => ref.isActive).length,
         level3Active: level3WithInfo.filter(ref => ref.isActive).length,
-        earnings: earnings.totalEarnings,
-        breakdown: earnings.earnings
+        earnings: statsData.totalEarnings,
+        breakdown: statsData.earnings
       }
     };
   } catch (error) {
