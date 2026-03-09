@@ -1190,6 +1190,56 @@ export default function LeaderboardNew() {
                   </Card>
                 </Grid>
               )}
+
+              {/* Active Level 1 Referrals Section */}
+              <Grid item xs={12}>
+                <Card variant="outlined">
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom color="success.main">
+                      ✅ All Active Level 1 Referrals
+                    </Typography>
+                    <Box sx={{ mt: 2, maxHeight: 400, overflow: 'auto' }}>
+                      <Table size="small" stickyHeader>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>Email</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>Joined Date</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>Activation Date</TableCell>
+                            <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {referrerDetails?.allReferrals?.filter(r => r.isActive).map((referral, idx) => (
+                            <TableRow key={referral._id || idx} hover>
+                              <TableCell>{referral.fullName || 'N/A'}</TableCell>
+                              <TableCell>{referral.email || 'N/A'}</TableCell>
+                              <TableCell>
+                                {referral.createdAt ? format(new Date(referral.createdAt), 'MMM dd, yyyy') : 'N/A'}
+                              </TableCell>
+                              <TableCell>
+                                {referral.activatedAt ? format(new Date(referral.activatedAt), 'MMM dd, yyyy') : 'N/A'}
+                              </TableCell>
+                              <TableCell>
+                                <Chip label="Active" color="success" size="small" variant="outlined" />
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                          {(!referrerDetails?.allReferrals || referrerDetails.allReferrals.filter(r => r.isActive).length === 0) && (
+                            <TableRow>
+                              <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
+                                <Typography variant="body2" color="text.secondary">
+                                  No active level 1 referrals found
+                                </Typography>
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </TableBody>
+                      </Table>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
             </Grid>
           )}
         </DialogContent>

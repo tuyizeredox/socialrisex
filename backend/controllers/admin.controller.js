@@ -11,7 +11,8 @@ import ErrorResponse from '../utils/errorResponse.js';
 import { 
   calculateMultilevelReferralEarnings,
   updateMultilevelEarnings,
-  getAllMultilevelEarnings
+  getAllMultilevelEarnings,
+  getUserReferralStructure
 } from '../utils/referralCalculations.js';
 
 // Dashboard Stats
@@ -771,6 +772,7 @@ export const getTransactionDetails = async (req, res, next) => {
 };
 
 // Leaderboard Management
+// Optimized Leaderboard Management
 export const getLeaderboard = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -785,16 +787,16 @@ export const getLeaderboard = async (req, res, next) => {
     
     switch (timeRange) {
       case '7d':
-        dateFilter = { createdAt: { $gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) } };
+        dateFilter = { 'user.createdAt': { $gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) } };
         break;
       case '30d':
-        dateFilter = { createdAt: { $gte: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) } };
+        dateFilter = { 'user.createdAt': { $gte: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) } };
         break;
       case '90d':
-        dateFilter = { createdAt: { $gte: new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000) } };
+        dateFilter = { 'user.createdAt': { $gte: new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000) } };
         break;
       case '1y':
-        dateFilter = { createdAt: { $gte: new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000) } };
+        dateFilter = { 'user.createdAt': { $gte: new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000) } };
         break;
       default:
         dateFilter = {};
@@ -805,68 +807,36 @@ export const getLeaderboard = async (req, res, next) => {
     if (search) {
       searchQuery = {
         $or: [
-          { fullName: { $regex: search, $options: 'i' } },
-          { email: { $regex: search, $options: 'i' } }
+          { 'user.fullName': { $regex: search, $options: 'i' } },
+          { 'user.email': { $regex: search, $options: 'i' } }
         ]
       };
     }
 
-    // Combine search and date filters for user lookup
-    const userMatchQuery = { ...searchQuery, ...dateFilter };
+    // Combined match stage for aggregation
+    const matchStage = { ...searchQuery, ...dateFilter };
 
-    // Aggregation pipeline to get referrer performance
-    const aggregationPipeline = [
-      // Match users who have referrals
+    // Aggregation pipeline for leaderboard
+    const pipeline = [
       {
         $lookup: {
           from: 'users',
-          localField: '_id',
-          foreignField: 'referredBy',
-          as: 'referrals'
+          localField: 'user',
+          foreignField: '_id',
+          as: 'user'
         }
       },
-      {
-        $match: {
-          'referrals.0': { $exists: true }, // Only users with referrals
-          ...userMatchQuery
-        }
-      },
+      { $unwind: '$user' },
+      { $match: matchStage },
       {
         $addFields: {
-          totalReferrals: { $size: '$referrals' },
-          activeReferrals: {
-            $size: {
-              $filter: {
-                input: '$referrals',
-                as: 'referral',
-                cond: { $eq: ['$$referral.isActive', true] }
-              }
-            }
-          },
-          recentReferrals: {
-            $size: {
-              $filter: {
-                input: '$referrals',
-                as: 'referral',
-                cond: { 
-                  $gte: ['$$referral.createdAt', new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)]
-                }
-              }
-            }
-          }
-        }
-      },
-      {
-        $addFields: {
-          // Note: totalEarnings will be calculated separately using multilevel system
-          // These are kept for backward compatibility but will be overridden
-          totalEarnings: { $multiply: ['$activeReferrals', 3200] }, // Level 1 base rate
-          recentEarnings: { $multiply: ['$recentReferrals', 3200] }, // Level 1 base rate
+          activeReferrals: { $add: ['$level1.count', '$level2.count', '$level3.count'] },
+          totalReferrals: '$user.referralCount', // Keep original level 1 referral count
           conversionRate: {
             $cond: [
-              { $eq: ['$totalReferrals', 0] },
+              { $eq: ['$user.referralCount', 0] },
               0,
-              { $multiply: [{ $divide: ['$activeReferrals', '$totalReferrals'] }, 100] }
+              { $multiply: [{ $divide: ['$level1.count', '$user.referralCount'] }, 100] }
             ]
           },
           activityScore: {
@@ -874,18 +844,18 @@ export const getLeaderboard = async (req, res, next) => {
               100,
               {
                 $add: [
-                  { $multiply: ['$conversionRate', 0.4] }, // 40% weight on conversion
-                  { $multiply: [{ $min: [50, '$totalReferrals'] }, 0.6] } // 60% weight on volume (capped at 50)
+                  { $multiply: [{
+                    $cond: [
+                      { $eq: ['$user.referralCount', 0] },
+                      0,
+                      { $multiply: [{ $divide: ['$level1.count', '$user.referralCount'] }, 100] }
+                    ]
+                  }, 0.4] },
+                  { $multiply: [{ $min: [50, '$user.referralCount'] }, 0.6] }
                 ]
               }
             ]
           }
-        }
-      },
-      {
-        $project: {
-          password: 0,
-          'referrals.password': 0
         }
       }
     ];
@@ -906,111 +876,78 @@ export const getLeaderboard = async (req, res, next) => {
         sortStage = { totalEarnings: -1 };
     }
 
-    // Get total count for pagination
-    const totalPipeline = [...aggregationPipeline, { $count: 'total' }];
-    const totalResult = await User.aggregate(totalPipeline);
-    const total = totalResult[0]?.total || 0;
-
-    // Get paginated results
-    const referrersPipeline = [
-      ...aggregationPipeline,
-      { $sort: sortStage },
-      { $skip: (page - 1) * limit },
-      { $limit: limit }
-    ];
-
-    const referrers = await User.aggregate(referrersPipeline);
-
-    // Transform referrers data to include user info and calculate multilevel earnings
-    const transformedReferrers = await Promise.all(referrers.map(async (referrer) => {
-      // Calculate actual multilevel earnings
-      const multilevelData = await calculateMultilevelReferralEarnings(referrer._id);
-      
-      return {
-        userId: referrer._id,
-        user: {
-          fullName: referrer.fullName,
-          email: referrer.email,
-          createdAt: referrer.createdAt,
-          isActive: referrer.isActive
-        },
-        totalReferrals: referrer.totalReferrals,
-        activeReferrals: multilevelData.activeReferrals,
-        totalEarnings: multilevelData.totalEarnings, // Use actual multilevel earnings
-        recentEarnings: referrer.recentEarnings, // Keep aggregated recent earnings for now
-        conversionRate: Math.round(referrer.conversionRate * 10) / 10,
-        activityScore: Math.round(referrer.activityScore),
-        multilevelBreakdown: multilevelData.earnings, // Add detailed breakdown
-        levels: {
-          level1: multilevelData.level1Count,
-          level2: multilevelData.level2Count,
-          level3: multilevelData.level3Count
+    // Get paginated results and total count in parallel
+    const [referrers, countResult] = await Promise.all([
+      MultilevelEarnings.aggregate([
+        ...pipeline,
+        { $sort: sortStage },
+        { $skip: (page - 1) * limit },
+        { $limit: limit },
+        {
+          $project: {
+            'user.password': 0,
+            'user.__v': 0
+          }
         }
-      };
+      ]),
+      MultilevelEarnings.aggregate([
+        ...pipeline,
+        { $count: 'total' }
+      ])
+    ]);
+
+    const total = countResult[0]?.total || 0;
+
+    // Transform data for response
+    const transformedReferrers = referrers.map(referrer => ({
+      userId: referrer.user._id,
+      user: {
+        fullName: referrer.user.fullName,
+        email: referrer.user.email,
+        createdAt: referrer.user.createdAt,
+        isActive: referrer.user.isActive
+      },
+      totalReferrals: referrer.totalReferrals || 0,
+      activeReferrals: referrer.activeReferrals || 0,
+      totalEarnings: referrer.totalEarnings || 0,
+      conversionRate: Math.round(referrer.conversionRate * 10) / 10,
+      activityScore: Math.round(referrer.activityScore),
+      multilevelBreakdown: {
+        level1: referrer.level1.earnings,
+        level2: referrer.level2.earnings,
+        level3: referrer.level3.earnings
+      },
+      levels: {
+        level1: referrer.level1.count,
+        level2: referrer.level2.count,
+        level3: referrer.level3.count
+      }
     }));
 
-    // Get top 3 performers for highlighting
-    const topPerformers = transformedReferrers.slice(0, 3);
-
-    // Calculate overall stats with real multilevel earnings
-    const allReferrers = await User.aggregate([
+    // Calculate global stats efficiently
+    const statsResult = await MultilevelEarnings.aggregate([
       {
-        $lookup: {
-          from: 'users',
-          localField: '_id',
-          foreignField: 'referredBy',
-          as: 'referrals'
-        }
-      },
-      {
-        $match: {
-          'referrals.0': { $exists: true }
-        }
-      },
-      {
-        $addFields: {
-          totalReferrals: { $size: '$referrals' },
-          activeReferrals: {
-            $size: {
-              $filter: {
-                input: '$referrals',
-                as: 'referral',
-                cond: { $eq: ['$$referral.isActive', true] }
-              }
-            }
-          },
-          recentActivity: {
-            $size: {
-              $filter: {
-                input: '$referrals',
-                as: 'referral',
-                cond: {
-                  $gte: ['$$referral.createdAt', new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)]
-                }
-              }
-            }
-          }
+        $group: {
+          _id: null,
+          totalReferrers: { $sum: 1 },
+          totalEarnings: { $sum: '$totalEarnings' },
+          totalLevel1: { $sum: '$level1.count' },
+          totalLevel2: { $sum: '$level2.count' },
+          totalLevel3: { $sum: '$level3.count' }
         }
       }
     ]);
 
-    // Calculate real multilevel earnings for all referrers
-    let totalEarnings = 0;
-    for (const referrer of allReferrers) {
-      const multilevelData = await calculateMultilevelReferralEarnings(referrer._id);
-      totalEarnings += multilevelData.totalEarnings;
-    }
-
     const stats = {
-      totalReferrers: allReferrers.length,
-      totalReferrals: allReferrers.reduce((sum, r) => sum + r.totalReferrals, 0),
-      totalEarnings: totalEarnings, // Use real multilevel earnings
-      activeReferrers: allReferrers.filter(r => r.recentActivity > 0).length
+      totalReferrers: statsResult[0]?.totalReferrers || 0,
+      totalReferrals: (statsResult[0]?.totalLevel1 || 0) + (statsResult[0]?.totalLevel2 || 0) + (statsResult[0]?.totalLevel3 || 0),
+      totalEarnings: statsResult[0]?.totalEarnings || 0,
+      activeReferrers: statsResult[0]?.totalReferrers || 0 // Assuming all in MultilevelEarnings are somewhat active
     };
 
     res.json({
       referrers: transformedReferrers,
-      topPerformers,
+      topPerformers: transformedReferrers.slice(0, 3),
       pagination: {
         page,
         limit,
@@ -1026,26 +963,27 @@ export const getLeaderboard = async (req, res, next) => {
 };
 
 // Export leaderboard to CSV
+// Optimized Export Leaderboard
 export const exportLeaderboard = async (req, res, next) => {
   try {
     const { search, timeRange, sortBy } = req.query;
 
-    // Use similar logic as getLeaderboard but without pagination
+    // Build filters (same as getLeaderboard)
     let dateFilter = {};
     const now = new Date();
     
     switch (timeRange) {
       case '7d':
-        dateFilter = { createdAt: { $gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) } };
+        dateFilter = { 'user.createdAt': { $gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) } };
         break;
       case '30d':
-        dateFilter = { createdAt: { $gte: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) } };
+        dateFilter = { 'user.createdAt': { $gte: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) } };
         break;
       case '90d':
-        dateFilter = { createdAt: { $gte: new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000) } };
+        dateFilter = { 'user.createdAt': { $gte: new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000) } };
         break;
       case '1y':
-        dateFilter = { createdAt: { $gte: new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000) } };
+        dateFilter = { 'user.createdAt': { $gte: new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000) } };
         break;
       default:
         dateFilter = {};
@@ -1055,51 +993,35 @@ export const exportLeaderboard = async (req, res, next) => {
     if (search) {
       searchQuery = {
         $or: [
-          { fullName: { $regex: search, $options: 'i' } },
-          { email: { $regex: search, $options: 'i' } }
+          { 'user.fullName': { $regex: search, $options: 'i' } },
+          { 'user.email': { $regex: search, $options: 'i' } }
         ]
       };
     }
 
-    const userMatchQuery = { ...searchQuery, ...dateFilter };
+    const matchStage = { ...searchQuery, ...dateFilter };
 
-    const aggregationPipeline = [
+    // Optimized aggregation pipeline
+    const pipeline = [
       {
         $lookup: {
           from: 'users',
-          localField: '_id',
-          foreignField: 'referredBy',
-          as: 'referrals'
+          localField: 'user',
+          foreignField: '_id',
+          as: 'user'
         }
       },
-      {
-        $match: {
-          'referrals.0': { $exists: true },
-          ...userMatchQuery
-        }
-      },
+      { $unwind: '$user' },
+      { $match: matchStage },
       {
         $addFields: {
-          totalReferrals: { $size: '$referrals' },
-          activeReferrals: {
-            $size: {
-              $filter: {
-                input: '$referrals',
-                as: 'referral',
-                cond: { $eq: ['$$referral.isActive', true] }
-              }
-            }
-          }
-        }
-      },
-      {
-        $addFields: {
-          totalEarnings: { $multiply: ['$activeReferrals', 3200] }, // Placeholder - will be recalculated with multilevel
+          activeReferrals: { $add: ['$level1.count', '$level2.count', '$level3.count'] },
+          totalReferrals: '$user.referralCount',
           conversionRate: {
             $cond: [
-              { $eq: ['$totalReferrals', 0] },
+              { $eq: ['$user.referralCount', 0] },
               0,
-              { $multiply: [{ $divide: ['$activeReferrals', '$totalReferrals'] }, 100] }
+              { $multiply: [{ $divide: ['$level1.count', '$user.referralCount'] }, 100] }
             ]
           },
           activityScore: {
@@ -1107,24 +1029,18 @@ export const exportLeaderboard = async (req, res, next) => {
               100,
               {
                 $add: [
-                  { $multiply: ['$conversionRate', 0.4] },
-                  { $multiply: [{ $min: [50, '$totalReferrals'] }, 0.6] }
+                  { $multiply: [{
+                    $cond: [
+                      { $eq: ['$user.referralCount', 0] },
+                      0,
+                      { $multiply: [{ $divide: ['$level1.count', '$user.referralCount'] }, 100] }
+                    ]
+                  }, 0.4] },
+                  { $multiply: [{ $min: [50, '$user.referralCount'] }, 0.6] }
                 ]
               }
             ]
           }
-        }
-      },
-      {
-        $project: {
-          fullName: 1,
-          email: 1,
-          createdAt: 1,
-          totalReferrals: 1,
-          activeReferrals: 1,
-          totalEarnings: 1,
-          conversionRate: 1,
-          activityScore: 1
         }
       }
     ];
@@ -1145,23 +1061,10 @@ export const exportLeaderboard = async (req, res, next) => {
         sortStage = { totalEarnings: -1 };
     }
 
-    const referrers = await User.aggregate([
-      ...aggregationPipeline,
+    const referrers = await MultilevelEarnings.aggregate([
+      ...pipeline,
       { $sort: sortStage }
     ]);
-
-    // Calculate real multilevel earnings for export
-    const enrichedReferrers = await Promise.all(referrers.map(async (referrer) => {
-      const multilevelData = await calculateMultilevelReferralEarnings(referrer._id);
-      return {
-        ...referrer,
-        totalEarnings: multilevelData.totalEarnings, // Use real multilevel earnings
-        level1Count: multilevelData.level1Count,
-        level2Count: multilevelData.level2Count,
-        level3Count: multilevelData.level3Count,
-        earningsBreakdown: multilevelData.earnings
-      };
-    }));
 
     // Create CSV content with multilevel details
     const csvHeaders = [
@@ -1182,20 +1085,20 @@ export const exportLeaderboard = async (req, res, next) => {
       'Activity Score'
     ];
 
-    const csvRows = enrichedReferrers.map((referrer, index) => [
+    const csvRows = referrers.map((referrer, index) => [
       index + 1,
-      referrer.fullName,
-      referrer.email,
-      new Date(referrer.createdAt).toLocaleDateString(),
-      referrer.totalReferrals,
-      referrer.activeReferrals,
-      referrer.level1Count,
-      referrer.level2Count,
-      referrer.level3Count,
+      referrer.user.fullName,
+      referrer.user.email,
+      new Date(referrer.user.createdAt).toLocaleDateString(),
+      referrer.totalReferrals || 0,
+      referrer.activeReferrals || 0,
+      referrer.level1.count,
+      referrer.level2.count,
+      referrer.level3.count,
       referrer.totalEarnings,
-      referrer.earningsBreakdown.level1,
-      referrer.earningsBreakdown.level2,
-      referrer.earningsBreakdown.level3,
+      referrer.level1.earnings,
+      referrer.level2.earnings,
+      referrer.level3.earnings,
       Math.round(referrer.conversionRate * 10) / 10,
       Math.round(referrer.activityScore)
     ]);
@@ -1221,20 +1124,11 @@ export const getReferrerDetails = async (req, res, next) => {
       throw new ErrorResponse('Referrer not found', 404);
     }
 
-    // Get detailed referral information
-    const referrals = await User.find({ referredBy: userId })
-      .select('fullName email createdAt isActive activatedAt')
-      .sort({ createdAt: -1 });
-
-    // Get recent referrals (last 10)
-    const recentReferrals = referrals.slice(0, 10);
-
-    // Calculate performance metrics
-    const totalReferrals = referrals.length;
-    const activeReferrals = referrals.filter(ref => ref.isActive).length;
-    const totalEarnings = activeReferrals * 2800;
+    // Get detailed referral information using the utility function
+    const referralStructure = await getUserReferralStructure(userId);
     
-    // Monthly performance
+    // Get monthly performance
+    const referrals = referralStructure.referrals;
     const monthlyStats = [];
     for (let i = 0; i < 12; i++) {
       const monthStart = new Date();
@@ -1252,18 +1146,23 @@ export const getReferrerDetails = async (req, res, next) => {
         month: monthStart.toISOString().slice(0, 7), // YYYY-MM format
         referrals: monthlyReferrals.length,
         activations: monthlyReferrals.filter(ref => ref.isActive).length,
-        earnings: monthlyReferrals.filter(ref => ref.isActive).length * 2800
+        earnings: monthlyReferrals.filter(ref => ref.isActive).length * 3200
       });
     }
 
     res.json({
       referrer,
-      recentReferrals,
+      recentReferrals: referrals.slice(0, 10),
+      allReferrals: referrals, // All Level 1 referrals
       stats: {
-        totalReferrals,
-        activeReferrals,
-        totalEarnings,
-        conversionRate: totalReferrals > 0 ? (activeReferrals / totalReferrals * 100).toFixed(1) : 0
+        totalReferrals: referralStructure.stats.total,
+        activeReferrals: referralStructure.stats.active,
+        totalEarnings: referralStructure.stats.earnings,
+        conversionRate: referralStructure.stats.total > 0 ? (referralStructure.stats.active / referralStructure.stats.total * 100).toFixed(1) : 0,
+        level1Count: referralStructure.stats.level1Count,
+        level2Count: referralStructure.stats.level2Count,
+        level3Count: referralStructure.stats.level3Count,
+        breakdown: referralStructure.stats.breakdown
       },
       monthlyStats
     });
