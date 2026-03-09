@@ -24,11 +24,17 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     
-    // Handle 401 errors (unauthorized)
-    if (error.response?.status === 401) {
+    // Handle 401 errors (unauthorized) - but only if NOT an auth request
+    const isAuthRequest = originalRequest.url.includes('/auth/login') || 
+                         originalRequest.url.includes('/auth/register');
+                         
+    if (error.response?.status === 401 && !isAuthRequest) {
       // Clear token and redirect to login
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      // Use window.location only if not already on login page
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
       return Promise.reject(error.response?.data || error);
     }
     

@@ -30,10 +30,13 @@ export const register = async (req, res, next) => {
         await userExists.save();
         return sendTokenResponse(userExists, 201, res);
       }
-      if (userExists.email === email) {
-        throw new ErrorResponse('Email already registered', 400);
+      if (userExists.email === email && userExists.mobileNumber === mobileNumber) {
+        throw new ErrorResponse('This email and mobile number are already registered. Please login.', 400);
       }
-      throw new ErrorResponse('Mobile number already registered', 400);
+      if (userExists.email === email) {
+        throw new ErrorResponse('This email is already registered. Please use another email or login.', 400);
+      }
+      throw new ErrorResponse('This mobile number is already registered. Please use another number or login.', 400);
     }
 
     // Check if username (fullName) already exists
@@ -106,13 +109,13 @@ export const login = async (req, res, next) => {
     }).select('+password +fullName +email +role +isActive +referralCode +referralCount +earnings +points +mobileNumber');
 
     if (!user) {
-      throw new ErrorResponse('User not found. Please check your username.', 401);
+      throw new ErrorResponse('Username not found. Please check your spelling or sign up.', 401);
     }
 
     // Check password
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
-      throw new ErrorResponse('Incorrect password. Please try again.', 401);
+      throw new ErrorResponse('Incorrect password. Please check your password and try again.', 401);
     }
 
     // Generate token
