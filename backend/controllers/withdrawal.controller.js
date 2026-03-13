@@ -37,7 +37,10 @@ export const createWithdrawal = async (req, res) => {
 
     // Get user's current balance
     const user = await User.findById(userId);
-    const referralCount = await User.countDocuments({ referredBy: userId });
+    const activeReferralCount = await User.countDocuments({ 
+      referredBy: userId,
+      isActive: true 
+    });
     const welcomeBonusAmount = 4000;
     
     // Skip balance check for first-time withdrawal
@@ -47,8 +50,8 @@ export const createWithdrawal = async (req, res) => {
       const referralEarnings = multilevelData.totalEarnings;
       const bonusEarnings = user.bonusEarnings || 0;
       
-      // Welcome bonus is withdrawable ONLY if user has 20 or more referrals
-      const withdrawableWelcomeBonus = referralCount >= 20 ? welcomeBonusAmount : 0;
+      // Welcome bonus is withdrawable ONLY if user has 20 or more active referrals
+      const withdrawableWelcomeBonus = activeReferralCount >= 20 ? welcomeBonusAmount : 0;
       
       // Total earnings from referrals and bonuses only
       const totalEarnings = referralEarnings + bonusEarnings + withdrawableWelcomeBonus;
@@ -167,7 +170,10 @@ export const getUserWithdrawals = async (req, res, next) => {
     ]);
 
     const user = await User.findById(req.user._id);
-    const referralCount = await User.countDocuments({ referredBy: req.user._id });
+    const activeReferralCount = await User.countDocuments({ 
+      referredBy: req.user._id,
+      isActive: true 
+    });
     
     // Calculate fresh referral earnings
     const multilevelData = await calculateMultilevelReferralEarnings(req.user._id);
@@ -177,8 +183,8 @@ export const getUserWithdrawals = async (req, res, next) => {
     // Welcome bonus: 4000 RWF
     const welcomeBonus = 4000;
     
-    // Welcome bonus is withdrawable ONLY if user has 20 or more referrals
-    const withdrawableWelcomeBonus = referralCount >= 20 ? welcomeBonus : 0;
+    // Welcome bonus is withdrawable ONLY if user has 20 or more active referrals
+    const withdrawableWelcomeBonus = activeReferralCount >= 20 ? welcomeBonus : 0;
     
     // Total earnings from referrals and bonuses only
     const totalEarnings = referralEarnings + bonusEarnings + withdrawableWelcomeBonus;
@@ -200,8 +206,8 @@ export const getUserWithdrawals = async (req, res, next) => {
         bonusEarnings: user.bonusEarnings || 0,
         welcomeBonus: welcomeBonus,
         withdrawableEarnings: totalEarnings, // Actual earnings that can be withdrawn
-        referralCount,
-        welcomeBonusWithdrawable: referralCount >= 20
+        activeReferralCount,
+        welcomeBonusWithdrawable: activeReferralCount >= 20
       }
     });
   } catch (error) {
@@ -319,11 +325,14 @@ export const processWithdrawal = async (req, res, next) => {
     const multilevelData = await calculateMultilevelReferralEarnings(withdrawal.user._id);
     const referralEarnings = multilevelData.totalEarnings;
     const bonusEarnings = user.bonusEarnings || 0;
-    const referralCount = await User.countDocuments({ referredBy: user._id });
+    const activeReferralCount = await User.countDocuments({ 
+      referredBy: user._id,
+      isActive: true 
+    });
     const welcomeBonusAmount = 4000;
 
-    // Welcome bonus is withdrawable ONLY if user has 20 or more referrals
-    const withdrawableWelcomeBonus = referralCount >= 20 ? welcomeBonusAmount : 0;
+    // Welcome bonus is withdrawable ONLY if user has 20 or more active referrals
+    const withdrawableWelcomeBonus = activeReferralCount >= 20 ? welcomeBonusAmount : 0;
 
     // Include bonus and referral earnings in total earnings
     const totalEarnings = referralEarnings + bonusEarnings + withdrawableWelcomeBonus;

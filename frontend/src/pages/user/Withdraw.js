@@ -82,7 +82,7 @@ export default function Withdraw() {
         bonusEarnings: data.bonusEarnings || 0,
         welcomeBonus: data.welcomeBonus || 0,
         withdrawableEarnings: data.withdrawableEarnings || 0,
-        referralCount: data.referralCount || 0,
+        activeReferralCount: data.activeReferralCount || 0,
         welcomeBonusWithdrawable: data.welcomeBonusWithdrawable || false
       });
       
@@ -199,7 +199,7 @@ export default function Withdraw() {
             value={`RWF ${(balance.welcomeBonus || 0).toLocaleString()}`}
             icon={MonetizationOn}
             color="info"
-            subtitle={balance.welcomeBonusWithdrawable ? "Withdrawable (20+ referrals)" : `Need ${Math.max(20 - (balance.referralCount || 0), 0)} more referrals to withdraw`}
+            subtitle={balance.welcomeBonusWithdrawable ? "Withdrawable (20+ active referrals)" : `Need ${Math.max(20 - (balance.activeReferralCount || 0), 0)} more active referrals to withdraw`}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={2}>

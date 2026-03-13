@@ -94,7 +94,10 @@ export const getUserStats = async (req, res, next) => {
     const videoEarnings = videoPoints;
     const bonusEarnings = user.bonusEarnings || 0;
     const referralEarnings = multilevelData.totalEarnings;
-    const totalEarnings = videoEarnings + photoPoints + bonusEarnings + referralEarnings + (user.welcomeBonusGiven ? welcomeBonus : 0);
+    
+    // Welcome bonus is only included in total earnings if user has 20 or more active referrals
+    const withdrawableWelcomeBonus = (user.welcomeBonusGiven && activeReferrals >= 20) ? welcomeBonus : 0;
+    const totalEarnings = videoEarnings + photoPoints + bonusEarnings + referralEarnings + withdrawableWelcomeBonus;
 
     res.status(200).json({
       success: true,

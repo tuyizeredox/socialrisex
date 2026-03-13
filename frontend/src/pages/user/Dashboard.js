@@ -142,9 +142,9 @@ export default function Dashboard() {
         const currentLevel = calculateLevel(totalPoints);
         const nextLevelThreshold = calculateNextLevelXP(currentLevel);
         
-        // Total earnings is what backend calculated + welcome bonus (if not already included)
-        // Ensure welcome bonus is always added in frontend as requested
+        // Total earnings is what backend calculated (already respects 20+ active referrals rule)
         const totalEarnings = (data.earnings || 0);
+        const activeReferrals = data.activeReferrals || 0;
         
         setStats({
           points: data.points || 0,
@@ -152,9 +152,9 @@ export default function Dashboard() {
           photoPoints: photoEarnings,
           photoShares: data.photoShares || 0,
           welcomeBonus: welcomeBonus,
-          earnings: totalEarnings + welcomeBonus,
+          earnings: totalEarnings,
           referralEarnings: referralEarnings,
-          activeReferrals: data.activeReferrals || 0,
+          activeReferrals: activeReferrals,
           referrals: data.referrals || 0,
           videosWatched: data.videosWatched || 0,
           topRank: data.topRank || 0,
